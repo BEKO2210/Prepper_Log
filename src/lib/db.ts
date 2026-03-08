@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import { version as appVersion } from '../../package.json';
 import type {
   Product,
   StorageLocation,
@@ -117,7 +118,7 @@ export async function exportData(): Promise<string> {
   ]);
 
   const data = {
-    version: '1.0.0',
+    version: appVersion,
     exportedAt: new Date().toISOString(),
     products,
     storageLocations,

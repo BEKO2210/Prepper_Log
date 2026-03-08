@@ -237,10 +237,11 @@ export function ProductForm() {
               </div>
             ) : (
               <div className="flex gap-2">
+                {/* Camera button hidden - to be fixed later */}
                 <button
                   type="button"
                   onClick={handleCameraClick}
-                  className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
+                  className="hidden items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
                 >
                   <Camera size={18} /> Kamera
                 </button>

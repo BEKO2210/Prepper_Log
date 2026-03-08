@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { version as appVersion } from '../../package.json';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, exportExcelXML, importData } from '../lib/db';
 import { requestNotificationPermission, getNotificationPermissionStatus } from '../lib/notifications';
@@ -125,7 +126,7 @@ export function Settings() {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-gray-400">
-                Installiere PrepTrack als App fuer schnelleren Zugriff und Offline-Nutzung.
+                Installiere PrepTrack als App für schnelleren Zugriff und Offline-Nutzung.
               </p>
               <button
                 onClick={handleInstall}
@@ -207,7 +208,7 @@ export function Settings() {
               )}
               {notifStatus === 'unsupported' && (
                 <p className="text-xs text-gray-500">
-                  Nicht in diesem Browser unterstuetzt
+                  Nicht in diesem Browser unterstützt
                 </p>
               )}
             </div>
@@ -286,7 +287,7 @@ export function Settings() {
             <FileJson size={20} className="text-blue-400" />
             <div className="text-left">
               <span>JSON-Backup</span>
-              <p className="text-xs text-gray-500">Vollstaendiges Backup aller Daten</p>
+              <p className="text-xs text-gray-500">Vollständiges Backup aller Daten</p>
             </div>
             <Download size={16} className="ml-auto text-gray-500" />
           </button>
@@ -310,7 +311,7 @@ export function Settings() {
             <FileText size={20} className="text-gray-400" />
             <div className="text-left">
               <span>CSV exportieren</span>
-              <p className="text-xs text-gray-500">Fuer Google Sheets oder Textverarbeitung</p>
+              <p className="text-xs text-gray-500">Für Google Sheets oder Textverarbeitung</p>
             </div>
             <Download size={16} className="ml-auto text-gray-500" />
           </button>
@@ -347,11 +348,11 @@ export function Settings() {
       <section className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-4">
         <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <Heart size={18} className="text-pink-400" />
-          Unterstuetzen
+          Unterstützen
         </h2>
         <p className="mb-3 text-sm text-gray-400">
-          PrepTrack ist kostenlos und werbefrei. Wenn dir die App gefaellt, kannst du die
-          Entwicklung mit einer kleinen Spende unterstuetzen. Danke!
+          PrepTrack ist kostenlos und werbefrei. Wenn dir die App gefällt, kannst du die
+          Entwicklung mit einer kleinen Spende unterstützen. Danke!
         </p>
         <a
           href="https://www.paypal.com/donate?business=renateweinfurtner%40gmx.de&currency_code=EUR&item_name=PrepTrack%20Spende"
@@ -375,7 +376,7 @@ export function Settings() {
         >
           <h2 className="flex items-center gap-2 font-semibold text-gray-200">
             <Shield size={18} className="text-green-400" />
-            Datenschutzerklaerung
+            Datenschutzerklärung
           </h2>
           {showDatenschutz ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
@@ -391,22 +392,22 @@ export function Settings() {
 
             <p className="font-medium text-gray-300">1. Datenverarbeitung</p>
             <p>
-              PrepTrack speichert alle Daten ausschliesslich lokal auf deinem Geraet
+              PrepTrack speichert alle Daten ausschließlich lokal auf deinem Gerät
               (IndexedDB im Browser). Es werden keine personenbezogenen Daten an Server
-              uebertragen oder in einer Cloud gespeichert.
+              übertragen oder in einer Cloud gespeichert.
             </p>
 
             <p className="font-medium text-gray-300">2. Externe Dienste</p>
             <p>
               Beim Barcode-Scan wird die Open Food Facts API (world.openfoodfacts.org)
               kontaktiert, um Produktinformationen abzurufen. Dabei wird lediglich der
-              gescannte Barcode uebermittelt. Open Food Facts ist ein gemeinnuetziges
+              gescannte Barcode übermittelt. Open Food Facts ist ein gemeinnütziges
               Open-Data-Projekt.
             </p>
 
             <p className="font-medium text-gray-300">3. Benachrichtigungen</p>
             <p>
-              Wenn du Benachrichtigungen aktivierst, werden diese lokal auf deinem Geraet
+              Wenn du Benachrichtigungen aktivierst, werden diese lokal auf deinem Gerät
               erzeugt. Es werden keine Push-Tokens oder Daten an externe Server gesendet.
             </p>
 
@@ -419,8 +420,8 @@ export function Settings() {
             <p className="font-medium text-gray-300">5. Deine Rechte</p>
             <p>
               Da alle Daten lokal gespeichert werden, hast du jederzeit volle Kontrolle.
-              Du kannst deine Daten ueber die Export-Funktion sichern und ueber die
-              Browser-Einstellungen (Website-Daten loeschen) vollstaendig entfernen.
+              Du kannst deine Daten über die Export-Funktion sichern und über die
+              Browser-Einstellungen (Website-Daten löschen) vollständig entfernen.
             </p>
           </div>
         )}
@@ -434,7 +435,7 @@ export function Settings() {
         >
           <h2 className="flex items-center gap-2 font-semibold text-gray-200">
             <FileText size={18} className="text-blue-400" />
-            Allgemeine Geschaeftsbedingungen
+            Allgemeine Geschäftsbedingungen
           </h2>
           {showAGB ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
@@ -450,39 +451,39 @@ export function Settings() {
 
             <p className="font-medium text-gray-300">1. Geltungsbereich</p>
             <p>
-              Diese AGB gelten fuer die Nutzung der Web-App &quot;PrepTrack&quot;.
+              Diese AGB gelten für die Nutzung der Web-App &quot;PrepTrack&quot;.
               Mit der Nutzung der App akzeptierst du diese Bedingungen.
             </p>
 
             <p className="font-medium text-gray-300">2. Leistungsbeschreibung</p>
             <p>
               PrepTrack ist eine kostenlose, werbefreie Progressive Web App zur Verwaltung
-              von Vorratsbestaenden. Die App funktioniert offline und speichert alle Daten
-              lokal auf dem Endgeraet des Nutzers.
+              von Vorratsbeständen. Die App funktioniert offline und speichert alle Daten
+              lokal auf dem Endgerät des Nutzers.
             </p>
 
-            <p className="font-medium text-gray-300">3. Verfuegbarkeit</p>
+            <p className="font-medium text-gray-300">3. Verfügbarkeit</p>
             <p>
-              Ein Anspruch auf staendige Verfuegbarkeit besteht nicht. Die App kann jederzeit
-              ohne Ankuendigung geaendert oder eingestellt werden.
+              Ein Anspruch auf ständige Verfügbarkeit besteht nicht. Die App kann jederzeit
+              ohne Ankündigung geändert oder eingestellt werden.
             </p>
 
             <p className="font-medium text-gray-300">4. Haftung</p>
             <p>
-              Die Nutzung erfolgt auf eigene Verantwortung. Der Anbieter haftet nicht fuer
-              Schaeden, die durch die Nutzung der App entstehen, insbesondere nicht fuer den
-              Verlust von Daten. Regelmaessige Backups werden empfohlen.
+              Die Nutzung erfolgt auf eigene Verantwortung. Der Anbieter haftet nicht für
+              Schäden, die durch die Nutzung der App entstehen, insbesondere nicht für den
+              Verlust von Daten. Regelmäßige Backups werden empfohlen.
             </p>
 
             <p className="font-medium text-gray-300">5. Geistiges Eigentum</p>
             <p>
               Alle Rechte an der App liegen beim Anbieter.
-              Die App darf fuer den persoenlichen Gebrauch frei genutzt werden.
+              Die App darf für den persönlichen Gebrauch frei genutzt werden.
             </p>
 
             <p className="font-medium text-gray-300">6. Spenden</p>
             <p>
-              Spenden sind freiwillig und begruenden kein Vertragsverhaeltnis.
+              Spenden sind freiwillig und begründen kein Vertragsverhältnis.
               Es besteht kein Anspruch auf besondere Leistungen.
             </p>
           </div>
@@ -491,7 +492,7 @@ export function Settings() {
 
       {/* App Info */}
       <section className="space-y-1 text-center text-xs text-gray-600">
-        <p>PrepTrack v1.0.0</p>
+        <p>PrepTrack v{appVersion}</p>
         <p>Dein Vorrat. Immer im Blick.</p>
         <p>&copy; {new Date().getFullYear()} Belkis Aslani</p>
       </section>
