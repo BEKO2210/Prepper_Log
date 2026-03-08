@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { getExpiryStatus, computeStats } from '../lib/utils';
-import { CATEGORY_LABELS, type ProductCategory } from '../types';
+import { CATEGORY_LABELS } from '../types';
 import { BarChart3, TrendingUp, Package, Calendar } from 'lucide-react';
 
 export function Statistics() {
