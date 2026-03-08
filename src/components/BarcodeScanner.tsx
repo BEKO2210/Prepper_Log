@@ -158,10 +158,11 @@ export function BarcodeScanner() {
           </div>
         )}
 
-        {/* Scan overlay with darkened surround */}
+        {/* Scan overlay with darkened surround + animated scan line */}
         {cameraActive && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="h-1/3 w-3/4 rounded-lg border-2 border-green-400/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]" />
+            <div className="scan-line" />
           </div>
         )}
       </div>

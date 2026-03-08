@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: './',
+  base: process.env.GITHUB_PAGES ? '/Prepper_Log/' : './',
   plugins: [
     react(),
     VitePWA({
@@ -35,6 +35,16 @@ export default defineConfig({
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.bunny\.net\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: {
+                maxAgeSeconds: 60 * 60 * 24 * 365,
               },
             },
           },
