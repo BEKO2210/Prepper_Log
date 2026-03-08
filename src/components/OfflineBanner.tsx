@@ -16,7 +16,7 @@ export function OfflineBanner() {
         >
           <div className="flex items-center justify-center gap-2 px-4 py-2">
             <WifiOff size={16} />
-            <span>Offline-Modus — Daten werden lokal gespeichert</span>
+            <span>Offline — alles funktioniert weiterhin lokal</span>
           </div>
         </motion.div>
       )}

@@ -22,6 +22,14 @@ export class PrepTrackDB extends Dexie {
       consumptionLogs: '++id, productId, consumedAt',
       notificationSchedules: '++id, productId, notifyAt, sent',
     });
+
+    this.version(2).stores({
+      products:
+        '++id, name, barcode, category, storageLocation, expiryDate, archived, createdAt',
+      storageLocations: '++id, name',
+      consumptionLogs: '++id, productId, consumedAt',
+      notificationSchedules: '++id, productId, notifyAt, sent, [productId+daysBefore]',
+    });
   }
 }
 

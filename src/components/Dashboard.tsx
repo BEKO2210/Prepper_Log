@@ -8,9 +8,7 @@ import {
   AlertCircle,
   Clock,
   CheckCircle,
-  TrendingDown,
-  MapPin,
-  Layers,
+  ScanBarcode,
 } from 'lucide-react';
 
 export function Dashboard() {
@@ -25,38 +23,44 @@ export function Dashboard() {
     .sort((a, b) => a.daysLeft - b.daysLeft)
     .slice(0, 8);
 
-  const statCards = [
-    { label: 'Gesamt', value: stats.totalProducts, icon: Package, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    { label: 'Abgelaufen', value: stats.expiredCount, icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
-    { label: 'Kritisch', value: stats.criticalCount, icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-400/10' },
-    { label: 'Warnung', value: stats.warningCount, icon: Clock, color: 'text-orange-400', bg: 'bg-orange-400/10' },
-    { label: 'OK', value: stats.goodCount, icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
-    { label: 'Unterbestand', value: stats.lowStockCount, icon: TrendingDown, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-    { label: 'Kategorien', value: stats.totalCategories, icon: Layers, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-    { label: 'Lagerorte', value: stats.totalLocations, icon: MapPin, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
+  const ampelCards = [
+    { label: 'Abgelaufen', value: stats.expiredCount, icon: AlertCircle, color: 'text-red-500' },
+    { label: 'Kritisch', value: stats.criticalCount, icon: AlertTriangle, color: 'text-red-400' },
+    { label: 'Warnung', value: stats.warningCount, icon: Clock, color: 'text-orange-400' },
+    { label: 'OK', value: stats.goodCount, icon: CheckCircle, color: 'text-green-400' },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-100">Dashboard</h1>
-        <p className="text-sm text-gray-400">Dein Vorrat. Immer im Blick.</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {statCards.map(({ label, value, icon: Icon, color, bg }) => (
-          <div
-            key={label}
-            className={`rounded-xl border border-primary-700 ${bg} p-3`}
-          >
-            <div className="flex items-center gap-2">
-              <Icon size={18} className={color} />
-              <span className="text-xs text-gray-400">{label}</span>
+      {/* Ampel Stats */}
+      <div className="grid grid-cols-4 gap-px overflow-hidden rounded-xl border border-primary-700 bg-primary-700">
+        {ampelCards.map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="bg-primary-800 p-3 text-center">
+            <p className={`font-display text-3xl leading-none ${color}`}>{value}</p>
+            <div className="mt-1 flex items-center justify-center gap-1">
+              <Icon size={10} className={color} />
+              <span className="text-[0.65rem] text-gray-500">{label}</span>
             </div>
-            <p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Secondary stats */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-lg border border-primary-700 bg-primary-800/60 p-3 text-center">
+          <p className="font-display text-2xl text-gray-200">{stats.totalProducts}</p>
+          <span className="text-[0.65rem] text-gray-500">Gesamt</span>
+        </div>
+        <div className="rounded-lg border border-primary-700 bg-primary-800/60 p-3 text-center">
+          <p className={`font-display text-2xl ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-200'}`}>
+            {stats.lowStockCount}
+          </p>
+          <span className="text-[0.65rem] text-gray-500">Unterbestand</span>
+        </div>
+        <div className="rounded-lg border border-primary-700 bg-primary-800/60 p-3 text-center">
+          <p className="font-display text-2xl text-gray-200">{stats.totalLocations}</p>
+          <span className="text-[0.65rem] text-gray-500">Lagerorte</span>
+        </div>
       </div>
 
       {/* Urgent Products */}
@@ -73,12 +77,12 @@ export function Dashboard() {
           </div>
           <div className="space-y-2">
             {urgentProducts.map((product) => {
-              const statusColors: Record<string, string> = {
-                expired: 'border-red-500/40 bg-red-500/5',
-                critical: 'border-red-400/40 bg-red-400/5',
-                warning: 'border-orange-400/40 bg-orange-400/5',
-                soon: 'border-yellow-400/40 bg-yellow-400/5',
-                good: 'border-green-400/40 bg-green-400/5',
+              const borderColors: Record<string, string> = {
+                expired: 'border-l-red-500',
+                critical: 'border-l-red-400',
+                warning: 'border-l-orange-400',
+                soon: 'border-l-yellow-400',
+                good: 'border-l-green-400',
               };
               const textColors: Record<string, string> = {
                 expired: 'text-red-400',
@@ -90,19 +94,19 @@ export function Dashboard() {
               return (
                 <div
                   key={product.id}
-                  className={`flex items-center justify-between rounded-lg border p-3 ${statusColors[product.status]}`}
+                  className={`flex items-center justify-between border-l-4 ${borderColors[product.status]} rounded-r-lg border border-primary-700 bg-primary-800/60 p-3`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-gray-200">
                       {product.name}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-500">
                       {product.storageLocation} &middot;{' '}
                       {formatDate(product.expiryDate, product.expiryPrecision)}
                     </p>
                   </div>
                   <span
-                    className={`shrink-0 text-sm font-semibold ${textColors[product.status]}`}
+                    className={`shrink-0 font-mono text-sm font-bold ${textColors[product.status]}`}
                   >
                     {formatDaysUntil(product.daysLeft)}
                   </span>
@@ -115,17 +119,26 @@ export function Dashboard() {
 
       {products.filter((p) => !p.archived).length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary-600 py-16 text-center">
-          <Package size={48} className="mb-3 text-gray-600" />
-          <p className="text-lg font-medium text-gray-400">Noch keine Produkte</p>
+          <Package size={48} className="mb-3 text-primary-600" />
+          <p className="text-lg font-medium text-gray-300">Noch leer.</p>
           <p className="mt-1 text-sm text-gray-500">
-            Füge dein erstes Produkt hinzu oder scanne einen Barcode.
+            Leg los mit dem ersten Scan oder erfasse ein Produkt manuell.
           </p>
-          <button
-            onClick={() => setPage('add')}
-            className="mt-4 rounded-lg bg-green-600 px-6 py-2 font-medium text-white hover:bg-green-500"
-          >
-            Produkt hinzufügen
-          </button>
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={() => setPage('scanner')}
+              className="flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
+            >
+              <ScanBarcode size={18} />
+              Barcode scannen
+            </button>
+            <button
+              onClick={() => setPage('add')}
+              className="rounded-lg border border-primary-600 px-5 py-2 font-medium text-gray-300 hover:bg-primary-700"
+            >
+              Manuell erfassen
+            </button>
+          </div>
         </div>
       )}
     </div>

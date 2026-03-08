@@ -63,7 +63,7 @@ export function Settings() {
     try {
       const text = await file.text();
       const count = await importData(text);
-      setImportStatus(`${count} Produkte erfolgreich importiert.`);
+      setImportStatus(`${count} Produkte importiert.`);
     } catch (err) {
       setImportStatus(`Fehler: ${err instanceof Error ? err.message : 'Import fehlgeschlagen'}`);
     }
@@ -93,7 +93,7 @@ export function Settings() {
               <Sun size={20} className="text-yellow-400" />
             )}
             <span className="text-gray-200">
-              {isDark ? 'Dark Mode' : 'Light Mode'}
+              {isDark ? 'Dunkles Design' : 'Helles Design'}
             </span>
           </div>
           <div

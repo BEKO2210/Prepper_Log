@@ -24,6 +24,14 @@ import {
 import { useState } from 'react';
 import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
 
+const BORDER_COLORS: Record<string, string> = {
+  expired: 'border-l-red-500',
+  critical: 'border-l-red-400',
+  warning: 'border-l-orange-400',
+  soon: 'border-l-yellow-400',
+  good: 'border-l-green-400',
+};
+
 export function ProductList() {
   const { filters, setFilter, resetFilters, setEditingProductId } = useAppStore();
   const [showFilters, setShowFilters] = useState(false);
@@ -115,7 +123,7 @@ export function ProductList() {
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
             type="text"
-            placeholder="Suchen..."
+            placeholder="Name oder Barcode..."
             value={filters.search}
             onChange={(e) => setFilter('search', e.target.value)}
             className="w-full rounded-lg border border-primary-600 bg-primary-800 py-2 pl-10 pr-4 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
@@ -130,7 +138,7 @@ export function ProductList() {
           }`}
         >
           <Filter size={18} />
-          <ChevronDown size={14} className={showFilters ? 'rotate-180' : ''} />
+          <ChevronDown size={14} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
         </button>
       </div>
 
@@ -180,8 +188,8 @@ export function ProductList() {
             >
               <option value="">Alle Status</option>
               <option value="expired">Abgelaufen</option>
-              <option value="critical">Kritisch (≤7 Tage)</option>
-              <option value="warning">Warnung (≤30 Tage)</option>
+              <option value="critical">Kritisch (&le;7 Tage)</option>
+              <option value="warning">Warnung (&le;30 Tage)</option>
               <option value="good">OK (&gt;30 Tage)</option>
             </select>
           </div>
@@ -198,18 +206,19 @@ export function ProductList() {
         {filtered.map((product) => (
           <div
             key={product.id}
-            className="rounded-xl border border-primary-700 bg-primary-800/60 p-3"
+            className={`border-l-4 ${BORDER_COLORS[product.status]} rounded-r-lg border border-primary-700 bg-primary-800/60 p-3`}
           >
             <div className="flex items-start gap-3">
               {product.photo ? (
                 <img
                   src={product.photo}
-                  alt={product.name}
+                  alt=""
+                  loading="lazy"
                   className="h-14 w-14 shrink-0 rounded-lg object-cover"
                 />
               ) : (
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary-700">
-                  <Package size={24} className="text-gray-500" />
+                  <Package size={24} className="text-gray-600" />
                 </div>
               )}
 
@@ -219,7 +228,7 @@ export function ProductList() {
                     <p className="truncate font-medium text-gray-200">
                       {product.name}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-500">
                       {CATEGORY_LABELS[product.category as ProductCategory] ?? product.category} &middot;{' '}
                       {product.storageLocation}
                     </p>
@@ -235,11 +244,10 @@ export function ProductList() {
 
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
                   <span>
-                    MHD: {formatDate(product.expiryDate, product.expiryPrecision)} (
-                    {formatDaysUntil(product.daysLeft)})
+                    MHD: {formatDate(product.expiryDate, product.expiryPrecision)} ({formatDaysUntil(product.daysLeft)})
                   </span>
                   <span>
-                    Menge: {product.quantity} {product.unit}
+                    {product.quantity} {product.unit}
                   </span>
                   {product.minStock && product.quantity < product.minStock && (
                     <span className="text-yellow-400">
@@ -287,13 +295,13 @@ export function ProductList() {
             {/* Delete Confirmation */}
             {confirmDelete === product.id && (
               <div className="mt-2 flex items-center justify-between rounded-lg border border-red-500/30 bg-red-500/10 p-2">
-                <span className="text-sm text-red-400">Wirklich löschen?</span>
+                <span className="text-sm text-red-400">Wirklich löschen? Nicht rückgängig machbar.</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleDelete(product.id!)}
                     className="rounded bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500"
                   >
-                    Ja, löschen
+                    Löschen
                   </button>
                   <button
                     onClick={() => setConfirmDelete(null)}
@@ -310,7 +318,13 @@ export function ProductList() {
         {filtered.length === 0 && (
           <div className="py-12 text-center text-gray-500">
             <Package size={40} className="mx-auto mb-2 text-gray-600" />
-            <p>Keine Produkte gefunden</p>
+            {hasActiveFilters ? (
+              <p>Kein Treffer für diese Filter.</p>
+            ) : showArchived ? (
+              <p>Archiv ist leer.</p>
+            ) : (
+              <p>Noch keine Produkte erfasst.</p>
+            )}
           </div>
         )}
       </div>

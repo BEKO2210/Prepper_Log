@@ -9,6 +9,12 @@ interface FilterState {
   status: string;
 }
 
+export interface ScannedData {
+  barcode: string;
+  name?: string;
+  imageUrl?: string;
+}
+
 interface AppState {
   currentPage: Page;
   setPage: (page: Page) => void;
@@ -17,6 +23,9 @@ interface AppState {
   resetFilters: () => void;
   editingProductId: number | null;
   setEditingProductId: (id: number | null) => void;
+  scannedData: ScannedData | null;
+  setScannedData: (data: ScannedData | null) => void;
+  navigateToAddWithScan: (data: ScannedData) => void;
   notificationsEnabled: boolean;
   setNotificationsEnabled: (enabled: boolean) => void;
 }
@@ -40,6 +49,10 @@ export const useAppStore = create<AppState>((set) => ({
   editingProductId: null,
   setEditingProductId: (id) =>
     set({ editingProductId: id, currentPage: id ? 'add' : 'products' }),
+  scannedData: null,
+  setScannedData: (data) => set({ scannedData: data }),
+  navigateToAddWithScan: (data) =>
+    set({ scannedData: data, currentPage: 'add', editingProductId: null }),
   notificationsEnabled: Notification.permission === 'granted',
   setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
 }));
