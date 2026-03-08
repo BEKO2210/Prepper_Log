@@ -16,10 +16,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="PrepTrack" />
-    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="./icons/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192x192.png" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -40,6 +41,19 @@
     <link rel="preconnect" href="https://world.openfoodfacts.org" />
   </head>
   <body class="bg-primary-900 text-gray-100 antialiased">
+    <script>
+      // Apply dark mode synchronously before React renders to prevent flash
+      (function() {
+        var stored = localStorage.getItem('preptrack-dark-mode');
+        if (stored === 'false') {
+          document.documentElement.classList.remove('dark');
+        } else if (stored === null) {
+          if (!window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
