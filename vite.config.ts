@@ -117,22 +117,6 @@ export default defineConfig({
             purpose: 'maskable',
           },
         ],
-        screenshots: [
-          {
-            src: 'screenshots/screenshot-mobile.png',
-            sizes: '390x844',
-            type: 'image/png',
-            form_factor: 'narrow',
-            label: 'PrepTrack Dashboard — Mobilansicht',
-          },
-          {
-            src: 'screenshots/screenshot-desktop.png',
-            sizes: '1280x720',
-            type: 'image/png',
-            form_factor: 'wide',
-            label: 'PrepTrack Dashboard — Desktopansicht',
-          },
-        ],
       },
     }),
   ],
