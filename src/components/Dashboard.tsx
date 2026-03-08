@@ -3,12 +3,9 @@ import { db } from '../lib/db';
 import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDaysUntil } from '../lib/utils';
 import { useAppStore } from '../store/useAppStore';
 import { CATEGORY_LABELS } from '../types';
+import { StatRing } from './StatRing';
 import {
   Package,
-  AlertTriangle,
-  AlertCircle,
-  Clock,
-  CheckCircle,
   ScanBarcode,
   PlusCircle,
   TrendingDown,
@@ -40,13 +37,12 @@ export function Dashboard() {
     .slice(0, 4);
 
   const total = Math.max(stats.totalProducts, 1);
-  const goodPct = Math.round((stats.goodCount / total) * 100);
 
   // Empty state
   if (activeProducts.length === 0) {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-800 border border-primary-700">
+        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-primary-700 bg-primary-800">
           <Package size={40} className="text-primary-600" />
         </div>
         <p className="mt-5 text-xl font-semibold text-gray-200">Noch keine Vorraete</p>
@@ -75,43 +71,33 @@ export function Dashboard() {
 
   return (
     <div className="space-y-5 pb-4">
-      {/* Hero: Total + Ring */}
-      <div className="flex items-center gap-5 rounded-2xl border border-primary-700 bg-primary-800/60 p-5">
-        {/* SVG ring */}
-        <div className="relative h-24 w-24 shrink-0">
-          <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="8" className="text-primary-700" />
-            <circle
-              cx="50" cy="50" r="42" fill="none"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 42}`}
-              strokeDashoffset={`${2 * Math.PI * 42 * (1 - goodPct / 100)}`}
-              className="text-green-500 transition-all duration-700"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-bold text-green-400">{goodPct}%</span>
-            <span className="text-[0.6rem] text-gray-500">OK</span>
-          </div>
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-3xl font-bold text-gray-100">{stats.totalProducts}</p>
-          <p className="text-sm text-gray-500">Produkte im Vorrat</p>
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-            {stats.expiredCount > 0 && (
-              <span className="text-red-400">{stats.expiredCount} abgelaufen</span>
-            )}
-            {stats.criticalCount > 0 && (
-              <span className="text-red-400">{stats.criticalCount} kritisch</span>
-            )}
-            {stats.warningCount > 0 && (
-              <span className="text-orange-400">{stats.warningCount} Warnung</span>
-            )}
-            {stats.lowStockCount > 0 && (
-              <span className="text-yellow-400">{stats.lowStockCount} Unterbestand</span>
-            )}
-          </div>
+      {/* Stat Rings */}
+      <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-5">
+        <div className="flex items-center justify-around">
+          <StatRing
+            value={stats.expiredCount + stats.criticalCount}
+            max={total}
+            label="Kritisch"
+            color="#ef4444"
+          />
+          <StatRing
+            value={stats.warningCount + stats.soonCount}
+            max={total}
+            label="Bald"
+            color="#f97316"
+          />
+          <StatRing
+            value={stats.goodCount}
+            max={total}
+            label="Gut"
+            color="#22c55e"
+          />
+          <StatRing
+            value={stats.totalProducts}
+            max={stats.totalProducts}
+            label="Gesamt"
+            color="#9ca3af"
+          />
         </div>
       </div>
 
@@ -143,12 +129,11 @@ export function Dashboard() {
         </button>
       </div>
 
-      {/* Status Ampel Bar */}
-      <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-        <h2 className="mb-3 text-sm font-semibold text-gray-400 uppercase tracking-wide">MHD-Status</h2>
-        {/* Visual bar */}
-        {stats.totalProducts > 0 && (
-          <div className="mb-3 flex h-3 overflow-hidden rounded-full bg-primary-700">
+      {/* Status bar */}
+      {stats.totalProducts > 0 && (
+        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">MHD-Verteilung</h2>
+          <div className="mb-2 flex h-3 overflow-hidden rounded-full bg-primary-700">
             {stats.expiredCount > 0 && (
               <div className="bg-red-500 transition-all" style={{ width: `${(stats.expiredCount / total) * 100}%` }} />
             )}
@@ -165,30 +150,19 @@ export function Dashboard() {
               <div className="bg-green-500 transition-all" style={{ width: `${(stats.goodCount / total) * 100}%` }} />
             )}
           </div>
-        )}
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { label: 'Abgelaufen', value: stats.expiredCount, icon: AlertCircle, color: 'text-red-500' },
-            { label: 'Kritisch', value: stats.criticalCount, icon: AlertTriangle, color: 'text-red-400' },
-            { label: 'Warnung', value: stats.warningCount + stats.soonCount, icon: Clock, color: 'text-orange-400' },
-            { label: 'OK', value: stats.goodCount, icon: CheckCircle, color: 'text-green-400' },
-          ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Icon size={12} className={color} />
-                <span className={`text-lg font-bold ${color}`}>{value}</span>
-              </div>
-              <p className="text-[0.6rem] text-gray-500">{label}</p>
-            </div>
-          ))}
+          <div className="flex justify-between text-[0.6rem] text-gray-500">
+            <span>{stats.expiredCount} abgelaufen</span>
+            <span>{stats.warningCount + stats.soonCount} Warnung</span>
+            <span>{stats.goodCount} OK</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Urgent Products */}
       {urgentProducts.length > 0 && (
         <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Dringend</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">Dringend</h2>
             <button
               onClick={() => setPage('products')}
               className="flex items-center gap-0.5 text-xs text-green-400 hover:text-green-300"
@@ -226,9 +200,7 @@ export function Dashboard() {
                       {formatDate(product.expiryDate, product.expiryPrecision)}
                     </p>
                   </div>
-                  <span
-                    className={`shrink-0 text-xs font-bold ${textColors[product.status]}`}
-                  >
+                  <span className={`shrink-0 text-xs font-bold ${textColors[product.status]}`}>
                     {formatDaysUntil(product.daysLeft)}
                   </span>
                 </div>
@@ -240,10 +212,9 @@ export function Dashboard() {
 
       {/* Category + Stats row */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Categories */}
         {categoryBreakdown.length > 0 && (
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-            <h2 className="mb-2 text-[0.65rem] font-semibold text-gray-500 uppercase tracking-wide">Kategorien</h2>
+            <h2 className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Kategorien</h2>
             <div className="space-y-1.5">
               {categoryBreakdown.map(({ key, label, count }) => (
                 <div key={key} className="flex items-center justify-between">
@@ -254,21 +225,19 @@ export function Dashboard() {
             </div>
           </div>
         )}
-
-        {/* Quick numbers */}
         <div className="space-y-3">
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
             <div className="flex items-center gap-2">
               <TrendingDown size={14} className="text-yellow-400" />
-              <span className="text-[0.65rem] font-semibold text-gray-500 uppercase tracking-wide">Unterbestand</span>
+              <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Unterbestand</span>
             </div>
-            <p className={`mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}>
+            <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}>
               {stats.lowStockCount}
             </p>
           </div>
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-            <span className="text-[0.65rem] font-semibold text-gray-500 uppercase tracking-wide">Lagerorte</span>
-            <p className="mt-1 text-2xl font-bold text-gray-300">{stats.totalLocations}</p>
+            <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Lagerorte</span>
+            <p className="stat-number mt-1 text-2xl font-bold text-gray-300">{stats.totalLocations}</p>
           </div>
         </div>
       </div>

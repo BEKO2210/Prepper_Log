@@ -9,6 +9,7 @@ import {
   type Product,
   type ProductCategory,
 } from '../types';
+import { ImageCaptureModal } from './ImageCaptureModal';
 import { Camera, Upload, X, Save, ArrowLeft } from 'lucide-react';
 
 export function ProductForm() {
@@ -48,6 +49,7 @@ export function ProductForm() {
   });
 
   const [saving, setSaving] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
 
   // Populate form when editing
   useEffect(() => {
@@ -91,39 +93,8 @@ export function ProductForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function handlePhoto(source: 'camera' | 'gallery') {
-    if (source === 'camera') {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' },
-        });
-
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.setAttribute('playsinline', 'true');
-        await video.play();
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(video, 0, 0);
-
-        stream.getTracks().forEach((t) => t.stop());
-
-        const blob = await new Promise<Blob>((resolve) =>
-          canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.8)
-        );
-        const compressed = await compressImage(blob);
-        updateField('photo', compressed);
-      } catch {
-        fileInputRef.current?.click();
-      }
-    } else {
-      fileInputRef.current?.click();
-    }
+  function handleCameraCapture(base64: string) {
+    updateField('photo', base64);
   }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -212,14 +183,14 @@ export function ProductForm() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => handlePhoto('camera')}
+                  onClick={() => setShowCamera(true)}
                   className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
                 >
                   <Camera size={18} /> Kamera
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePhoto('gallery')}
+                  onClick={() => fileInputRef.current?.click()}
                   className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
                 >
                   <Upload size={18} /> Galerie
@@ -409,6 +380,12 @@ export function ProductForm() {
               : 'Produkt speichern'}
         </button>
       </form>
+
+      <ImageCaptureModal
+        isOpen={showCamera}
+        onCapture={handleCameraCapture}
+        onClose={() => setShowCamera(false)}
+      />
     </div>
   );
 }

@@ -185,10 +185,19 @@ export async function compressImage(
 export async function lookupBarcode(
   barcode: string
 ): Promise<{ name: string; category?: string; imageUrl?: string } | null> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 4000);
+
   try {
     const response = await fetch(
-      `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`
+      `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}?fields=product_name,product_name_de,brands,categories,image_front_url,quantity&lc=de`,
+      {
+        signal: controller.signal,
+        headers: { Accept: 'application/json' },
+      }
     );
+    clearTimeout(timeoutId);
+
     if (!response.ok) return null;
 
     const data = await response.json();
@@ -202,9 +211,10 @@ export async function lookupBarcode(
         product.brands ||
         'Unbekanntes Produkt',
       category: product.categories,
-      imageUrl: product.image_url,
+      imageUrl: product.image_front_url || undefined,
     };
   } catch {
+    clearTimeout(timeoutId);
     return null;
   }
 }
