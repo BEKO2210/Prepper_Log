@@ -15,7 +15,7 @@ export function registerSWEventHandlers(): void {
             navigator.serviceWorker.controller
           ) {
             // New service worker available — notify user
-            console.log('[PrepTrack] Neues Update verfügbar. Seite neu laden.');
+            if (import.meta.env.DEV) console.log('[PrepTrack] Neues Update verfügbar. Seite neu laden.');
           }
         });
       });
@@ -23,7 +23,7 @@ export function registerSWEventHandlers(): void {
 
     // Handle controller change (after skip waiting)
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('[PrepTrack] Service Worker aktualisiert.');
+      if (import.meta.env.DEV) console.log('[PrepTrack] Service Worker aktualisiert.');
     });
   }
 }
