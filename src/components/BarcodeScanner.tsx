@@ -25,13 +25,19 @@ type ScanState =
   | { type: 'error'; message: string }
   | { type: 'saved'; name: string };
 
+function vibrate(pattern: number | number[]) {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(pattern);
+  }
+}
+
 export function BarcodeScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const [state, setState] = useState<ScanState>({ type: 'idle' });
   const [cameraActive, setCameraActive] = useState(false);
   const isOnline = useOnlineStatus();
-  const { setPage } = useAppStore();
+  const { navigateToAddWithScan } = useAppStore();
 
   const stopCamera = useCallback(() => {
     if (videoRef.current?.srcObject) {
@@ -58,7 +64,7 @@ export function BarcodeScanner() {
 
       const deviceId = backCamera?.deviceId || devices[0]?.deviceId;
       if (!deviceId) {
-        setState({ type: 'error', message: 'Keine Kamera gefunden' });
+        setState({ type: 'error', message: 'Keine Kamera gefunden.' });
         return;
       }
 
@@ -69,6 +75,7 @@ export function BarcodeScanner() {
           if (result) {
             const barcode = result.getText();
             stopCamera();
+            vibrate(100);
 
             if (!isOnline) {
               setState({ type: 'offline', barcode });
@@ -96,7 +103,7 @@ export function BarcodeScanner() {
     } catch (err) {
       const message =
         err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'Kamerazugriff verweigert. Bitte erlaube den Zugriff in den Browser-Einstellungen.'
+          ? 'Kein Kamera-Zugriff. Bitte in den Browser-Einstellungen erlauben.'
           : 'Kamera konnte nicht gestartet werden.';
       setState({ type: 'error', message });
     }
@@ -127,7 +134,12 @@ export function BarcodeScanner() {
       updatedAt: now,
     });
 
+    vibrate([50, 50, 100]);
     setState({ type: 'saved', name });
+  }
+
+  function goToFormWithData(barcode: string, name?: string) {
+    navigateToAddWithScan({ barcode, name });
   }
 
   function reset() {
@@ -136,9 +148,9 @@ export function BarcodeScanner() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-100">Barcode Scanner</h1>
+      <h1 className="text-2xl font-bold text-gray-100">Barcode scannen</h1>
       <p className="text-sm text-gray-400">
-        Scanne einen Barcode, um Produktinformationen automatisch zu laden.
+        Kamera auf den Barcode halten — Produkt wird automatisch erkannt.
       </p>
 
       {/* Camera View */}
@@ -155,10 +167,10 @@ export function BarcodeScanner() {
           </div>
         )}
 
-        {/* Scan overlay */}
+        {/* Scan overlay with darkened surround */}
         {cameraActive && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-1/3 w-3/4 rounded-lg border-2 border-green-400/60" />
+            <div className="h-1/3 w-3/4 rounded-lg border-2 border-green-400/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]" />
           </div>
         )}
       </div>
@@ -167,7 +179,7 @@ export function BarcodeScanner() {
       {state.type === 'idle' && (
         <button
           onClick={startCamera}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
         >
           <Camera size={20} />
           Kamera starten
@@ -188,7 +200,7 @@ export function BarcodeScanner() {
         <div className="flex items-center justify-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-6 py-3">
           <Loader2 size={20} className="animate-spin text-blue-400" />
           <span className="text-gray-300">
-            Suche Produkt für {state.barcode}...
+            Lade Produktdaten für {state.barcode}...
           </span>
         </div>
       )}
@@ -198,7 +210,7 @@ export function BarcodeScanner() {
           <div className="flex items-start gap-3">
             <CheckCircle size={24} className="shrink-0 text-green-400" />
             <div>
-              <p className="font-medium text-green-300">Produkt erkannt!</p>
+              <p className="font-medium text-green-300">Produkt erkannt</p>
               <p className="mt-1 text-lg text-gray-200">{state.name}</p>
               <p className="text-sm text-gray-400">Barcode: {state.barcode}</p>
             </div>
@@ -206,14 +218,12 @@ export function BarcodeScanner() {
           <div className="flex gap-2">
             <button
               onClick={() => saveFoundProduct(state.name, state.barcode)}
-              className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
+              className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
             >
               Schnell speichern
             </button>
             <button
-              onClick={() => {
-                setPage('add');
-              }}
+              onClick={() => goToFormWithData(state.barcode, state.name)}
               className="flex-1 rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-400 hover:bg-green-600/10"
             >
               Details bearbeiten
@@ -223,7 +233,7 @@ export function BarcodeScanner() {
             onClick={reset}
             className="w-full text-sm text-gray-400 hover:text-gray-300"
           >
-            Neuen Scan starten
+            Nochmal scannen
           </button>
         </div>
       )}
@@ -234,13 +244,13 @@ export function BarcodeScanner() {
             <AlertCircle size={24} className="shrink-0 text-orange-400" />
             <div>
               <p className="font-medium text-orange-300">
-                Produkt nicht in der Datenbank
+                Nicht in der Datenbank
               </p>
               <p className="text-sm text-gray-400">Barcode: {state.barcode}</p>
             </div>
           </div>
           <button
-            onClick={() => setPage('add')}
+            onClick={() => goToFormWithData(state.barcode)}
             className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
           >
             Manuell erfassen
@@ -249,7 +259,7 @@ export function BarcodeScanner() {
             onClick={reset}
             className="w-full text-sm text-gray-400 hover:text-gray-300"
           >
-            Neuen Scan starten
+            Nochmal scannen
           </button>
         </div>
       )}
@@ -261,22 +271,21 @@ export function BarcodeScanner() {
             <div>
               <p className="font-medium text-orange-300">Offline</p>
               <p className="text-sm text-gray-400">
-                Barcode {state.barcode} erkannt, aber die Produktdatenbank ist
-                offline nicht verfügbar.
+                Barcode {state.barcode} erkannt — Produktdatenbank ohne Internet nicht verfügbar.
               </p>
             </div>
           </div>
           <button
-            onClick={() => setPage('add')}
+            onClick={() => goToFormWithData(state.barcode)}
             className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
           >
-            Manuell erfassen (Barcode: {state.barcode})
+            Manuell erfassen
           </button>
           <button
             onClick={reset}
             className="w-full text-sm text-gray-400 hover:text-gray-300"
           >
-            Neuen Scan starten
+            Nochmal scannen
           </button>
         </div>
       )}
@@ -285,16 +294,19 @@ export function BarcodeScanner() {
         <div className="space-y-3 rounded-lg border border-red-500/30 bg-red-500/10 p-4">
           <div className="flex items-start gap-3">
             <AlertCircle size={24} className="shrink-0 text-red-400" />
-            <div>
-              <p className="font-medium text-red-300">Fehler</p>
-              <p className="text-sm text-gray-400">{state.message}</p>
-            </div>
+            <p className="text-sm text-gray-300">{state.message}</p>
           </div>
           <button
-            onClick={reset}
+            onClick={() => goToFormWithData('')}
             className="w-full rounded-lg border border-primary-600 px-4 py-2 text-sm text-gray-300 hover:bg-primary-700"
           >
-            Erneut versuchen
+            Manuell eingeben
+          </button>
+          <button
+            onClick={reset}
+            className="w-full text-sm text-gray-400 hover:text-gray-300"
+          >
+            Nochmal versuchen
           </button>
         </div>
       )}
@@ -304,9 +316,9 @@ export function BarcodeScanner() {
           <div className="flex items-start gap-3">
             <CheckCircle size={24} className="shrink-0 text-green-400" />
             <div>
-              <p className="font-medium text-green-300">Gespeichert!</p>
+              <p className="font-medium text-green-300">Gespeichert.</p>
               <p className="text-sm text-gray-400">
-                &quot;{state.name}&quot; wurde zur Vorratsliste hinzugefügt.
+                &quot;{state.name}&quot; ist jetzt in deiner Vorratsliste.
               </p>
             </div>
           </div>
@@ -315,10 +327,10 @@ export function BarcodeScanner() {
               onClick={startCamera}
               className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
             >
-              Nächstes scannen
+              Weiter scannen
             </button>
             <button
-              onClick={() => setPage('products')}
+              onClick={() => useAppStore.getState().setPage('products')}
               className="flex-1 rounded-lg border border-primary-600 px-4 py-2 text-sm text-gray-300 hover:bg-primary-700"
             >
               Zur Liste

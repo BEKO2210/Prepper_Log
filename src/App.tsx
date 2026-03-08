@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useAppStore } from './store/useAppStore';
 import { seedDefaults } from './lib/db';
 import { startNotificationChecker } from './lib/notifications';
@@ -8,9 +8,21 @@ import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
-import { BarcodeScanner } from './components/BarcodeScanner';
 import { Settings } from './components/Settings';
 import { Statistics } from './components/Statistics';
+import { Loader2 } from 'lucide-react';
+
+const BarcodeScanner = lazy(() =>
+  import('./components/BarcodeScanner').then((m) => ({ default: m.BarcodeScanner }))
+);
+
+function LazyFallback() {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <Loader2 size={24} className="animate-spin text-green-400" />
+    </div>
+  );
+}
 
 function PageContent() {
   const currentPage = useAppStore((s) => s.currentPage);
@@ -23,7 +35,11 @@ function PageContent() {
     case 'add':
       return <ProductForm />;
     case 'scanner':
-      return <BarcodeScanner />;
+      return (
+        <Suspense fallback={<LazyFallback />}>
+          <BarcodeScanner />
+        </Suspense>
+      );
     case 'settings':
       return <Settings />;
     case 'stats':
@@ -46,7 +62,7 @@ export default function App() {
       <header className="sticky top-0 z-30 border-b border-primary-700 bg-primary-800/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-600 text-sm font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-600 font-display text-lg text-white">
               PT
             </div>
             <h1 className="text-lg font-bold text-gray-100">PrepTrack</h1>

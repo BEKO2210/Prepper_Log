@@ -12,7 +12,7 @@ import {
 import { Camera, Upload, X, Save, ArrowLeft } from 'lucide-react';
 
 export function ProductForm() {
-  const { editingProductId, setPage, setEditingProductId } = useAppStore();
+  const { editingProductId, setPage, setEditingProductId, scannedData, setScannedData } = useAppStore();
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
   const existingProduct = useLiveQuery(
     () => (editingProductId ? db.products.get(editingProductId) : undefined),
@@ -67,6 +67,18 @@ export function ProductForm() {
       });
     }
   }, [existingProduct]);
+
+  // Populate form from scanned data
+  useEffect(() => {
+    if (scannedData && !editingProductId) {
+      setForm((prev) => ({
+        ...prev,
+        barcode: scannedData.barcode || prev.barcode,
+        name: scannedData.name || prev.name,
+      }));
+      setScannedData(null);
+    }
+  }, [scannedData, editingProductId, setScannedData]);
 
   // Update default location when locations load
   useEffect(() => {

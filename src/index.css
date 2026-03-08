@@ -1,3 +1,5 @@
+@import url('https://fonts.bunny.net/css?family=bebas-neue:400|inter:400,500,600,700');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -49,6 +51,11 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .font-display {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
   }
 }
 
