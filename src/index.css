@@ -106,9 +106,9 @@ html:not(.dark) .text-gray-300 {
 }
 
 html:not(.dark) .text-gray-400 {
-  @apply text-gray-500;
+  color: #6b7280; /* gray-500 */
 }
 
 html:not(.dark) .text-gray-500 {
-  @apply text-gray-400;
+  color: #9ca3af; /* gray-400 */
 }
