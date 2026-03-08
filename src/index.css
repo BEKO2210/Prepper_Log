@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-primary-900 text-gray-100;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-primary-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-primary-600;
+  }
+
+  /* Input autofill styling */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: #e5e7eb;
+    -webkit-box-shadow: 0 0 0px 1000px #1a3a2a inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Light mode overrides */
+html:not(.dark) body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+html:not(.dark) .bg-primary-900 {
+  @apply bg-gray-50;
+}
+
+html:not(.dark) .bg-primary-800 {
+  @apply bg-white;
+}
+
+html:not(.dark) .bg-primary-800\/95 {
+  background-color: rgb(255 255 255 / 0.95);
+}
+
+html:not(.dark) .bg-primary-800\/60 {
+  background-color: rgb(255 255 255 / 0.6);
+}
+
+html:not(.dark) .bg-primary-700 {
+  @apply bg-gray-100;
+}
+
+html:not(.dark) .bg-primary-700\/50 {
+  background-color: rgb(243 244 246 / 0.5);
+}
+
+html:not(.dark) .bg-primary-700\/30 {
+  background-color: rgb(243 244 246 / 0.3);
+}
+
+html:not(.dark) .border-primary-700 {
+  @apply border-gray-200;
+}
+
+html:not(.dark) .border-primary-600 {
+  @apply border-gray-300;
+}
+
+html:not(.dark) .text-gray-100 {
+  @apply text-gray-900;
+}
+
+html:not(.dark) .text-gray-200 {
+  @apply text-gray-800;
+}
+
+html:not(.dark) .text-gray-300 {
+  @apply text-gray-700;
+}
+
+html:not(.dark) .text-gray-400 {
+  @apply text-gray-500;
+}
+
+html:not(.dark) .text-gray-500 {
+  @apply text-gray-400;
+}
