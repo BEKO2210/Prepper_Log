@@ -2,19 +2,27 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { useAppStore } from '../store/useAppStore';
-import { lookupBarcode } from '../lib/utils';
+import { lookupBarcode, formatDate, getDaysUntilExpiry, formatDaysUntil, getExpiryStatus, getStatusBadgeColor, getStatusLabel } from '../lib/utils';
+import { db } from '../lib/db';
+import type { Product } from '../types';
 import {
   Camera,
   CameraOff,
   Loader2,
   AlertCircle,
   X,
+  Package,
+  MapPin,
+  Calendar,
+  Layers,
+  PlusCircle,
 } from 'lucide-react';
 
 type ScanState =
   | { type: 'idle' }
   | { type: 'scanning' }
   | { type: 'loading'; barcode: string }
+  | { type: 'duplicate'; barcode: string; existing: Product[]; apiName?: string }
   | { type: 'error'; message: string };
 
 function vibrate(pattern: number | number[]) {
@@ -72,16 +80,33 @@ export function BarcodeScanner() {
             stopCamera();
             vibrate(100);
 
+            setState({ type: 'loading', barcode });
+
+            // Check if barcode already exists in the local DB
+            const existing = await db.products
+              .where('barcode')
+              .equals(barcode)
+              .filter((p) => !p.archived)
+              .toArray();
+
+            if (existing.length > 0) {
+              // Fetch API name in background for extra info
+              let apiName: string | undefined;
+              if (isOnline) {
+                const apiResult = await lookupBarcode(barcode);
+                apiName = apiResult?.name;
+              }
+              setState({ type: 'duplicate', barcode, existing, apiName });
+              return;
+            }
+
+            // No duplicate — look up online and go to form
             if (!isOnline) {
-              // Offline: go to form with just the barcode
               navigateToAddWithScan({ barcode });
               return;
             }
 
-            setState({ type: 'loading', barcode });
-
             const product = await lookupBarcode(barcode);
-            // Navigate to form with whatever data we got
             navigateToAddWithScan({
               barcode,
               name: product?.name,
@@ -99,7 +124,7 @@ export function BarcodeScanner() {
           : 'Kamera konnte nicht gestartet werden.';
       setState({ type: 'error', message });
     }
-  }, [isOnline, stopCamera]);
+  }, [isOnline, stopCamera, navigateToAddWithScan]);
 
   useEffect(() => {
     return () => {
@@ -168,6 +193,97 @@ export function BarcodeScanner() {
           <span className="text-gray-300">
             Lade Produktdaten für {state.barcode}...
           </span>
+        </div>
+      )}
+
+      {/* Duplicate found popup */}
+      {state.type === 'duplicate' && (
+        <div className="space-y-3 rounded-xl border border-orange-500/30 bg-orange-500/5 p-4">
+          <div className="flex items-center gap-2">
+            <Package size={20} className="text-orange-400" />
+            <p className="font-semibold text-orange-300">
+              Produkt bereits vorhanden
+            </p>
+          </div>
+          {state.apiName && (
+            <p className="text-sm text-gray-400">
+              Barcode: {state.barcode} &middot; {state.apiName}
+            </p>
+          )}
+          {!state.apiName && (
+            <p className="text-sm text-gray-400">Barcode: {state.barcode}</p>
+          )}
+
+          <div className="space-y-2">
+            {state.existing.map((product) => {
+              const status = getExpiryStatus(product.expiryDate);
+              const daysLeft = getDaysUntilExpiry(product.expiryDate);
+              return (
+                <div
+                  key={product.id}
+                  className="rounded-lg border border-primary-700 bg-primary-800 p-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-medium text-gray-200">{product.name}</p>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadgeColor(status)}`}>
+                      {getStatusLabel(status)}
+                    </span>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-400">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin size={12} className="text-gray-500" />
+                      {product.storageLocation}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Layers size={12} className="text-gray-500" />
+                      {product.quantity} {product.unit}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar size={12} className="text-gray-500" />
+                      {formatDate(product.expiryDate, product.expiryPrecision)}
+                    </div>
+                    <div className={`flex items-center gap-1.5 font-semibold ${
+                      status === 'expired' || status === 'critical' ? 'text-red-400' :
+                      status === 'warning' ? 'text-orange-400' :
+                      status === 'soon' ? 'text-yellow-400' : 'text-green-400'
+                    }`}>
+                      {formatDaysUntil(daysLeft)}
+                    </div>
+                  </div>
+                  {product.notes && (
+                    <p className="mt-1.5 text-xs italic text-gray-500">{product.notes}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={() => {
+                navigateToAddWithScan({
+                  barcode: state.barcode,
+                  name: state.apiName || state.existing[0]?.name,
+                });
+              }}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
+            >
+              <PlusCircle size={16} />
+              Trotzdem hinzufuegen
+            </button>
+            <button
+              onClick={startCamera}
+              className="flex-1 rounded-lg border border-primary-600 px-4 py-2.5 text-sm text-gray-300 hover:bg-primary-700"
+            >
+              Nochmal scannen
+            </button>
+          </div>
+          <button
+            onClick={reset}
+            className="w-full text-sm text-gray-500 hover:text-gray-300"
+          >
+            Abbrechen
+          </button>
         </div>
       )}
 
