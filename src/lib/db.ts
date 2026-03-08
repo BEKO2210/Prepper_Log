@@ -117,10 +117,16 @@ export async function exportData(): Promise<string> {
     db.consumptionLogs.toArray(),
   ]);
 
+  // Strip photo data from export to keep file size manageable
+  const productsWithoutPhotos = products.map(({ photo, ...rest }) => ({
+    ...rest,
+    photo: photo ? '[FOTO]' : undefined,
+  }));
+
   const data = {
     version: appVersion,
     exportedAt: new Date().toISOString(),
-    products,
+    products: productsWithoutPhotos,
     storageLocations,
     consumptionLogs,
   };
@@ -265,13 +271,23 @@ export async function exportExcelXML(): Promise<string> {
 }
 
 export async function importData(jsonString: string): Promise<number> {
-  const data = JSON.parse(jsonString);
-
-  if (!data.version || !data.products) {
-    throw new Error('Ungültiges Importformat');
+  let data: Record<string, unknown>;
+  try {
+    data = JSON.parse(jsonString);
+  } catch {
+    throw new Error('Ungültige JSON-Datei. Bitte eine gültige Backup-Datei wählen.');
   }
 
+  if (!data.products || !Array.isArray(data.products)) {
+    throw new Error('Ungültiges Importformat: Keine Produkte gefunden.');
+  }
+
+  const products = data.products as Record<string, unknown>[];
+  const storageLocations = (data.storageLocations ?? []) as Record<string, unknown>[];
+  const consumptionLogs = (data.consumptionLogs ?? []) as Record<string, unknown>[];
+
   let imported = 0;
+  let skipped = 0;
 
   await db.transaction(
     'rw',
@@ -279,37 +295,87 @@ export async function importData(jsonString: string): Promise<number> {
     db.storageLocations,
     db.consumptionLogs,
     async () => {
-      if (data.storageLocations?.length) {
-        for (const loc of data.storageLocations) {
-          const existing = await db.storageLocations
-            .where('name')
-            .equals(loc.name)
-            .first();
-          if (!existing) {
-            await db.storageLocations.add({
-              name: loc.name,
-              createdAt: loc.createdAt || new Date().toISOString(),
-            });
-          }
+      // Import storage locations (skip duplicates)
+      for (const loc of storageLocations) {
+        if (!loc.name || typeof loc.name !== 'string') continue;
+        const existing = await db.storageLocations
+          .where('name')
+          .equals(loc.name)
+          .first();
+        if (!existing) {
+          await db.storageLocations.add({
+            name: loc.name,
+            createdAt: (loc.createdAt as string) || new Date().toISOString(),
+          });
         }
       }
 
-      if (data.products?.length) {
-        for (const product of data.products) {
-          const { id: _id, ...productData } = product;
-          await db.products.add(productData);
-          imported++;
+      // Import products (skip duplicates based on name + expiryDate + storageLocation)
+      for (const product of products) {
+        if (!product.name || !product.expiryDate) {
+          skipped++;
+          continue;
         }
+
+        // Check for duplicate
+        const existingProducts = await db.products
+          .where('name')
+          .equals(product.name as string)
+          .toArray();
+        const isDuplicate = existingProducts.some(
+          (p) =>
+            p.expiryDate === product.expiryDate &&
+            p.storageLocation === product.storageLocation
+        );
+
+        if (isDuplicate) {
+          skipped++;
+          continue;
+        }
+
+        const { id: _id, photo: rawPhoto, ...rest } = product;
+
+        // Clean up photo field - don't import placeholder markers
+        const photo = rawPhoto && rawPhoto !== '[FOTO]' ? rawPhoto : undefined;
+
+        // Ensure archived is boolean
+        const archived = rest.archived === true || rest.archived === 1;
+
+        await db.products.add({
+          ...rest,
+          photo,
+          archived,
+          createdAt: (rest.createdAt as string) || new Date().toISOString(),
+          updatedAt: (rest.updatedAt as string) || new Date().toISOString(),
+        } as Omit<Product, 'id'>);
+        imported++;
       }
 
-      if (data.consumptionLogs?.length) {
-        for (const log of data.consumptionLogs) {
-          const { id: _id, ...logData } = log;
-          await db.consumptionLogs.add(logData);
-        }
+      // Import consumption logs
+      for (const log of consumptionLogs) {
+        if (!log.productId || !log.consumedAt) continue;
+        const { id: _id, ...logData } = log;
+        await db.consumptionLogs.add(logData as Omit<ConsumptionLog, 'id'>);
       }
     }
   );
 
+  if (skipped > 0) {
+    throw new ImportResult(imported, skipped);
+  }
+
   return imported;
+}
+
+// Custom class to pass both imported and skipped counts
+export class ImportResult {
+  imported: number;
+  skipped: number;
+  message: string;
+
+  constructor(imported: number, skipped: number) {
+    this.imported = imported;
+    this.skipped = skipped;
+    this.message = `${imported} Produkte importiert, ${skipped} übersprungen (Duplikate oder ungültig).`;
+  }
 }
