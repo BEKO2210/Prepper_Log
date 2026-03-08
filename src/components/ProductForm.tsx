@@ -9,7 +9,6 @@ import {
   type Product,
   type ProductCategory,
 } from '../types';
-import { ImageCaptureModal } from './ImageCaptureModal';
 import { Camera, Upload, X, Save, ArrowLeft } from 'lucide-react';
 
 export function ProductForm() {
@@ -21,6 +20,7 @@ export function ProductForm() {
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<{
     name: string;
@@ -49,7 +49,6 @@ export function ProductForm() {
   });
 
   const [saving, setSaving] = useState(false);
-  const [showCamera, setShowCamera] = useState(false);
 
   // Populate form when editing
   useEffect(() => {
@@ -93,15 +92,12 @@ export function ProductForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleCameraCapture(base64: string) {
-    updateField('photo', base64);
-  }
-
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     const compressed = await compressImage(file);
     updateField('photo', compressed);
+    e.target.value = '';
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -183,7 +179,7 @@ export function ProductForm() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowCamera(true)}
+                  onClick={() => cameraInputRef.current?.click()}
                   className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
                 >
                   <Camera size={18} /> Kamera
@@ -197,6 +193,16 @@ export function ProductForm() {
                 </button>
               </div>
             )}
+            {/* Camera input - opens native camera directly */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            {/* Gallery input - opens file picker */}
             <input
               ref={fileInputRef}
               type="file"
@@ -380,12 +386,6 @@ export function ProductForm() {
               : 'Produkt speichern'}
         </button>
       </form>
-
-      <ImageCaptureModal
-        isOpen={showCamera}
-        onCapture={handleCameraCapture}
-        onClose={() => setShowCamera(false)}
-      />
     </div>
   );
 }
