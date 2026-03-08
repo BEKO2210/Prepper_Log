@@ -11,6 +11,64 @@ import {
 } from '../types';
 import { Camera, Upload, X, Save, ArrowLeft } from 'lucide-react';
 
+const FORM_STORAGE_KEY = 'preptrack-form-draft';
+
+interface FormState {
+  name: string;
+  barcode: string;
+  category: ProductCategory;
+  storageLocation: string;
+  quantity: number;
+  unit: string;
+  expiryDate: string;
+  expiryPrecision: 'day' | 'month' | 'year';
+  photo: string;
+  minStock: number;
+  notes: string;
+}
+
+const defaultForm: FormState = {
+  name: '',
+  barcode: '',
+  category: 'lebensmittel',
+  storageLocation: 'Keller',
+  quantity: 1,
+  unit: 'Stück',
+  expiryDate: '',
+  expiryPrecision: 'day',
+  photo: '',
+  minStock: 0,
+  notes: '',
+};
+
+function saveFormDraft(form: FormState, editingId: number | null) {
+  try {
+    sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify({ form, editingId, timestamp: Date.now() }));
+  } catch {
+    // sessionStorage full or unavailable
+  }
+}
+
+function loadFormDraft(): { form: FormState; editingId: number | null } | null {
+  try {
+    const raw = sessionStorage.getItem(FORM_STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    // Only restore if saved less than 10 minutes ago
+    if (Date.now() - data.timestamp > 10 * 60 * 1000) {
+      sessionStorage.removeItem(FORM_STORAGE_KEY);
+      return null;
+    }
+    return { form: data.form, editingId: data.editingId };
+  } catch {
+    return null;
+  }
+}
+
+function clearFormDraft() {
+  sessionStorage.removeItem(FORM_STORAGE_KEY);
+}
+
 export function ProductForm() {
   const { editingProductId, setPage, setEditingProductId, scannedData, setScannedData } = useAppStore();
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
@@ -21,34 +79,27 @@ export function ProductForm() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const restoredRef = useRef(false);
 
-  const [form, setForm] = useState<{
-    name: string;
-    barcode: string;
-    category: ProductCategory;
-    storageLocation: string;
-    quantity: number;
-    unit: string;
-    expiryDate: string;
-    expiryPrecision: 'day' | 'month' | 'year';
-    photo: string;
-    minStock: number;
-    notes: string;
-  }>({
-    name: '',
-    barcode: '',
-    category: 'lebensmittel',
-    storageLocation: locations[0]?.name || 'Keller',
-    quantity: 1,
-    unit: 'Stück',
-    expiryDate: '',
-    expiryPrecision: 'day',
-    photo: '',
-    minStock: 0,
-    notes: '',
+  const [form, setForm] = useState<FormState>(() => {
+    // Check for saved draft on mount (page was reloaded by camera)
+    const draft = loadFormDraft();
+    if (draft) {
+      restoredRef.current = true;
+      return draft.form;
+    }
+    return { ...defaultForm, storageLocation: '' };
   });
 
   const [saving, setSaving] = useState(false);
+
+  // If we restored a draft, clear it now that we've loaded it
+  useEffect(() => {
+    if (restoredRef.current) {
+      clearFormDraft();
+      restoredRef.current = false;
+    }
+  }, []);
 
   // Populate form when editing
   useEffect(() => {
@@ -88,8 +139,14 @@ export function ProductForm() {
     }
   }, [locations, editingProductId, form.storageLocation]);
 
-  function updateField<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function handleCameraClick() {
+    // Save form state before opening native camera (page may reload)
+    saveFormDraft(form, editingProductId);
+    cameraInputRef.current?.click();
   }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -97,6 +154,7 @@ export function ProductForm() {
     if (!file) return;
     const compressed = await compressImage(file);
     updateField('photo', compressed);
+    clearFormDraft();
     e.target.value = '';
   }
 
@@ -131,6 +189,7 @@ export function ProductForm() {
       await addProduct(productData);
     }
 
+    clearFormDraft();
     setSaving(false);
     setEditingProductId(null);
     setPage('products');
@@ -142,6 +201,7 @@ export function ProductForm() {
         {editingProductId && (
           <button
             onClick={() => {
+              clearFormDraft();
               setEditingProductId(null);
               setPage('products');
             }}
@@ -179,7 +239,7 @@ export function ProductForm() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => cameraInputRef.current?.click()}
+                  onClick={handleCameraClick}
                   className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
                 >
                   <Camera size={18} /> Kamera

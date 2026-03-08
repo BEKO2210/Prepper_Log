@@ -31,11 +31,28 @@ interface AppState {
 }
 
 const NOTIF_KEY = 'preptrack-notifications-enabled';
+const FORM_STORAGE_KEY = 'preptrack-form-draft';
 
 function getStoredNotifications(): boolean {
   const stored = localStorage.getItem(NOTIF_KEY);
   if (stored !== null) return stored === 'true';
   return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+}
+
+function getInitialPage(): Page {
+  // If there's a form draft (camera caused page reload), restore to 'add' page
+  try {
+    const raw = sessionStorage.getItem(FORM_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (Date.now() - data.timestamp < 10 * 60 * 1000) {
+        return 'add';
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return 'dashboard';
 }
 
 const defaultFilters: FilterState = {
@@ -46,7 +63,7 @@ const defaultFilters: FilterState = {
 };
 
 export const useAppStore = create<AppState>((set) => ({
-  currentPage: 'dashboard',
+  currentPage: getInitialPage(),
   setPage: (page) => set({ currentPage: page, editingProductId: null }),
   filters: { ...defaultFilters },
   setFilter: (key, value) =>
