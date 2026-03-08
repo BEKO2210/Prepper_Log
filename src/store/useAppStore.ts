@@ -30,6 +30,14 @@ interface AppState {
   setNotificationsEnabled: (enabled: boolean) => void;
 }
 
+const NOTIF_KEY = 'preptrack-notifications-enabled';
+
+function getStoredNotifications(): boolean {
+  const stored = localStorage.getItem(NOTIF_KEY);
+  if (stored !== null) return stored === 'true';
+  return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+}
+
 const defaultFilters: FilterState = {
   search: '',
   category: '',
@@ -53,6 +61,9 @@ export const useAppStore = create<AppState>((set) => ({
   setScannedData: (data) => set({ scannedData: data }),
   navigateToAddWithScan: (data) =>
     set({ scannedData: data, currentPage: 'add', editingProductId: null }),
-  notificationsEnabled: Notification.permission === 'granted',
-  setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+  notificationsEnabled: getStoredNotifications(),
+  setNotificationsEnabled: (enabled) => {
+    localStorage.setItem(NOTIF_KEY, String(enabled));
+    set({ notificationsEnabled: enabled });
+  },
 }));

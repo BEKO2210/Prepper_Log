@@ -5,9 +5,6 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const COOLDOWN_KEY = 'preptrack-install-dismissed';
-const COOLDOWN_DAYS = 3;
-
 function isIOS(): boolean {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
 }
@@ -19,17 +16,10 @@ function isInStandaloneMode(): boolean {
   );
 }
 
-function isDismissedRecently(): boolean {
-  const dismissed = localStorage.getItem(COOLDOWN_KEY);
-  if (!dismissed) return false;
-  const dismissedAt = new Date(dismissed);
-  const now = new Date();
-  const diffDays = (now.getTime() - dismissedAt.getTime()) / (1000 * 60 * 60 * 24);
-  return diffDays < COOLDOWN_DAYS;
-}
+// Store prompt globally so Settings can trigger it anytime
+let globalDeferredPrompt: BeforeInstallPromptEvent | null = null;
 
 export function usePWAInstall() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
@@ -40,22 +30,20 @@ export function usePWAInstall() {
       return;
     }
 
-    if (isIOS() && !isDismissedRecently()) {
+    if (isIOS()) {
       setShowIOSInstructions(true);
     }
 
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      if (!isDismissedRecently()) {
-        setIsInstallable(true);
-      }
+      globalDeferredPrompt = e as BeforeInstallPromptEvent;
+      setIsInstallable(true);
     };
 
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setIsInstallable(false);
-      setDeferredPrompt(null);
+      globalDeferredPrompt = null;
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -68,21 +56,21 @@ export function usePWAInstall() {
   }, []);
 
   const install = useCallback(async () => {
-    if (!deferredPrompt) return;
+    if (!globalDeferredPrompt) return false;
 
-    await deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
+    await globalDeferredPrompt.prompt();
+    const choice = await globalDeferredPrompt.userChoice;
 
     if (choice.outcome === 'accepted') {
       setIsInstalled(true);
     }
 
-    setDeferredPrompt(null);
+    globalDeferredPrompt = null;
     setIsInstallable(false);
-  }, [deferredPrompt]);
+    return choice.outcome === 'accepted';
+  }, []);
 
   const dismiss = useCallback(() => {
-    localStorage.setItem(COOLDOWN_KEY, new Date().toISOString());
     setIsInstallable(false);
     setShowIOSInstructions(false);
   }, []);
@@ -91,6 +79,7 @@ export function usePWAInstall() {
     isInstallable,
     isInstalled,
     showIOSInstructions,
+    isIOS: isIOS(),
     install,
     dismiss,
   };
