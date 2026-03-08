@@ -45,7 +45,7 @@ export function Dashboard() {
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-primary-700 bg-primary-800">
           <Package size={40} className="text-primary-600" />
         </div>
-        <p className="mt-5 text-xl font-semibold text-gray-200">Noch keine Vorraete</p>
+        <p className="mt-5 text-xl font-semibold text-gray-200">Noch keine Vorräte</p>
         <p className="mt-2 max-w-xs text-sm text-gray-500">
           Starte mit einem Barcode-Scan oder erfasse dein erstes Produkt manuell.
         </p>
@@ -123,7 +123,7 @@ export function Dashboard() {
             <PlusCircle size={20} className="text-blue-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-200">Hinzufuegen</p>
+            <p className="text-sm font-medium text-gray-200">Hinzufügen</p>
             <p className="text-[0.65rem] text-gray-500">Manuell erfassen</p>
           </div>
         </button>
