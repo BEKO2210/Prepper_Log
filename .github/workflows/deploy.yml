@@ -41,8 +41,13 @@ jobs:
       - name: Run tests
         run: npm run test --if-present
 
+      - name: Remove oversized source icon
+        run: rm -f public/icons/Icon_3117x3117_8MB.png
+
       - name: Build
         run: npm run build
+        env:
+          GITHUB_PAGES: 'true'
 
       - name: Audit dependencies
         run: npm audit --audit-level=high || true
@@ -68,6 +73,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Remove oversized source icon
+        run: rm -f public/icons/Icon_3117x3117_8MB.png
 
       - name: Build
         run: npm run build
