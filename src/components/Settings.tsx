@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { version as appVersion } from '../../package.json';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, exportExcelXML, importData } from '../lib/db';
+import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, ImportResult } from '../lib/db';
 import { requestNotificationPermission, getNotificationPermissionStatus } from '../lib/notifications';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { usePWAInstall } from '../hooks/usePWAInstall';
@@ -18,7 +18,7 @@ import {
   Download,
   Upload,
   FileJson,
-  FileSpreadsheet,
+  // FileSpreadsheet removed - Excel export disabled
   Shield,
   Heart,
   Smartphone,
@@ -66,11 +66,6 @@ export function Settings() {
     downloadFile(data, `preptrack-export-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
   }
 
-  async function handleExportExcel() {
-    const data = await exportExcelXML();
-    downloadFile(data, `preptrack-export-${new Date().toISOString().split('T')[0]}.xls`, 'application/vnd.ms-excel');
-  }
-
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,9 +73,13 @@ export function Settings() {
     try {
       const text = await file.text();
       const count = await importData(text);
-      setImportStatus(`${count} Produkte importiert.`);
+      setImportStatus(`${count} Produkte erfolgreich importiert.`);
     } catch (err) {
-      setImportStatus(`Fehler: ${err instanceof Error ? err.message : 'Import fehlgeschlagen'}`);
+      if (err instanceof ImportResult) {
+        setImportStatus(err.message);
+      } else {
+        setImportStatus(`Fehler: ${err instanceof Error ? err.message : 'Import fehlgeschlagen'}`);
+      }
     }
 
     e.target.value = '';
@@ -293,18 +292,6 @@ export function Settings() {
           </button>
 
           <button
-            onClick={handleExportExcel}
-            className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
-          >
-            <FileSpreadsheet size={20} className="text-green-400" />
-            <div className="text-left">
-              <span>Excel exportieren</span>
-              <p className="text-xs text-gray-500">Formatiert mit Farben und Spaltenbreiten</p>
-            </div>
-            <Download size={16} className="ml-auto text-gray-500" />
-          </button>
-
-          <button
             onClick={handleExportCSV}
             className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
           >
@@ -335,7 +322,9 @@ export function Settings() {
               className={`rounded-lg px-3 py-2 text-sm ${
                 importStatus.startsWith('Fehler')
                   ? 'bg-red-500/10 text-red-400'
-                  : 'bg-green-500/10 text-green-400'
+                  : importStatus.includes('übersprungen')
+                    ? 'bg-orange-500/10 text-orange-400'
+                    : 'bg-green-500/10 text-green-400'
               }`}
             >
               {importStatus}
