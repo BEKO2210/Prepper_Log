@@ -15,17 +15,13 @@
     overscroll-behavior-y: contain;
   }
 
-  /* Custom scrollbar for dark theme */
-  ::-webkit-scrollbar {
-    width: 6px;
+  /* Hide scrollbar globally, keep scroll functionality */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
   }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-primary-900;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-primary-600;
+  *::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Opera */
   }
 
   /* Input autofill styling */
