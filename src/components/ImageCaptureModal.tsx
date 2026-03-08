@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { X, Camera, RotateCcw, Check, RefreshCw } from 'lucide-react';
+import { X, Camera, RotateCcw, Check } from 'lucide-react';
 
 interface ImageCaptureModalProps {
   isOpen: boolean;
@@ -11,129 +11,53 @@ export function ImageCaptureModal({ isOpen, onCapture, onClose }: ImageCaptureMo
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const mountedRef = useRef(true);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
   const [captured, setCaptured] = useState<string | null>(null);
   const [frozen, setFrozen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const stopStream = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => {
-        t.stop();
-      });
+      streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
     }
   }, []);
 
-  const startCamera = useCallback(async (facing: 'user' | 'environment') => {
+  const startCamera = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setPermissionDenied(false);
     stopStream();
-
-    // Check if getUserMedia is available (requires HTTPS or localhost)
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setError('Kamera nicht verfügbar. Die App muss über HTTPS aufgerufen werden.');
-      setLoading(false);
-      return;
-    }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: facing,
+          facingMode,
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
-        audio: false,
       });
-
-      if (!mountedRef.current) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
-
       streamRef.current = stream;
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // Wait for video to actually start playing
-        await new Promise<void>((resolve, reject) => {
-          const video = videoRef.current!;
-          const timeout = setTimeout(() => reject(new Error('timeout')), 8000);
-          video.onloadedmetadata = () => {
-            clearTimeout(timeout);
-            video.play().then(resolve).catch(reject);
-          };
-          video.onerror = () => {
-            clearTimeout(timeout);
-            reject(new Error('video error'));
-          };
-        });
-        if (mountedRef.current) {
-          setLoading(false);
-        }
+        videoRef.current.onloadedmetadata = () => setLoading(false);
       }
-    } catch (err) {
-      if (!mountedRef.current) return;
-
-      const error = err as DOMException;
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        setError('Kamera-Zugriff wurde verweigert. Bitte erlaube den Zugriff in den Browser-Einstellungen und versuche es erneut.');
-      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-        setError('Keine Kamera gefunden. Stelle sicher, dass dein Gerät eine Kamera hat.');
-      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-        setError('Kamera wird von einer anderen App verwendet. Schliesse andere Kamera-Apps und versuche es erneut.');
-      } else if (error.name === 'OverconstrainedError') {
-        // Retry without specific facing mode
-        try {
-          const fallbackStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false,
-          });
-          if (!mountedRef.current) {
-            fallbackStream.getTracks().forEach((t) => t.stop());
-            return;
-          }
-          streamRef.current = fallbackStream;
-          if (videoRef.current) {
-            videoRef.current.srcObject = fallbackStream;
-            videoRef.current.onloadedmetadata = () => {
-              if (mountedRef.current) setLoading(false);
-            };
-          }
-          return;
-        } catch {
-          setError('Kamera konnte nicht gestartet werden.');
-        }
-      } else {
-        setError('Kamera konnte nicht gestartet werden. Bitte versuche es erneut.');
-      }
+    } catch {
+      setPermissionDenied(true);
       setLoading(false);
     }
-  }, [stopStream]);
+  }, [facingMode, stopStream]);
 
   useEffect(() => {
-    mountedRef.current = true;
     if (isOpen) {
       setCaptured(null);
       setFrozen(false);
-      setError(null);
-      startCamera(facingMode);
+      startCamera();
     } else {
       stopStream();
     }
-    return () => {
-      mountedRef.current = false;
-      stopStream();
-    };
-    // Only depend on isOpen - facingMode changes are handled by flipCamera
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+    return () => stopStream();
+  }, [isOpen, startCamera, stopStream]);
 
   const shoot = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -161,7 +85,6 @@ export function ImageCaptureModal({ isOpen, onCapture, onClose }: ImageCaptureMo
       setCaptured(base64);
       setFrozen(false);
 
-      // Pause stream to save battery
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => (t.enabled = false));
       }
@@ -183,14 +106,8 @@ export function ImageCaptureModal({ isOpen, onCapture, onClose }: ImageCaptureMo
   }, [captured, onCapture, onClose]);
 
   const flipCamera = useCallback(() => {
-    const newFacing = facingMode === 'environment' ? 'user' : 'environment';
-    setFacingMode(newFacing);
-    startCamera(newFacing);
-  }, [facingMode, startCamera]);
-
-  const retry = useCallback(() => {
-    startCamera(facingMode);
-  }, [facingMode, startCamera]);
+    setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'));
+  }, []);
 
   if (!isOpen) return null;
 
@@ -205,7 +122,7 @@ export function ImageCaptureModal({ isOpen, onCapture, onClose }: ImageCaptureMo
         >
           <X size={20} />
         </button>
-        {!error && !captured && (
+        {!permissionDenied && !captured && (
           <button
             onClick={flipCamera}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white"
@@ -218,26 +135,19 @@ export function ImageCaptureModal({ isOpen, onCapture, onClose }: ImageCaptureMo
 
       {/* Viewfinder */}
       <div className="relative flex-1 overflow-hidden">
-        {error ? (
+        {permissionDenied ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-white">
             <Camera size={48} className="mb-4 opacity-40" />
-            <p className="mb-2 text-lg font-medium">Kamera-Problem</p>
-            <p className="mb-6 text-sm opacity-60">{error}</p>
-            <div className="flex gap-3">
-              <button
-                onClick={retry}
-                className="flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white"
-              >
-                <RefreshCw size={16} />
-                Erneut versuchen
-              </button>
-              <button
-                onClick={onClose}
-                className="rounded-lg border border-white/30 px-6 py-3 text-sm text-white"
-              >
-                Schliessen
-              </button>
-            </div>
+            <p className="mb-2 text-lg font-medium">Kein Kamera-Zugriff</p>
+            <p className="mb-6 text-sm opacity-60">
+              Erlaube den Kamera-Zugriff in den Browser-Einstellungen.
+            </p>
+            <button
+              onClick={onClose}
+              className="rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white"
+            >
+              Schliessen
+            </button>
           </div>
         ) : captured ? (
           <img
@@ -293,16 +203,16 @@ export function ImageCaptureModal({ isOpen, onCapture, onClose }: ImageCaptureMo
               <span className="text-xs font-semibold">Verwenden</span>
             </button>
           </>
-        ) : !error ? (
+        ) : (
           <button
             onClick={shoot}
-            disabled={loading}
+            disabled={loading || permissionDenied}
             aria-label="Foto aufnehmen"
             className="shutter-btn"
           >
             <span className="shutter-inner" />
           </button>
-        ) : null}
+        )}
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
