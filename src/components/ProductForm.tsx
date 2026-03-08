@@ -18,12 +18,12 @@ interface FormState {
   barcode: string;
   category: ProductCategory;
   storageLocation: string;
-  quantity: number;
+  quantity: string;
   unit: string;
   expiryDate: string;
   expiryPrecision: 'day' | 'month' | 'year';
   photo: string;
-  minStock: number;
+  minStock: string;
   notes: string;
 }
 
@@ -32,12 +32,12 @@ const defaultForm: FormState = {
   barcode: '',
   category: 'lebensmittel',
   storageLocation: 'Keller',
-  quantity: 1,
+  quantity: '1',
   unit: 'Stück',
   expiryDate: '',
   expiryPrecision: 'day',
   photo: '',
-  minStock: 0,
+  minStock: '0',
   notes: '',
 };
 
@@ -109,12 +109,12 @@ export function ProductForm() {
         barcode: existingProduct.barcode || '',
         category: existingProduct.category,
         storageLocation: existingProduct.storageLocation,
-        quantity: existingProduct.quantity,
+        quantity: String(existingProduct.quantity),
         unit: existingProduct.unit,
         expiryDate: existingProduct.expiryDate.split('T')[0],
         expiryPrecision: existingProduct.expiryPrecision,
         photo: existingProduct.photo || '',
-        minStock: existingProduct.minStock || 0,
+        minStock: String(existingProduct.minStock || 0),
         notes: existingProduct.notes || '',
       });
     }
@@ -169,12 +169,12 @@ export function ProductForm() {
       barcode: form.barcode || undefined,
       category: form.category,
       storageLocation: form.storageLocation,
-      quantity: form.quantity,
+      quantity: parseInt(form.quantity) || 1,
       unit: form.unit,
       expiryDate: new Date(form.expiryDate).toISOString(),
       expiryPrecision: form.expiryPrecision,
       photo: form.photo || undefined,
-      minStock: form.minStock || undefined,
+      minStock: parseInt(form.minStock) || undefined,
       notes: form.notes || undefined,
       archived: false,
       createdAt: editingProductId
@@ -352,7 +352,7 @@ export function ProductForm() {
               min="1"
               required
               value={form.quantity}
-              onChange={(e) => updateField('quantity', parseInt(e.target.value) || 1)}
+              onChange={(e) => updateField('quantity', e.target.value)}
               className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none"
             />
           </div>
@@ -413,7 +413,7 @@ export function ProductForm() {
             type="number"
             min="0"
             value={form.minStock}
-            onChange={(e) => updateField('minStock', parseInt(e.target.value) || 0)}
+            onChange={(e) => updateField('minStock', e.target.value)}
             placeholder="0 = kein Minimum"
             className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
           />
