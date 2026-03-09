@@ -50,7 +50,9 @@ function PageContent() {
 
 export default function App() {
   useEffect(() => {
-    seedDefaults();
+    seedDefaults().catch((err) =>
+      console.error('[PrepTrack] seedDefaults fehlgeschlagen:', err)
+    );
 
     const interval = startNotificationChecker();
     return () => clearInterval(interval);

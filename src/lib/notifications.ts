@@ -57,7 +57,8 @@ export async function checkAndNotifyExpiringProducts(): Promise<void> {
     const daysLeft = getDaysUntilExpiry(product.expiryDate);
 
     for (const threshold of NOTIFICATION_THRESHOLDS) {
-      if (daysLeft === threshold) {
+      // Use <= to catch the threshold even if timezone differences cause off-by-one
+      if (daysLeft <= threshold) {
         const existingNotification = await db.notificationSchedules
           .where('[productId+daysBefore]')
           .equals([product.id!, threshold])
@@ -85,12 +86,20 @@ export async function checkAndNotifyExpiringProducts(): Promise<void> {
             sent: true,
           });
         }
+        // Only fire the highest matching threshold per product
+        break;
       }
     }
   }
 }
 
 export function startNotificationChecker(): ReturnType<typeof setInterval> {
-  checkAndNotifyExpiringProducts();
-  return setInterval(checkAndNotifyExpiringProducts, 1000 * 60 * 60);
+  checkAndNotifyExpiringProducts().catch((err) =>
+    console.error('[PrepTrack] Benachrichtigungsprüfung fehlgeschlagen:', err)
+  );
+  return setInterval(() => {
+    checkAndNotifyExpiringProducts().catch((err) =>
+      console.error('[PrepTrack] Benachrichtigungsprüfung fehlgeschlagen:', err)
+    );
+  }, 1000 * 60 * 60);
 }

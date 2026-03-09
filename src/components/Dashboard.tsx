@@ -13,6 +13,22 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
+const URGENT_BORDER_COLORS: Record<string, string> = {
+  expired: 'border-l-red-500',
+  critical: 'border-l-red-400',
+  warning: 'border-l-orange-400',
+  soon: 'border-l-yellow-400',
+  good: 'border-l-green-400',
+};
+
+const URGENT_TEXT_COLORS: Record<string, string> = {
+  expired: 'text-red-400',
+  critical: 'text-red-400',
+  warning: 'text-orange-400',
+  soon: 'text-yellow-400',
+  good: 'text-green-400',
+};
+
 export function Dashboard() {
   const setPage = useAppStore((s) => s.setPage);
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
@@ -179,25 +195,10 @@ export function Dashboard() {
             </button>
           </div>
           <div className="space-y-2">
-            {urgentProducts.map((product) => {
-              const borderColors: Record<string, string> = {
-                expired: 'border-l-red-500',
-                critical: 'border-l-red-400',
-                warning: 'border-l-orange-400',
-                soon: 'border-l-yellow-400',
-                good: 'border-l-green-400',
-              };
-              const textColors: Record<string, string> = {
-                expired: 'text-red-400',
-                critical: 'text-red-400',
-                warning: 'text-orange-400',
-                soon: 'text-yellow-400',
-                good: 'text-green-400',
-              };
-              return (
+            {urgentProducts.map((product) => (
                 <div
                   key={product.id}
-                  className={`flex items-center justify-between border-l-4 ${borderColors[product.status]} rounded-r-lg bg-primary-900/40 p-3`}
+                  className={`flex items-center justify-between border-l-4 ${URGENT_BORDER_COLORS[product.status]} rounded-r-lg bg-primary-900/40 p-3`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-200">
@@ -208,12 +209,11 @@ export function Dashboard() {
                       {formatDate(product.expiryDate, product.expiryPrecision)}
                     </p>
                   </div>
-                  <span className={`shrink-0 text-xs font-bold ${textColors[product.status]}`}>
+                  <span className={`shrink-0 text-xs font-bold ${URGENT_TEXT_COLORS[product.status]}`}>
                     {formatDaysUntil(product.daysLeft)}
                   </span>
                 </div>
-              );
-            })}
+              ))}
           </div>
         </div>
       )}

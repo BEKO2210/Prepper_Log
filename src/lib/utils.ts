@@ -240,13 +240,16 @@ export async function lookupBarcode(
     if (data.status !== 1 || !data.product) return null;
 
     const product = data.product;
+    // Take only the first category from the comma-separated API string
+    const rawCategory = product.categories as string | undefined;
+    const firstCategory = rawCategory?.split(',')[0]?.trim() || undefined;
     return {
       name:
         product.product_name_de ||
         product.product_name ||
         product.brands ||
         'Unbekanntes Produkt',
-      category: product.categories,
+      category: firstCategory,
       imageUrl: product.image_front_url || undefined,
     };
   } catch {

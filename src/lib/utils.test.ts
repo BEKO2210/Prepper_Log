@@ -258,4 +258,44 @@ describe('lookupBarcode', () => {
     // Unknown barcode — API returns null or a product
     expect(result === null || typeof result?.name === 'string').toBe(true);
   });
+
+  it('rejects barcodes with special characters', async () => {
+    expect(await lookupBarcode('1234-5678')).toBeNull();
+    expect(await lookupBarcode('12345678\n')).toBeNull();
+    expect(await lookupBarcode('=CMD()')).toBeNull();
+  });
+});
+
+describe('formatDate edge cases', () => {
+  it('defaults to day precision when not specified', () => {
+    const result = formatDate('2025-01-15T00:00:00.000Z');
+    expect(result).toMatch(/15/);
+    expect(result).toMatch(/2025/);
+  });
+});
+
+describe('computeStats edge cases', () => {
+  it('counts all status types correctly in mixed set', () => {
+    const now = Date.now();
+    const products = [
+      makeProduct({ id: 1, expiryDate: new Date(now - 86_400_000).toISOString() }),         // expired
+      makeProduct({ id: 2, expiryDate: new Date(now + 3 * 86_400_000).toISOString() }),      // critical
+      makeProduct({ id: 3, expiryDate: new Date(now + 10 * 86_400_000).toISOString() }),     // warning
+      makeProduct({ id: 4, expiryDate: new Date(now + 20 * 86_400_000).toISOString() }),     // soon
+      makeProduct({ id: 5, expiryDate: new Date(now + 90 * 86_400_000).toISOString() }),     // good
+    ];
+    const stats = computeStats(products);
+    expect(stats.totalProducts).toBe(5);
+    expect(stats.expiredCount).toBe(1);
+    expect(stats.criticalCount).toBe(1);
+    expect(stats.warningCount).toBe(1);
+    expect(stats.soonCount).toBe(1);
+    expect(stats.goodCount).toBe(1);
+  });
+
+  it('handles products with quantity at exactly minStock (not low stock)', () => {
+    const products = [makeProduct({ quantity: 5, minStock: 5 })];
+    const stats = computeStats(products);
+    expect(stats.lowStockCount).toBe(0);
+  });
 });
