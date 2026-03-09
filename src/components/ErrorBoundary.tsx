@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import i18n from '../i18n/i18n';
 
 interface Props {
   children: ReactNode;
@@ -31,13 +32,14 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const t = i18n.t.bind(i18n);
       return (
         <div className="flex min-h-screen items-center justify-center bg-primary-900 p-6">
           <div className="w-full max-w-md rounded-2xl border border-red-500/30 bg-primary-800 p-6 text-center">
             <AlertTriangle size={48} className="mx-auto mb-4 text-red-400" />
-            <h2 className="mb-2 text-xl font-bold text-gray-100">Etwas ist schiefgelaufen</h2>
+            <h2 className="mb-2 text-xl font-bold text-gray-100">{t('error.title')}</h2>
             <p className="mb-4 text-sm text-gray-400">
-              Ein unerwarteter Fehler ist aufgetreten. Deine Daten sind sicher.
+              {t('error.description')}
             </p>
             {this.state.error && (
               <pre className="mb-4 overflow-auto rounded-lg bg-primary-900 p-3 text-left text-xs text-red-300">
@@ -49,14 +51,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleReset}
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary-600 px-4 py-2.5 text-sm text-gray-300 hover:bg-primary-700"
               >
-                Erneut versuchen
+                {t('error.retry')}
               </button>
               <button
                 onClick={this.handleReload}
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-500"
               >
                 <RefreshCw size={16} />
-                Seite neu laden
+                {t('error.reload')}
               </button>
             </div>
           </div>

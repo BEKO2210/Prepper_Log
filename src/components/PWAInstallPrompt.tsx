@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { Download, X, Share } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function PWAInstallPrompt() {
   const { isInstallable, showIOSInstructions, install, dismiss } = usePWAInstall();
+  const { t } = useTranslation();
 
   const showPrompt = isInstallable || showIOSInstructions;
 
@@ -20,7 +22,7 @@ export function PWAInstallPrompt() {
           <button
             onClick={dismiss}
             className="absolute right-3 top-3 rounded-full p-1 text-gray-400 hover:bg-primary-700 hover:text-gray-200"
-            aria-label="Schließen"
+            aria-label={t('pwa.close')}
           >
             <X size={18} />
           </button>
@@ -30,26 +32,25 @@ export function PWAInstallPrompt() {
               <Download size={24} className="text-green-400" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-semibold text-gray-100">PrepTrack installieren</h3>
+              <h3 className="font-semibold text-gray-100">{t('pwa.installTitle')}</h3>
 
               {isInstallable && (
                 <>
                   <p className="mt-1 text-sm text-gray-400">
-                    Installiere PrepTrack auf deinem Gerät für schnelleren Zugriff und
-                    Offline-Nutzung.
+                    {t('pwa.installDesc')}
                   </p>
                   <div className="mt-3 flex gap-2">
                     <button
                       onClick={install}
                       className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 active:bg-green-700"
                     >
-                      Installieren
+                      {t('pwa.install')}
                     </button>
                     <button
                       onClick={dismiss}
                       className="rounded-lg px-4 py-2 text-sm text-gray-400 hover:bg-primary-700 hover:text-gray-200"
                     >
-                      Später
+                      {t('pwa.later')}
                     </button>
                   </div>
                 </>
@@ -58,16 +59,16 @@ export function PWAInstallPrompt() {
               {showIOSInstructions && !isInstallable && (
                 <>
                   <p className="mt-1 text-sm text-gray-400">
-                    Tippe auf{' '}
+                    {t('pwa.iosHint')}{' '}
                     <Share size={14} className="inline text-blue-400" />{' '}
-                    <strong>Teilen</strong> und dann auf{' '}
-                    <strong>&quot;Zum Home-Bildschirm&quot;</strong>, um PrepTrack zu installieren.
+                    <strong>{t('pwa.iosShare')}</strong>{' '}
+                    <strong>&quot;{t('pwa.iosHomeScreen')}&quot;</strong>{t('pwa.iosInstallSuffix')}
                   </p>
                   <button
                     onClick={dismiss}
                     className="mt-3 rounded-lg px-4 py-2 text-sm text-gray-400 hover:bg-primary-700 hover:text-gray-200"
                   >
-                    Verstanden
+                    {t('pwa.understood')}
                   </button>
                 </>
               )}

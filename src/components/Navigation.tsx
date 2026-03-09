@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/useAppStore';
 import {
   LayoutDashboard,
@@ -9,22 +10,24 @@ import {
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard' as const, label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'products' as const, label: 'Vorräte', icon: Package },
-  { id: 'add' as const, label: 'Hinzufügen', icon: PlusCircle },
-  { id: 'scanner' as const, label: 'Scanner', icon: ScanBarcode },
-  { id: 'stats' as const, label: 'Statistik', icon: BarChart3 },
-  { id: 'settings' as const, label: 'Einstellungen', icon: Settings },
+  { id: 'dashboard' as const, labelKey: 'nav.dashboard', icon: LayoutDashboard },
+  { id: 'products' as const, labelKey: 'nav.products', icon: Package },
+  { id: 'add' as const, labelKey: 'nav.add', icon: PlusCircle },
+  { id: 'scanner' as const, labelKey: 'nav.scanner', icon: ScanBarcode },
+  { id: 'stats' as const, labelKey: 'nav.stats', icon: BarChart3 },
+  { id: 'settings' as const, labelKey: 'nav.settings', icon: Settings },
 ];
 
 export function Navigation() {
   const { currentPage, setPage } = useAppStore();
+  const { t } = useTranslation();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-primary-700 bg-primary-800/95 backdrop-blur-sm safe-bottom">
       <div className="mx-auto flex max-w-lg items-center justify-around">
-        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+        {NAV_ITEMS.map(({ id, labelKey, icon: Icon }) => {
           const isActive = currentPage === id;
+          const label = t(labelKey);
           return (
             <button
               key={id}

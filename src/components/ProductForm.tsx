@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addProduct, updateProduct } from '../lib/db';
 import { useAppStore } from '../store/useAppStore';
 import { compressImage } from '../lib/utils';
 import {
-  CATEGORY_LABELS,
   DEFAULT_UNITS,
   type Product,
   type ProductCategory,
@@ -44,9 +44,7 @@ const defaultForm: FormState = {
 function saveFormDraft(form: FormState, editingId: number | null) {
   try {
     sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify({ form, editingId, timestamp: Date.now() }));
-  } catch {
-    // sessionStorage full or unavailable
-  }
+  } catch { /* sessionStorage full or unavailable */ }
 }
 
 function loadFormDraft(): { form: FormState; editingId: number | null } | null {
@@ -54,15 +52,12 @@ function loadFormDraft(): { form: FormState; editingId: number | null } | null {
     const raw = sessionStorage.getItem(FORM_STORAGE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
-    // Only restore if saved less than 10 minutes ago
     if (Date.now() - data.timestamp > 10 * 60 * 1000) {
       sessionStorage.removeItem(FORM_STORAGE_KEY);
       return null;
     }
     return { form: data.form, editingId: data.editingId };
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function clearFormDraft() {
@@ -72,10 +67,8 @@ function clearFormDraft() {
 export function ProductForm() {
   const { editingProductId, setPage, setEditingProductId, scannedData, setScannedData } = useAppStore();
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
-  const existingProduct = useLiveQuery(
-    () => (editingProductId ? db.products.get(editingProductId) : undefined),
-    [editingProductId]
-  );
+  const existingProduct = useLiveQuery(() => (editingProductId ? db.products.get(editingProductId) : undefined), [editingProductId]);
+  const { t } = useTranslation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -83,12 +76,8 @@ export function ProductForm() {
   const populatedRef = useRef(false);
 
   const [form, setForm] = useState<FormState>(() => {
-    // Check for saved draft on mount (page was reloaded by camera)
     const draft = loadFormDraft();
-    if (draft) {
-      restoredRef.current = true;
-      return draft.form;
-    }
+    if (draft) { restoredRef.current = true; return draft.form; }
     return { ...defaultForm, storageLocation: '' };
   });
 
@@ -98,21 +87,15 @@ export function ProductForm() {
     switch (unit) {
       case 'kg': return '0.1';
       case 'Liter': return '0.25';
-      case 'g':
-      case 'ml': return '1';
+      case 'g': case 'ml': return '1';
       default: return '1';
     }
   }
 
-  // If we restored a draft, clear it now that we've loaded it
   useEffect(() => {
-    if (restoredRef.current) {
-      clearFormDraft();
-      restoredRef.current = false;
-    }
+    if (restoredRef.current) { clearFormDraft(); restoredRef.current = false; }
   }, []);
 
-  // Populate form when editing — only once to avoid overwriting user edits
   useEffect(() => {
     if (existingProduct && !populatedRef.current) {
       populatedRef.current = true;
@@ -132,24 +115,15 @@ export function ProductForm() {
     }
   }, [existingProduct]);
 
-  // Reset populated flag when switching products
-  useEffect(() => {
-    populatedRef.current = false;
-  }, [editingProductId]);
+  useEffect(() => { populatedRef.current = false; }, [editingProductId]);
 
-  // Populate form from scanned data
   useEffect(() => {
     if (scannedData && !editingProductId) {
-      setForm((prev) => ({
-        ...prev,
-        barcode: scannedData.barcode || prev.barcode,
-        name: scannedData.name || prev.name,
-      }));
+      setForm((prev) => ({ ...prev, barcode: scannedData.barcode || prev.barcode, name: scannedData.name || prev.name }));
       setScannedData(null);
     }
   }, [scannedData, editingProductId, setScannedData]);
 
-  // Update default location when locations load
   useEffect(() => {
     if (!editingProductId && locations.length > 0 && !form.storageLocation) {
       setForm((prev) => ({ ...prev, storageLocation: locations[0].name }));
@@ -161,7 +135,6 @@ export function ProductForm() {
   }
 
   function handleCameraClick() {
-    // Save form state before opening native camera (page may reload)
     saveFormDraft(form, editingProductId);
     cameraInputRef.current?.click();
   }
@@ -174,7 +147,7 @@ export function ProductForm() {
       updateField('photo', compressed);
       clearFormDraft();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Bild konnte nicht verarbeitet werden.');
+      alert(err instanceof Error ? err.message : t('form.imageError'));
     }
     e.target.value = '';
   }
@@ -182,9 +155,7 @@ export function ProductForm() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || !form.expiryDate) return;
-
     setSaving(true);
-
     try {
       const productData: Omit<Product, 'id'> = {
         name: form.name.trim(),
@@ -199,280 +170,122 @@ export function ProductForm() {
         minStock: parseFloat(form.minStock) || undefined,
         notes: form.notes || undefined,
         archived: false,
-        createdAt: editingProductId
-          ? existingProduct?.createdAt || new Date().toISOString()
-          : new Date().toISOString(),
+        createdAt: editingProductId ? existingProduct?.createdAt || new Date().toISOString() : new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-
-      if (editingProductId) {
-        await updateProduct(editingProductId, productData);
-      } else {
-        await addProduct(productData);
-      }
-
+      if (editingProductId) { await updateProduct(editingProductId, productData); }
+      else { await addProduct(productData); }
       clearFormDraft();
       setEditingProductId(null);
       setPage('products');
     } catch (err) {
       console.error('Speichern fehlgeschlagen:', err);
-      alert('Fehler beim Speichern. Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
-    }
+      alert(t('form.saveError'));
+    } finally { setSaving(false); }
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         {editingProductId && (
-          <button
-            onClick={() => {
-              clearFormDraft();
-              setEditingProductId(null);
-              setPage('products');
-            }}
-            className="rounded-lg p-2 text-gray-400 hover:bg-primary-700 hover:text-gray-200"
-          >
+          <button onClick={() => { clearFormDraft(); setEditingProductId(null); setPage('products'); }} className="rounded-lg p-2 text-gray-400 hover:bg-primary-700 hover:text-gray-200">
             <ArrowLeft size={20} />
           </button>
         )}
         <h2 className="text-2xl font-bold text-gray-100">
-          {editingProductId ? 'Produkt bearbeiten' : 'Produkt hinzufügen'}
+          {editingProductId ? t('form.editTitle') : t('form.addTitle')}
         </h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Photo */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">Foto</label>
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.photo')}</label>
           <div className="flex items-center gap-3">
             {form.photo ? (
               <div className="relative">
-                <img
-                  src={form.photo}
-                  alt="Produktbild"
-                  className="h-20 w-20 rounded-lg object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => updateField('photo', '')}
-                  className="absolute -right-1 -top-1 rounded-full bg-red-600 p-0.5"
-                >
-                  <X size={12} className="text-white" />
-                </button>
+                <img src={form.photo} alt={t('form.productImage')} className="h-20 w-20 rounded-lg object-cover" />
+                <button type="button" onClick={() => updateField('photo', '')} className="absolute -right-1 -top-1 rounded-full bg-red-600 p-0.5"><X size={12} className="text-white" /></button>
               </div>
             ) : (
               <div className="flex gap-2">
-                {/* Camera button hidden - to be fixed later */}
-                <button
-                  type="button"
-                  onClick={handleCameraClick}
-                  className="hidden items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
-                >
-                  <Camera size={18} /> Kamera
+                <button type="button" onClick={handleCameraClick} className="hidden items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500">
+                  <Camera size={18} /> {t('form.camera')}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500"
-                >
-                  <Upload size={18} /> Galerie
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500">
+                  <Upload size={18} /> {t('form.gallery')}
                 </button>
               </div>
             )}
-            {/* Camera input - opens native camera directly */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            {/* Gallery input - opens file picker */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileSelect} className="hidden" />
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
           </div>
         </div>
 
-        {/* Name */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">
-            Produktname *
-          </label>
-          <input
-            type="text"
-            required
-            value={form.name}
-            onChange={(e) => updateField('name', e.target.value)}
-            placeholder="z.B. Dosentomaten"
-            className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.productName')}</label>
+          <input type="text" required value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder={t('form.productNamePlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
         </div>
 
-        {/* Barcode */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">
-            Barcode
-          </label>
-          <input
-            type="text"
-            value={form.barcode}
-            onChange={(e) => updateField('barcode', e.target.value)}
-            placeholder="EAN / UPC"
-            className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.barcode')}</label>
+          <input type="text" value={form.barcode} onChange={(e) => updateField('barcode', e.target.value)} placeholder={t('form.barcodePlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
         </div>
 
-        {/* Category & Location */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-300">
-              Kategorie
-            </label>
-            <select
-              value={form.category}
-              onChange={(e) =>
-                updateField('category', e.target.value as ProductCategory)
-              }
-              className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none"
-            >
-              {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.category')}</label>
+            <select value={form.category} onChange={(e) => updateField('category', e.target.value as ProductCategory)} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none">
+              {(['konserven', 'wasser', 'medizin', 'werkzeug', 'hygiene', 'lebensmittel', 'getranke', 'elektronik', 'kleidung', 'sonstiges'] as ProductCategory[]).map((key) => (
+                <option key={key} value={key}>{t(`categories.${key}`)}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-300">
-              Lagerort
-            </label>
-            <select
-              value={form.storageLocation}
-              onChange={(e) => updateField('storageLocation', e.target.value)}
-              className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none"
-            >
-              {locations.map((loc) => (
-                <option key={loc.id} value={loc.name}>
-                  {loc.name}
-                </option>
-              ))}
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.storageLocation')}</label>
+            <select value={form.storageLocation} onChange={(e) => updateField('storageLocation', e.target.value)} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none">
+              {locations.map((loc) => (<option key={loc.id} value={loc.name}>{loc.name}</option>))}
             </select>
           </div>
         </div>
 
-        {/* Quantity & Unit */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-300">
-              Menge
-            </label>
-            <input
-              type="number"
-              min={getQuantityStep(form.unit)}
-              step={getQuantityStep(form.unit)}
-              required
-              value={form.quantity}
-              onChange={(e) => updateField('quantity', e.target.value)}
-              className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none"
-            />
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.quantity')}</label>
+            <input type="number" min={getQuantityStep(form.unit)} step={getQuantityStep(form.unit)} required value={form.quantity} onChange={(e) => updateField('quantity', e.target.value)} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-300">
-              Einheit
-            </label>
-            <select
-              value={form.unit}
-              onChange={(e) => updateField('unit', e.target.value)}
-              className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none"
-            >
-              {DEFAULT_UNITS.map((unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ))}
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.unit')}</label>
+            <select value={form.unit} onChange={(e) => updateField('unit', e.target.value)} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none">
+              {DEFAULT_UNITS.map((unit) => (<option key={unit} value={unit}>{t(`units.${unit}`)}</option>))}
             </select>
           </div>
         </div>
 
-        {/* Expiry Date */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">
-            Mindesthaltbarkeitsdatum (MHD) *
-          </label>
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.expiryDate')}</label>
           <div className="flex gap-2">
-            <input
-              type="date"
-              required
-              value={form.expiryDate}
-              onChange={(e) => updateField('expiryDate', e.target.value)}
-              className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none"
-            />
-            <select
-              value={form.expiryPrecision}
-              onChange={(e) =>
-                updateField(
-                  'expiryPrecision',
-                  e.target.value as 'day' | 'month' | 'year'
-                )
-              }
-              className="rounded-lg border border-primary-600 bg-primary-800 px-3 py-2.5 text-sm text-gray-200 focus:border-green-500 focus:outline-none"
-            >
-              <option value="day">Tag genau</option>
-              <option value="month">Nur Monat</option>
-              <option value="year">Nur Jahr</option>
+            <input type="date" required value={form.expiryDate} onChange={(e) => updateField('expiryDate', e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
+            <select value={form.expiryPrecision} onChange={(e) => updateField('expiryPrecision', e.target.value as 'day' | 'month' | 'year')} className="rounded-lg border border-primary-600 bg-primary-800 px-3 py-2.5 text-sm text-gray-200 focus:border-green-500 focus:outline-none">
+              <option value="day">{t('form.precisionDay')}</option>
+              <option value="month">{t('form.precisionMonth')}</option>
+              <option value="year">{t('form.precisionYear')}</option>
             </select>
           </div>
         </div>
 
-        {/* Min Stock */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">
-            Mindestbestand (optional)
-          </label>
-          <input
-            type="number"
-            min="0"
-            value={form.minStock}
-            onChange={(e) => updateField('minStock', e.target.value)}
-            placeholder="0 = kein Minimum"
-            className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.minStock')}</label>
+          <input type="number" min="0" value={form.minStock} onChange={(e) => updateField('minStock', e.target.value)} placeholder={t('form.minStockPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
         </div>
 
-        {/* Notes */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">
-            Notizen
-          </label>
-          <textarea
-            value={form.notes}
-            onChange={(e) => updateField('notes', e.target.value)}
-            rows={2}
-            placeholder="Zusätzliche Informationen..."
-            className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.notes')}</label>
+          <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} rows={2} placeholder={t('form.notesPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
         </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={saving || !form.name.trim() || !form.expiryDate}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <button type="submit" disabled={saving || !form.name.trim() || !form.expiryDate} className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
           <Save size={20} />
-          {saving
-            ? 'Speichert...'
-            : editingProductId
-              ? 'Änderungen speichern'
-              : 'Produkt speichern'}
+          {saving ? t('form.saving') : editingProductId ? t('form.saveChanges') : t('form.saveProduct')}
         </button>
       </form>
     </div>

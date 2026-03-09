@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { version as appVersion } from '../../package.json';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, ImportResult } from '../lib/db';
@@ -18,7 +19,6 @@ import {
   Download,
   Upload,
   FileJson,
-  // FileSpreadsheet removed - Excel export disabled
   Shield,
   Heart,
   Smartphone,
@@ -27,7 +27,13 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  Globe,
 } from 'lucide-react';
+
+const LANGUAGES = [
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+];
 
 export function Settings() {
   const [isDark, toggleDark] = useDarkMode();
@@ -40,6 +46,7 @@ export function Settings() {
   const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
+  const { t, i18n } = useTranslation();
 
   async function handleToggleNotifications() {
     if (notificationsEnabled) {
@@ -76,12 +83,12 @@ export function Settings() {
     try {
       const text = await file.text();
       const count = await importData(text);
-      setImportStatus(`${count} Produkte erfolgreich importiert.`);
+      setImportStatus(t('import.success', { count }));
     } catch (err) {
       if (err instanceof ImportResult) {
         setImportStatus(err.message);
       } else {
-        setImportStatus(`Fehler: ${err instanceof Error ? err.message : 'Import fehlgeschlagen'}`);
+        setImportStatus(t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }));
       }
     }
 
@@ -91,14 +98,12 @@ export function Settings() {
   async function handleInstall() {
     const success = await install();
     if (!success) {
-      alert(
-        'Die Installation konnte nicht automatisch gestartet werden.\n\n' +
-        'So installierst du PrepTrack manuell:\n' +
-        '1. Chrome/Edge: Klicke auf das Installieren-Symbol in der Adressleiste (oder Menu > App installieren)\n' +
-        '2. Safari (iOS): Tippe auf Teilen > Zum Home-Bildschirm\n' +
-        '3. Firefox: Menu > Seite installieren'
-      );
+      alert(t('settings.installError'));
     }
+  }
+
+  function handleLanguageChange(langCode: string) {
+    i18n.changeLanguage(langCode);
   }
 
   const notifStatus = getNotificationPermissionStatus();
@@ -106,40 +111,65 @@ export function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-100">Einstellungen</h2>
+        <h2 className="text-2xl font-bold text-gray-100">{t('settings.title')}</h2>
       </div>
+
+      {/* Language */}
+      <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <Globe size={18} className="text-blue-400" />
+          {t('settings.language')}
+        </h3>
+        <div className="flex gap-2">
+          {LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => handleLanguageChange(lang.code)}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                i18n.language.startsWith(lang.code)
+                  ? 'border-green-500 bg-green-500/10 text-green-400'
+                  : 'border-primary-600 text-gray-300 hover:bg-primary-700'
+              }`}
+            >
+              <span className="text-lg">{lang.flag}</span>
+              <span>{lang.label}</span>
+              <span className="text-xs uppercase text-gray-400">{lang.code}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* PWA Install */}
       {!isInstalled && (
         <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
           <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <Smartphone size={18} className="text-green-400" />
-            App installieren
+            {t('settings.installApp')}
           </h3>
           {isIOS ? (
             <div className="space-y-2 text-sm text-gray-400">
               <p>
-                Tippe auf{' '}
+                {t('settings.iosInstallHint')}{' '}
                 <Share size={14} className="inline text-blue-400" />{' '}
-                <strong className="text-gray-300">Teilen</strong> und dann auf{' '}
-                <strong className="text-gray-300">&quot;Zum Home-Bildschirm&quot;</strong>.
+                <strong className="text-gray-300">{t('settings.iosShare')}</strong>{' '}
+                <strong className="text-gray-300">&quot;{t('settings.iosHomeScreen')}&quot;</strong>.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-gray-400">
-                Installiere PrepTrack als App für schnelleren Zugriff und Offline-Nutzung.
+                {t('settings.installDescription')}
               </p>
               <button
                 onClick={handleInstall}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
               >
                 <Download size={18} />
-                {isInstallable ? 'Jetzt installieren' : 'App installieren'}
+                {isInstallable ? t('settings.installNow') : t('settings.installApp2')}
               </button>
               {!isInstallable && (
                 <p className="text-xs text-gray-400">
-                  Tipp: In Chrome/Edge erscheint auch ein Installieren-Symbol in der Adressleiste.
+                  {t('settings.installTip')}
                 </p>
               )}
             </div>
@@ -151,14 +181,14 @@ export function Settings() {
         <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
           <div className="flex items-center gap-2">
             <Smartphone size={18} className="text-green-400" />
-            <span className="text-sm font-medium text-green-400">App ist installiert</span>
+            <span className="text-sm font-medium text-green-400">{t('settings.appInstalled')}</span>
           </div>
         </section>
       )}
 
       {/* Appearance */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">Darstellung</h3>
+        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.appearance')}</h3>
         <button
           onClick={toggleDark}
           className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3"
@@ -170,7 +200,7 @@ export function Settings() {
               <Sun size={20} className="text-yellow-400" />
             )}
             <span className="text-gray-200">
-              {isDark ? 'Dunkles Design' : 'Helles Design'}
+              {isDark ? t('settings.darkTheme') : t('settings.lightTheme')}
             </span>
           </div>
           <div
@@ -189,7 +219,7 @@ export function Settings() {
 
       {/* Notifications */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">Benachrichtigungen</h3>
+        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.notifications')}</h3>
         <button
           onClick={handleToggleNotifications}
           disabled={notifStatus === 'denied' || notifStatus === 'unsupported'}
@@ -202,15 +232,15 @@ export function Settings() {
               <BellOff size={20} className="text-gray-400" />
             )}
             <div className="text-left">
-              <span className="text-gray-200">MHD-Erinnerungen</span>
+              <span className="text-gray-200">{t('settings.expiryReminders')}</span>
               {notifStatus === 'denied' && (
                 <p className="text-xs text-red-400">
-                  Benachrichtigungen im Browser blockiert
+                  {t('settings.notifBlocked')}
                 </p>
               )}
               {notifStatus === 'unsupported' && (
                 <p className="text-xs text-gray-400">
-                  Nicht in diesem Browser unterstützt
+                  {t('settings.notifUnsupported')}
                 </p>
               )}
             </div>
@@ -229,14 +259,14 @@ export function Settings() {
         </button>
         {notificationsEnabled && (
           <p className="mt-2 text-xs text-gray-400">
-            Du wirst 30, 14, 7, 3 und 1 Tag vor dem Ablauf benachrichtigt.
+            {t('settings.notifSchedule')}
           </p>
         )}
       </section>
 
       {/* Storage Locations */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">Lagerorte verwalten</h3>
+        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.manageLocations')}</h3>
         <div className="mb-3 flex gap-2">
           <div className="relative flex-1">
             <MapPin
@@ -248,7 +278,7 @@ export function Settings() {
               value={newLocation}
               onChange={(e) => setNewLocation(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddLocation()}
-              placeholder="Neuer Lagerort..."
+              placeholder={t('settings.newLocationPlaceholder')}
               className="w-full rounded-lg border border-primary-600 bg-primary-900 py-2 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
             />
           </div>
@@ -271,7 +301,7 @@ export function Settings() {
                 onClick={() => {
                   const used = allProducts.filter((p) => !p.archived && p.storageLocation === loc.name).length;
                   if (used > 0) {
-                    alert(`„${loc.name}" wird noch von ${used} aktiven Produkt${used !== 1 ? 'en' : ''} verwendet und kann nicht gelöscht werden.`);
+                    alert(t('settings.locationInUse', { name: loc.name, count: used }));
                     return;
                   }
                   deleteStorageLocation(loc.id!);
@@ -287,7 +317,7 @@ export function Settings() {
 
       {/* Data Management */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">Datenverwaltung</h3>
+        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.dataManagement')}</h3>
         <div className="space-y-2">
           <button
             onClick={handleExportJSON}
@@ -295,8 +325,8 @@ export function Settings() {
           >
             <FileJson size={20} className="text-blue-400" />
             <div className="text-left">
-              <span>JSON-Backup</span>
-              <p className="text-xs text-gray-400">Vollständiges Backup aller Daten</p>
+              <span>{t('settings.jsonBackup')}</span>
+              <p className="text-xs text-gray-400">{t('settings.jsonBackupDesc')}</p>
             </div>
             <Download size={16} className="ml-auto text-gray-400" />
           </button>
@@ -307,8 +337,8 @@ export function Settings() {
           >
             <FileText size={20} className="text-gray-400" />
             <div className="text-left">
-              <span>CSV exportieren</span>
-              <p className="text-xs text-gray-400">Für Google Sheets oder Textverarbeitung</p>
+              <span>{t('settings.csvExport')}</span>
+              <p className="text-xs text-gray-400">{t('settings.csvExportDesc')}</p>
             </div>
             <Download size={16} className="ml-auto text-gray-400" />
           </button>
@@ -316,8 +346,8 @@ export function Settings() {
           <label className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700">
             <Upload size={20} className="text-orange-400" />
             <div className="text-left">
-              <span>JSON-Backup importieren</span>
-              <p className="text-xs text-gray-400">Daten aus einem Backup wiederherstellen</p>
+              <span>{t('settings.jsonImport')}</span>
+              <p className="text-xs text-gray-400">{t('settings.jsonImportDesc')}</p>
             </div>
             <input
               type="file"
@@ -330,9 +360,9 @@ export function Settings() {
           {importStatus && (
             <p
               className={`rounded-lg px-3 py-2 text-sm ${
-                importStatus.startsWith('Fehler')
+                importStatus.toLowerCase().includes('fehler') || importStatus.toLowerCase().includes('error')
                   ? 'bg-red-500/10 text-red-400'
-                  : importStatus.includes('übersprungen')
+                  : importStatus.includes('übersprungen') || importStatus.includes('skipped')
                     ? 'bg-orange-500/10 text-orange-400'
                     : 'bg-green-500/10 text-green-400'
               }`}
@@ -347,11 +377,10 @@ export function Settings() {
       <section className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <Heart size={18} className="text-pink-400" />
-          Unterstützen
+          {t('settings.support')}
         </h3>
         <p className="mb-3 text-sm text-gray-400">
-          PrepTrack ist kostenlos und werbefrei. Wenn dir die App gefällt, kannst du die
-          Entwicklung mit einer kleinen Spende unterstützen. Danke!
+          {t('settings.supportDesc')}
         </p>
         <a
           href="https://www.paypal.com/donate?business=renateweinfurtner%40gmx.de&currency_code=EUR&item_name=PrepTrack%20Spende"
@@ -362,7 +391,7 @@ export function Settings() {
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
             <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.774.774 0 0 1 .763-.658h6.568c2.183 0 3.678.568 4.44 1.69.357.526.563 1.105.613 1.72.053.66-.01 1.443-.19 2.39l-.007.038v.338l.263.149c.224.116.402.253.539.412.227.265.374.593.435.976.064.396.044.866-.058 1.397-.116.607-.304 1.136-.56 1.574a3.305 3.305 0 0 1-.887.99 3.547 3.547 0 0 1-1.214.592c-.46.137-.98.206-1.55.206H13.44a.907.907 0 0 0-.607.233.927.927 0 0 0-.313.579l-.034.195-.563 3.574-.025.14a.082.082 0 0 1-.026.055.078.078 0 0 1-.05.018H7.076Z" />
           </svg>
-          Mit PayPal spenden
+          {t('settings.donatePayPal')}
         </a>
         <p className="mt-2 text-center text-xs text-gray-400">renateweinfurtner@gmx.de</p>
       </section>
@@ -375,36 +404,31 @@ export function Settings() {
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Info size={18} className="text-blue-400" />
-            Impressum
+            {t('settings.impressum')}
           </h3>
           {showImpressum ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
         {showImpressum && (
           <div className="mt-3 space-y-3 text-sm text-gray-400">
-            <p className="font-medium text-gray-300">Angaben gemäß § 5 TMG:</p>
+            <p className="font-medium text-gray-300">{t('settings.impressumTMG')}</p>
             <p>
               Belkis Aslani<br />
               Vogelsangstr. 32<br />
               71691 Freiberg am Neckar
             </p>
 
-            <p className="font-medium text-gray-300">Kontakt:</p>
+            <p className="font-medium text-gray-300">{t('settings.impressumContact')}</p>
             <p>E-Mail: belkis.aslani@gmail.com</p>
 
-            <p className="font-medium text-gray-300">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</p>
+            <p className="font-medium text-gray-300">{t('settings.impressumResponsible')}</p>
             <p>
               Belkis Aslani<br />
               Vogelsangstr. 32<br />
               71691 Freiberg am Neckar
             </p>
 
-            <p className="font-medium text-gray-300">Haftungsausschluss:</p>
-            <p>
-              Die Inhalte dieser App wurden mit größter Sorgfalt erstellt.
-              Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
-              können wir jedoch keine Gewähr übernehmen. Die Nutzung erfolgt
-              auf eigene Verantwortung.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.impressumDisclaimer')}</p>
+            <p>{t('settings.impressumDisclaimerText')}</p>
           </div>
         )}
       </section>
@@ -417,13 +441,13 @@ export function Settings() {
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Shield size={18} className="text-green-400" />
-            Datenschutzerklärung
+            {t('settings.privacy')}
           </h3>
           {showDatenschutz ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
         {showDatenschutz && (
           <div className="mt-3 space-y-3 text-sm text-gray-400">
-            <p className="font-medium text-gray-300">Verantwortlich:</p>
+            <p className="font-medium text-gray-300">{t('settings.privacyResponsible')}</p>
             <p>
               Belkis Aslani<br />
               Vogelsangstr. 32<br />
@@ -431,39 +455,20 @@ export function Settings() {
               E-Mail: belkis.aslani@gmail.com
             </p>
 
-            <p className="font-medium text-gray-300">1. Datenverarbeitung</p>
-            <p>
-              PrepTrack speichert alle Daten ausschließlich lokal auf deinem Gerät
-              (IndexedDB im Browser). Es werden keine personenbezogenen Daten an Server
-              übertragen oder in einer Cloud gespeichert.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.privacyDataProcessing')}</p>
+            <p>{t('settings.privacyDataProcessingText')}</p>
 
-            <p className="font-medium text-gray-300">2. Externe Dienste</p>
-            <p>
-              Beim Barcode-Scan wird die Open Food Facts API (world.openfoodfacts.org)
-              kontaktiert, um Produktinformationen abzurufen. Dabei wird lediglich der
-              gescannte Barcode übermittelt. Open Food Facts ist ein gemeinnütziges
-              Open-Data-Projekt.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.privacyExternalServices')}</p>
+            <p>{t('settings.privacyExternalServicesText')}</p>
 
-            <p className="font-medium text-gray-300">3. Benachrichtigungen</p>
-            <p>
-              Wenn du Benachrichtigungen aktivierst, werden diese lokal auf deinem Gerät
-              erzeugt. Es werden keine Push-Tokens oder Daten an externe Server gesendet.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.privacyNotifications')}</p>
+            <p>{t('settings.privacyNotificationsText')}</p>
 
-            <p className="font-medium text-gray-300">4. Cookies &amp; Tracking</p>
-            <p>
-              PrepTrack verwendet keine Cookies, kein Tracking, keine Analytics und keine
-              Werbung. Es werden keine Daten an Dritte weitergegeben.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.privacyCookies')}</p>
+            <p>{t('settings.privacyCookiesText')}</p>
 
-            <p className="font-medium text-gray-300">5. Deine Rechte</p>
-            <p>
-              Da alle Daten lokal gespeichert werden, hast du jederzeit volle Kontrolle.
-              Du kannst deine Daten über die Export-Funktion sichern und über die
-              Browser-Einstellungen (Website-Daten löschen) vollständig entfernen.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.privacyRights')}</p>
+            <p>{t('settings.privacyRightsText')}</p>
           </div>
         )}
       </section>
@@ -476,13 +481,13 @@ export function Settings() {
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <FileText size={18} className="text-blue-400" />
-            Allgemeine Geschäftsbedingungen
+            {t('settings.terms')}
           </h3>
           {showAGB ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
         {showAGB && (
           <div className="mt-3 space-y-3 text-sm text-gray-400">
-            <p className="font-medium text-gray-300">Anbieter:</p>
+            <p className="font-medium text-gray-300">{t('settings.termsProvider')}</p>
             <p>
               Belkis Aslani<br />
               Vogelsangstr. 32<br />
@@ -490,43 +495,23 @@ export function Settings() {
               E-Mail: belkis.aslani@gmail.com
             </p>
 
-            <p className="font-medium text-gray-300">1. Geltungsbereich</p>
-            <p>
-              Diese AGB gelten für die Nutzung der Web-App &quot;PrepTrack&quot;.
-              Mit der Nutzung der App akzeptierst du diese Bedingungen.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.termsScope')}</p>
+            <p>{t('settings.termsScopeText')}</p>
 
-            <p className="font-medium text-gray-300">2. Leistungsbeschreibung</p>
-            <p>
-              PrepTrack ist eine kostenlose, werbefreie Progressive Web App zur Verwaltung
-              von Vorratsbeständen. Die App funktioniert offline und speichert alle Daten
-              lokal auf dem Endgerät des Nutzers.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.termsService')}</p>
+            <p>{t('settings.termsServiceText')}</p>
 
-            <p className="font-medium text-gray-300">3. Verfügbarkeit</p>
-            <p>
-              Ein Anspruch auf ständige Verfügbarkeit besteht nicht. Die App kann jederzeit
-              ohne Ankündigung geändert oder eingestellt werden.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.termsAvailability')}</p>
+            <p>{t('settings.termsAvailabilityText')}</p>
 
-            <p className="font-medium text-gray-300">4. Haftung</p>
-            <p>
-              Die Nutzung erfolgt auf eigene Verantwortung. Der Anbieter haftet nicht für
-              Schäden, die durch die Nutzung der App entstehen, insbesondere nicht für den
-              Verlust von Daten. Regelmäßige Backups werden empfohlen.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.termsLiability')}</p>
+            <p>{t('settings.termsLiabilityText')}</p>
 
-            <p className="font-medium text-gray-300">5. Geistiges Eigentum</p>
-            <p>
-              Alle Rechte an der App liegen beim Anbieter.
-              Die App darf für den persönlichen Gebrauch frei genutzt werden.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.termsIP')}</p>
+            <p>{t('settings.termsIPText')}</p>
 
-            <p className="font-medium text-gray-300">6. Spenden</p>
-            <p>
-              Spenden sind freiwillig und begründen kein Vertragsverhältnis.
-              Es besteht kein Anspruch auf besondere Leistungen.
-            </p>
+            <p className="font-medium text-gray-300">{t('settings.termsDonations')}</p>
+            <p>{t('settings.termsDonationsText')}</p>
           </div>
         )}
       </section>
@@ -534,7 +519,7 @@ export function Settings() {
       {/* App Info */}
       <section className="space-y-1 text-center text-xs text-gray-400">
         <p>PrepTrack v{appVersion}</p>
-        <p>Dein Vorrat. Immer im Blick.</p>
+        <p>{t('settings.appSlogan')}</p>
         <p>&copy; {new Date().getFullYear()} Belkis Aslani</p>
       </section>
     </div>

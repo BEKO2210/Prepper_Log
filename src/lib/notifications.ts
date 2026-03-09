@@ -1,5 +1,6 @@
 import { db } from './db';
 import { getDaysUntilExpiry } from './utils';
+import i18n from '../i18n/i18n';
 
 const NOTIFICATION_THRESHOLDS = [30, 14, 7, 3, 1, 0];
 
@@ -52,6 +53,7 @@ export async function checkAndNotifyExpiringProducts(): Promise<void> {
     .toArray();
 
   const today = new Date().toISOString().split('T')[0];
+  const t = i18n.t.bind(i18n);
 
   for (const product of products) {
     const daysLeft = getDaysUntilExpiry(product.expiryDate);
@@ -67,13 +69,13 @@ export async function checkAndNotifyExpiringProducts(): Promise<void> {
         if (!existingNotification?.sent) {
           const title =
             daysLeft <= 0
-              ? `${product.name} ist abgelaufen!`
-              : `${product.name} läuft bald ab`;
+              ? t('notifications.expiredTitle', { name: product.name })
+              : t('notifications.expiringTitle', { name: product.name });
 
           const body =
             daysLeft <= 0
-              ? `Das Produkt "${product.name}" in "${product.storageLocation}" ist abgelaufen.`
-              : `Noch ${daysLeft} Tag${daysLeft !== 1 ? 'e' : ''} bis zum Ablauf von "${product.name}" in "${product.storageLocation}".`;
+              ? t('notifications.expiredBody', { name: product.name, location: product.storageLocation })
+              : t('notifications.expiringBody', { name: product.name, location: product.storageLocation, days: daysLeft });
 
           showLocalNotification(title, body, `expiry-${product.id}-${threshold}`);
 
