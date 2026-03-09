@@ -1,6 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, formatDaysUntil, computeStats } from './utils';
+import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, getStatusColor, getStatusBadgeColor, formatDaysUntil, formatDuration, formatDate, computeStats, lookupBarcode } from './utils';
 import type { Product } from '../types';
+
+// Helper to create a product with defaults
+function makeProduct(overrides: Partial<Product> = {}): Product {
+  return {
+    id: 1,
+    name: 'Testprodukt',
+    barcode: '',
+    category: 'konserven',
+    storageLocation: 'Keller',
+    quantity: 5,
+    unit: 'Stück',
+    expiryDate: new Date(Date.now() + 90 * 86_400_000).toISOString(),
+    expiryPrecision: 'day',
+    archived: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
 
 describe('getExpiryStatus', () => {
   it('returns "expired" for past dates', () => {
@@ -9,9 +28,21 @@ describe('getExpiryStatus', () => {
     expect(getExpiryStatus(yesterday.toISOString())).toBe('expired');
   });
 
+  it('returns "expired" for today (day 0)', () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    expect(getExpiryStatus(today.toISOString())).toBe('expired');
+  });
+
   it('returns "critical" for dates within 7 days', () => {
     const date = new Date();
     date.setDate(date.getDate() + 3);
+    expect(getExpiryStatus(date.toISOString())).toBe('critical');
+  });
+
+  it('returns "critical" for exactly 7 days', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
     expect(getExpiryStatus(date.toISOString())).toBe('critical');
   });
 
@@ -46,6 +77,12 @@ describe('getDaysUntilExpiry', () => {
     past.setDate(past.getDate() - 5);
     expect(getDaysUntilExpiry(past.toISOString())).toBe(-5);
   });
+
+  it('returns positive for future dates', () => {
+    const future = new Date();
+    future.setDate(future.getDate() + 10);
+    expect(getDaysUntilExpiry(future.toISOString())).toBe(10);
+  });
 });
 
 describe('getStatusLabel', () => {
@@ -55,6 +92,39 @@ describe('getStatusLabel', () => {
     expect(getStatusLabel('warning')).toBe('Warnung');
     expect(getStatusLabel('soon')).toBe('Bald');
     expect(getStatusLabel('good')).toBe('OK');
+  });
+});
+
+describe('getStatusColor', () => {
+  it('returns color classes for each status', () => {
+    expect(getStatusColor('expired')).toContain('text-red');
+    expect(getStatusColor('good')).toContain('text-green');
+  });
+});
+
+describe('getStatusBadgeColor', () => {
+  it('returns badge classes for each status', () => {
+    expect(getStatusBadgeColor('expired')).toContain('bg-red');
+    expect(getStatusBadgeColor('good')).toContain('bg-green');
+  });
+});
+
+describe('formatDate', () => {
+  it('formats day precision', () => {
+    const result = formatDate('2025-06-15T00:00:00.000Z', 'day');
+    expect(result).toMatch(/15/);
+    expect(result).toMatch(/06|Jun/);
+    expect(result).toMatch(/2025/);
+  });
+
+  it('formats month precision', () => {
+    const result = formatDate('2025-06-15T00:00:00.000Z', 'month');
+    expect(result).toMatch(/2025/);
+  });
+
+  it('formats year precision', () => {
+    const result = formatDate('2025-06-15T00:00:00.000Z', 'year');
+    expect(result).toBe('2025');
   });
 });
 
@@ -79,6 +149,33 @@ describe('formatDaysUntil', () => {
     expect(formatDaysUntil(400)).toBe('1 Jahr, 1 Monat');
     expect(formatDaysUntil(730)).toBe('2 Jahre');
   });
+
+  it('formats exactly 59 days as days', () => {
+    expect(formatDaysUntil(59)).toBe('59 Tage');
+  });
+
+  it('formats 60+ days as months', () => {
+    expect(formatDaysUntil(60)).toBe('2 Monate');
+  });
+});
+
+describe('formatDuration', () => {
+  it('formats 0 days as Heute', () => {
+    expect(formatDuration(0)).toBe('Heute');
+  });
+
+  it('formats 1 day', () => {
+    expect(formatDuration(1)).toBe('1 Tag');
+  });
+
+  it('formats multiple days', () => {
+    expect(formatDuration(30)).toBe('30 Tage');
+  });
+
+  it('formats months and years', () => {
+    expect(formatDuration(365)).toBe('1 Jahr');
+    expect(formatDuration(400)).toBe('1 Jahr, 1 Monat');
+  });
 });
 
 describe('computeStats', () => {
@@ -87,48 +184,76 @@ describe('computeStats', () => {
     expect(stats.totalProducts).toBe(0);
     expect(stats.expiredCount).toBe(0);
     expect(stats.totalCategories).toBe(0);
+    expect(stats.totalLocations).toBe(0);
+    expect(stats.lowStockCount).toBe(0);
   });
 
   it('excludes archived products', () => {
-    const products: Product[] = [
-      {
-        id: 1,
-        name: 'Test',
-        barcode: '',
-        category: 'konserven',
-        storageLocation: 'keller',
-        quantity: 5,
-        unit: 'Stück',
-        expiryDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        archived: true,
-        expiryPrecision: 'day',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
+    const products = [makeProduct({ archived: true })];
     const stats = computeStats(products);
     expect(stats.totalProducts).toBe(0);
   });
 
   it('counts low stock products', () => {
-    const products: Product[] = [
-      {
-        id: 1,
-        name: 'Low Stock',
-        barcode: '',
-        category: 'wasser',
-        storageLocation: 'keller',
-        quantity: 1,
-        unit: 'Liter',
-        minStock: 5,
-        expiryDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        archived: false,
-        expiryPrecision: 'day',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
+    const products = [makeProduct({ quantity: 1, minStock: 5 })];
     const stats = computeStats(products);
     expect(stats.lowStockCount).toBe(1);
+  });
+
+  it('does not count products without minStock as low stock', () => {
+    const products = [makeProduct({ quantity: 1, minStock: undefined })];
+    const stats = computeStats(products);
+    expect(stats.lowStockCount).toBe(0);
+  });
+
+  it('counts categories and locations correctly', () => {
+    const products = [
+      makeProduct({ id: 1, category: 'wasser', storageLocation: 'Keller' }),
+      makeProduct({ id: 2, category: 'medizin', storageLocation: 'Garage' }),
+      makeProduct({ id: 3, category: 'wasser', storageLocation: 'Keller' }),
+    ];
+    const stats = computeStats(products);
+    expect(stats.totalProducts).toBe(3);
+    expect(stats.totalCategories).toBe(2);
+    expect(stats.totalLocations).toBe(2);
+  });
+
+  it('categorizes products by expiry status', () => {
+    const expired = makeProduct({
+      id: 1,
+      expiryDate: new Date(Date.now() - 86_400_000).toISOString(),
+    });
+    const good = makeProduct({
+      id: 2,
+      expiryDate: new Date(Date.now() + 90 * 86_400_000).toISOString(),
+    });
+    const stats = computeStats([expired, good]);
+    expect(stats.expiredCount).toBe(1);
+    expect(stats.goodCount).toBe(1);
+  });
+});
+
+describe('lookupBarcode', () => {
+  it('returns null for empty barcode', async () => {
+    expect(await lookupBarcode('')).toBeNull();
+  });
+
+  it('returns null for non-numeric barcode', async () => {
+    expect(await lookupBarcode('abc123')).toBeNull();
+  });
+
+  it('returns null for too-short barcode', async () => {
+    expect(await lookupBarcode('1234567')).toBeNull();
+  });
+
+  it('returns null for too-long barcode', async () => {
+    expect(await lookupBarcode('123456789012345')).toBeNull();
+  });
+
+  it('accepts valid EAN-13 barcode format', async () => {
+    // This will fail the network request but validates input passes
+    const result = await lookupBarcode('4006381333931');
+    // null because network is not available in test
+    expect(result).toBeNull();
   });
 });

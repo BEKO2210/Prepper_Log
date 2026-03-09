@@ -1,55 +1,62 @@
+import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { getExpiryStatus, computeStats } from '../lib/utils';
 import { CATEGORY_LABELS } from '../types';
+import type { ExpiryStatus } from '../types';
 import { BarChart3, TrendingUp, Package, Calendar } from 'lucide-react';
 
 export function Statistics() {
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const consumptionLogs = useLiveQuery(() => db.consumptionLogs.toArray()) ?? [];
-  const stats = computeStats(products);
-  const activeProducts = products.filter((p) => !p.archived);
 
-  // Category breakdown
-  const categoryBreakdown = Object.entries(CATEGORY_LABELS).map(([key, label]) => {
-    const count = activeProducts.filter((p) => p.category === key).length;
-    return { key, label, count };
-  }).filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
+  const { stats, expiryDist, totalForDist, categoryBreakdown, locationBreakdown, topConsumed, expiryRate } = useMemo(() => {
+    const s = computeStats(products);
+    const activeProducts = products.filter((p) => !p.archived);
 
-  // Location breakdown
-  const locationCounts = activeProducts.reduce<Record<string, number>>((acc, p) => {
-    acc[p.storageLocation] = (acc[p.storageLocation] || 0) + 1;
-    return acc;
-  }, {});
-  const locationBreakdown = Object.entries(locationCounts)
-    .sort(([, a], [, b]) => b - a);
+    // Category breakdown
+    const catBreakdown = Object.entries(CATEGORY_LABELS).map(([key, label]) => {
+      const count = activeProducts.filter((p) => p.category === key).length;
+      return { key, label, count };
+    }).filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
 
-  // Expiry distribution
-  const expiryDist = {
-    expired: activeProducts.filter((p) => getExpiryStatus(p.expiryDate) === 'expired').length,
-    critical: activeProducts.filter((p) => getExpiryStatus(p.expiryDate) === 'critical').length,
-    warning: activeProducts.filter((p) => getExpiryStatus(p.expiryDate) === 'warning').length,
-    soon: activeProducts.filter((p) => getExpiryStatus(p.expiryDate) === 'soon').length,
-    good: activeProducts.filter((p) => getExpiryStatus(p.expiryDate) === 'good').length,
-  };
-  const totalForDist = Math.max(activeProducts.length, 1);
+    // Location breakdown
+    const locCounts = activeProducts.reduce<Record<string, number>>((acc, p) => {
+      acc[p.storageLocation] = (acc[p.storageLocation] || 0) + 1;
+      return acc;
+    }, {});
+    const locBreakdown = Object.entries(locCounts).sort(([, a], [, b]) => b - a);
 
-  // Most consumed products
-  const consumptionCounts = consumptionLogs.reduce<Record<string, number>>((acc, log) => {
-    acc[log.productName] = (acc[log.productName] || 0) + log.quantity;
-    return acc;
-  }, {});
-  const topConsumed = Object.entries(consumptionCounts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
+    // Expiry distribution — single pass instead of 5 separate filters
+    const dist: Record<ExpiryStatus, number> = { expired: 0, critical: 0, warning: 0, soon: 0, good: 0 };
+    for (const p of activeProducts) {
+      dist[getExpiryStatus(p.expiryDate)]++;
+    }
 
-  // Expiry rate
-  const archivedTotal = products.filter((p) => p.archived).length;
-  const expiredArchived = products.filter(
-    (p) => p.archived && getExpiryStatus(p.expiryDate) === 'expired'
-  ).length;
-  const expiryRate =
-    archivedTotal > 0 ? Math.round((expiredArchived / archivedTotal) * 100) : 0;
+    // Most consumed
+    const consumeCounts = consumptionLogs.reduce<Record<string, number>>((acc, log) => {
+      acc[log.productName] = (acc[log.productName] || 0) + log.quantity;
+      return acc;
+    }, {});
+    const topConsumedList = Object.entries(consumeCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
+
+    // Expiry rate
+    const archivedTotal = products.filter((p) => p.archived).length;
+    const expiredArchived = products.filter(
+      (p) => p.archived && getExpiryStatus(p.expiryDate) === 'expired'
+    ).length;
+    const rate = archivedTotal > 0 ? Math.round((expiredArchived / archivedTotal) * 100) : 0;
+
+    return {
+      stats: s,
+      expiryDist: dist,
+      totalForDist: Math.max(activeProducts.length, 1),
+      categoryBreakdown: catBreakdown,
+      locationBreakdown: locBreakdown,
+      topConsumed: topConsumedList,
+      expiryRate: rate,
+    };
+  }, [products, consumptionLogs]);
 
   return (
     <div className="space-y-6">
