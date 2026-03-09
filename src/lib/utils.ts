@@ -85,10 +85,43 @@ export function formatDate(dateString: string, precision: 'day' | 'month' | 'yea
 }
 
 export function formatDaysUntil(days: number): string {
-  if (days < 0) return `${Math.abs(days)} Tage abgelaufen`;
   if (days === 0) return 'Heute';
   if (days === 1) return 'Morgen';
-  return `${days} Tage`;
+  if (days === -1) return '1 Tag abgelaufen';
+
+  const abs = Math.abs(days);
+  const suffix = days < 0 ? ' abgelaufen' : '';
+
+  if (abs < 60) return `${abs} Tage${suffix}`;
+
+  const years = Math.floor(abs / 365);
+  const remaining = abs % 365;
+  const months = Math.floor(remaining / 30);
+  const d = remaining % 30;
+
+  const parts: string[] = [];
+  if (years > 0) parts.push(`${years} ${years === 1 ? 'Jahr' : 'Jahre'}`);
+  if (months > 0) parts.push(`${months} ${months === 1 ? 'Monat' : 'Monate'}`);
+  if (d > 0 && years === 0) parts.push(`${d} ${d === 1 ? 'Tag' : 'Tage'}`);
+
+  return parts.join(', ') + suffix;
+}
+
+export function formatDuration(totalDays: number): string {
+  if (totalDays < 1) return 'Heute';
+  if (totalDays < 60) return `${totalDays} ${totalDays === 1 ? 'Tag' : 'Tage'}`;
+
+  const years = Math.floor(totalDays / 365);
+  const remaining = totalDays % 365;
+  const months = Math.floor(remaining / 30);
+  const d = remaining % 30;
+
+  const parts: string[] = [];
+  if (years > 0) parts.push(`${years} ${years === 1 ? 'Jahr' : 'Jahre'}`);
+  if (months > 0) parts.push(`${months} ${months === 1 ? 'Monat' : 'Monate'}`);
+  if (d > 0 && years === 0) parts.push(`${d} ${d === 1 ? 'Tag' : 'Tage'}`);
+
+  return parts.join(', ');
 }
 
 export function computeStats(products: Product[]): DashboardStats {
