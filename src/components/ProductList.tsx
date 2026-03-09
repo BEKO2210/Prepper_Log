@@ -319,13 +319,13 @@ export function ProductList() {
                 <span className="text-sm text-red-400">Wirklich löschen? Nicht rückgängig machbar.</span>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleDelete(product.id!)}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(product.id!); }}
                     className="rounded bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500"
                   >
                     Löschen
                   </button>
                   <button
-                    onClick={() => setConfirmDelete(null)}
+                    onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }}
                     className="rounded bg-primary-700 px-3 py-1 text-xs text-gray-300 hover:bg-primary-600"
                   >
                     Abbrechen

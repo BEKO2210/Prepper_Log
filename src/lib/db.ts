@@ -83,11 +83,11 @@ export async function archiveProduct(id: number): Promise<void> {
 }
 
 export async function getActiveProducts(): Promise<Product[]> {
-  return db.products.where('archived').equals(0).toArray();
+  return db.products.filter((p) => !p.archived).toArray();
 }
 
 export async function getArchivedProducts(): Promise<Product[]> {
-  return db.products.where('archived').equals(1).toArray();
+  return db.products.filter((p) => p.archived).toArray();
 }
 
 // Storage Location CRUD
@@ -368,14 +368,15 @@ export async function importData(jsonString: string): Promise<number> {
 }
 
 // Custom class to pass both imported and skipped counts
-export class ImportResult {
+export class ImportResult extends Error {
   imported: number;
   skipped: number;
-  message: string;
 
   constructor(imported: number, skipped: number) {
+    const msg = `${imported} Produkte importiert, ${skipped} übersprungen (Duplikate oder ungültig).`;
+    super(msg);
+    this.name = 'ImportResult';
     this.imported = imported;
     this.skipped = skipped;
-    this.message = `${imported} Produkte importiert, ${skipped} übersprungen (Duplikate oder ungültig).`;
   }
 }
