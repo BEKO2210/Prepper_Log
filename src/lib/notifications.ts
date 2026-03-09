@@ -32,7 +32,7 @@ export function showLocalNotification(
   body: string,
   tag?: string
 ): void {
-  if (Notification.permission !== 'granted') return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
   new Notification(title, {
     body,
@@ -45,7 +45,7 @@ export function showLocalNotification(
 }
 
 export async function checkAndNotifyExpiringProducts(): Promise<void> {
-  if (Notification.permission !== 'granted') return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
   const products = await db.products
     .filter((p) => !p.archived)
@@ -77,14 +77,21 @@ export async function checkAndNotifyExpiringProducts(): Promise<void> {
 
           showLocalNotification(title, body, `expiry-${product.id}-${threshold}`);
 
-          await db.notificationSchedules.put({
-            productId: product.id!,
-            productName: product.name,
-            expiryDate: product.expiryDate,
-            notifyAt: today,
-            daysBefore: threshold,
-            sent: true,
-          });
+          if (existingNotification) {
+            await db.notificationSchedules.update(existingNotification.id!, {
+              sent: true,
+              notifyAt: today,
+            });
+          } else {
+            await db.notificationSchedules.add({
+              productId: product.id!,
+              productName: product.name,
+              expiryDate: product.expiryDate,
+              notifyAt: today,
+              daysBefore: threshold,
+              sent: true,
+            });
+          }
         }
         // Only fire the highest matching threshold per product
         break;

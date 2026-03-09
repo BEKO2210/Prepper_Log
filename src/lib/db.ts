@@ -261,21 +261,28 @@ export async function importData(jsonString: string): Promise<number> {
           continue;
         }
 
-        const { id: _id, photo: rawPhoto, ...rest } = product;
-
         // Clean up photo field - don't import placeholder markers
-        const photo = rawPhoto && rawPhoto !== '[FOTO]' ? rawPhoto : undefined;
+        const rawPhoto = product.photo;
+        const photo = rawPhoto && rawPhoto !== '[FOTO]' && typeof rawPhoto === 'string' ? rawPhoto : undefined;
+        const now = new Date().toISOString();
 
-        // Ensure archived is boolean
-        const archived = rest.archived === true || rest.archived === 1;
-
+        // Only import known fields to prevent injection of unexpected data
         await db.products.add({
-          ...rest,
+          name: String(product.name),
+          barcode: typeof product.barcode === 'string' ? product.barcode : undefined,
+          category: typeof product.category === 'string' ? product.category as Product['category'] : 'sonstiges',
+          storageLocation: typeof product.storageLocation === 'string' ? product.storageLocation : 'Keller',
+          quantity: typeof product.quantity === 'number' ? product.quantity : 1,
+          unit: typeof product.unit === 'string' ? product.unit : 'Stück',
+          expiryDate: String(product.expiryDate),
+          expiryPrecision: ['day', 'month', 'year'].includes(product.expiryPrecision as string) ? product.expiryPrecision as Product['expiryPrecision'] : 'day',
           photo,
-          archived,
-          createdAt: (rest.createdAt as string) || new Date().toISOString(),
-          updatedAt: (rest.updatedAt as string) || new Date().toISOString(),
-        } as Omit<Product, 'id'>);
+          minStock: typeof product.minStock === 'number' ? product.minStock : undefined,
+          notes: typeof product.notes === 'string' ? product.notes : undefined,
+          archived: product.archived === true || product.archived === 1,
+          createdAt: typeof product.createdAt === 'string' ? product.createdAt : now,
+          updatedAt: typeof product.updatedAt === 'string' ? product.updatedAt : now,
+        });
         imported++;
       }
 
