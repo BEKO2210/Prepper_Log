@@ -157,7 +157,11 @@ export async function exportCSV(): Promise<string> {
   ];
 
   function escCsv(val: string | number | undefined | null): string {
-    const s = String(val ?? '');
+    let s = String(val ?? '');
+    // Prevent CSV injection: prefix dangerous first characters
+    if (s.length > 0 && /^[=+\-@\t\r]/.test(s)) {
+      s = "'" + s;
+    }
     if (s.includes(';') || s.includes('"') || s.includes('\n')) {
       return `"${s.replace(/"/g, '""')}"`;
     }
@@ -231,7 +235,12 @@ export async function importData(jsonString: string): Promise<number> {
 
       // Import products (skip duplicates based on name + expiryDate + storageLocation)
       for (const product of products) {
-        if (!product.name || !product.expiryDate) {
+        if (
+          !product.name ||
+          typeof product.name !== 'string' ||
+          !product.expiryDate ||
+          typeof product.expiryDate !== 'string'
+        ) {
           skipped++;
           continue;
         }

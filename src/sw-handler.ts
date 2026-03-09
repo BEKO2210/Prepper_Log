@@ -19,6 +19,8 @@ export function registerSWEventHandlers(): void {
           }
         });
       });
+    }).catch(() => {
+      // Service Worker not available — non-critical
     });
 
     // Handle controller change (after skip waiting)
