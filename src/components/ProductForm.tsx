@@ -80,6 +80,7 @@ export function ProductForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const restoredRef = useRef(false);
+  const populatedRef = useRef(false);
 
   const [form, setForm] = useState<FormState>(() => {
     // Check for saved draft on mount (page was reloaded by camera)
@@ -111,9 +112,10 @@ export function ProductForm() {
     }
   }, []);
 
-  // Populate form when editing
+  // Populate form when editing — only once to avoid overwriting user edits
   useEffect(() => {
-    if (existingProduct) {
+    if (existingProduct && !populatedRef.current) {
+      populatedRef.current = true;
       setForm({
         name: existingProduct.name,
         barcode: existingProduct.barcode || '',
@@ -129,6 +131,11 @@ export function ProductForm() {
       });
     }
   }, [existingProduct]);
+
+  // Reset populated flag when switching products
+  useEffect(() => {
+    populatedRef.current = false;
+  }, [editingProductId]);
 
   // Populate form from scanned data
   useEffect(() => {

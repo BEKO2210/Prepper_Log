@@ -1,7 +1,7 @@
 import { db } from './db';
 import { getDaysUntilExpiry } from './utils';
 
-const NOTIFICATION_THRESHOLDS = [30, 14, 7, 3, 1];
+const NOTIFICATION_THRESHOLDS = [30, 14, 7, 3, 1, 0];
 
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!('Notification' in window)) {
@@ -48,8 +48,7 @@ export async function checkAndNotifyExpiringProducts(): Promise<void> {
   if (Notification.permission !== 'granted') return;
 
   const products = await db.products
-    .where('archived')
-    .equals(0)
+    .filter((p) => !p.archived)
     .toArray();
 
   const today = new Date().toISOString().split('T')[0];

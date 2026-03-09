@@ -35,12 +35,17 @@ export function BarcodeScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const processedRef = useRef(false);
+  const controlsRef = useRef<{ stop: () => void } | null>(null);
   const [state, setState] = useState<ScanState>({ type: 'idle' });
   const [cameraActive, setCameraActive] = useState(false);
   const isOnline = useOnlineStatus();
+  const isOnlineRef = useRef(isOnline);
+  isOnlineRef.current = isOnline;
   const { navigateToAddWithScan } = useAppStore();
 
   const stopCamera = useCallback(() => {
+    controlsRef.current?.stop();
+    controlsRef.current = null;
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach((t) => t.stop());
@@ -60,7 +65,7 @@ export function BarcodeScanner() {
         video: { facingMode: 'environment' },
       };
 
-      await reader.decodeFromConstraints(
+      const controls = await reader.decodeFromConstraints(
         constraints,
         videoRef.current!,
         async (result) => {
@@ -82,7 +87,7 @@ export function BarcodeScanner() {
             if (existing.length > 0) {
               // Fetch API name in background for extra info
               let apiName: string | undefined;
-              if (isOnline) {
+              if (isOnlineRef.current) {
                 const apiResult = await lookupBarcode(barcode);
                 apiName = apiResult?.name;
               }
@@ -91,7 +96,7 @@ export function BarcodeScanner() {
             }
 
             // No duplicate — look up online and go to form
-            if (!isOnline) {
+            if (!isOnlineRef.current) {
               navigateToAddWithScan({ barcode });
               return;
             }
@@ -106,6 +111,7 @@ export function BarcodeScanner() {
         }
       );
 
+      controlsRef.current = controls;
       setCameraActive(true);
     } catch (err) {
       const message =
@@ -114,7 +120,7 @@ export function BarcodeScanner() {
           : 'Kamera konnte nicht gestartet werden.';
       setState({ type: 'error', message });
     }
-  }, [isOnline, stopCamera, navigateToAddWithScan]);
+  }, [stopCamera, navigateToAddWithScan]);
 
   useEffect(() => {
     return () => {

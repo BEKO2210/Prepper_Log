@@ -33,6 +33,7 @@ export function Settings() {
   const { notificationsEnabled, setNotificationsEnabled } = useAppStore();
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
+  const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
@@ -265,7 +266,14 @@ export function Settings() {
             >
               <span className="text-sm text-gray-300">{loc.name}</span>
               <button
-                onClick={() => deleteStorageLocation(loc.id!)}
+                onClick={() => {
+                  const used = allProducts.filter((p) => !p.archived && p.storageLocation === loc.name).length;
+                  if (used > 0) {
+                    alert(`„${loc.name}" wird noch von ${used} aktiven Produkt${used !== 1 ? 'en' : ''} verwendet und kann nicht gelöscht werden.`);
+                    return;
+                  }
+                  deleteStorageLocation(loc.id!);
+                }}
                 className="rounded p-1 text-gray-500 hover:bg-primary-600 hover:text-red-400"
               >
                 <Trash2 size={14} />
