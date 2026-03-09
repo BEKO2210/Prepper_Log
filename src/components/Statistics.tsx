@@ -1,23 +1,24 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { getExpiryStatus, computeStats } from '../lib/utils';
-import { CATEGORY_LABELS } from '../types';
-import type { ExpiryStatus } from '../types';
+import type { ExpiryStatus, ProductCategory } from '../types';
 import { BarChart3, TrendingUp, Package, Calendar } from 'lucide-react';
 
 export function Statistics() {
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const consumptionLogs = useLiveQuery(() => db.consumptionLogs.toArray()) ?? [];
+  const { t } = useTranslation();
 
   const { stats, expiryDist, totalForDist, categoryBreakdown, locationBreakdown, topConsumed, expiryRate } = useMemo(() => {
     const s = computeStats(products);
     const activeProducts = products.filter((p) => !p.archived);
 
     // Category breakdown
-    const catBreakdown = Object.entries(CATEGORY_LABELS).map(([key, label]) => {
+    const catBreakdown = (['konserven', 'wasser', 'medizin', 'werkzeug', 'hygiene', 'lebensmittel', 'getranke', 'elektronik', 'kleidung', 'sonstiges'] as ProductCategory[]).map((key) => {
       const count = activeProducts.filter((p) => p.category === key).length;
-      return { key, label, count };
+      return { key, label: t(`categories.${key}`), count };
     }).filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
 
     // Location breakdown
@@ -56,13 +57,13 @@ export function Statistics() {
       topConsumed: topConsumedList,
       expiryRate: rate,
     };
-  }, [products, consumptionLogs]);
+  }, [products, consumptionLogs, t]);
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-100">Statistiken</h2>
-        <p className="text-sm text-gray-400">Übersicht deines Vorrats</p>
+        <h2 className="text-2xl font-bold text-gray-100">{t('stats.title')}</h2>
+        <p className="text-sm text-gray-400">{t('stats.subtitle')}</p>
       </div>
 
       {/* Quick stats */}
@@ -70,7 +71,7 @@ export function Statistics() {
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
           <div className="flex items-center gap-2 text-blue-400">
             <Package size={18} />
-            <span className="text-sm">Aktive Produkte</span>
+            <span className="text-sm">{t('stats.activeProducts')}</span>
           </div>
           <p className="mt-1 text-3xl font-bold text-gray-100">
             {stats.totalProducts}
@@ -79,10 +80,10 @@ export function Statistics() {
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
           <div className="flex items-center gap-2 text-orange-400">
             <Calendar size={18} />
-            <span className="text-sm">Ablaufrate</span>
+            <span className="text-sm">{t('stats.expiryRate')}</span>
           </div>
           <p className="mt-1 text-3xl font-bold text-gray-100">{expiryRate}%</p>
-          <p className="text-xs text-gray-400">der archivierten Produkte</p>
+          <p className="text-xs text-gray-400">{t('stats.ofArchived')}</p>
         </div>
       </div>
 
@@ -90,15 +91,15 @@ export function Statistics() {
       <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <BarChart3 size={18} className="text-green-400" />
-          MHD-Verteilung
+          {t('stats.expiryDistribution')}
         </h3>
         <div className="space-y-2">
           {[
-            { label: 'Abgelaufen', count: expiryDist.expired, color: 'bg-red-500' },
-            { label: 'Kritisch (≤7d)', count: expiryDist.critical, color: 'bg-red-400' },
-            { label: 'Warnung (8-14d)', count: expiryDist.warning, color: 'bg-orange-400' },
-            { label: 'Bald (15-30d)', count: expiryDist.soon, color: 'bg-yellow-400' },
-            { label: 'OK (>30d)', count: expiryDist.good, color: 'bg-green-500' },
+            { label: t('stats.expired'), count: expiryDist.expired, color: 'bg-red-500' },
+            { label: t('stats.critical'), count: expiryDist.critical, color: 'bg-red-400' },
+            { label: t('stats.warning'), count: expiryDist.warning, color: 'bg-orange-400' },
+            { label: t('stats.soon'), count: expiryDist.soon, color: 'bg-yellow-400' },
+            { label: t('stats.ok'), count: expiryDist.good, color: 'bg-green-500' },
           ].map(({ label, count, color }) => (
             <div key={label}>
               <div className="flex justify-between text-sm">
@@ -121,7 +122,7 @@ export function Statistics() {
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
           <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <Package size={18} className="text-purple-400" />
-            Nach Kategorie
+            {t('stats.byCategory')}
           </h3>
           <div className="space-y-2">
             {categoryBreakdown.map(({ key, label, count }) => (
@@ -142,7 +143,7 @@ export function Statistics() {
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
           <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <TrendingUp size={18} className="text-cyan-400" />
-            Nach Lagerort
+            {t('stats.byLocation')}
           </h3>
           <div className="space-y-2">
             {locationBreakdown.map(([name, count]) => (
@@ -163,7 +164,7 @@ export function Statistics() {
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
           <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <TrendingUp size={18} className="text-green-400" />
-            Meistverbraucht
+            {t('stats.mostConsumed')}
           </h3>
           <div className="space-y-2">
             {topConsumed.map(([name, count], i) => (

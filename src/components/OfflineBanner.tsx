@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { WifiOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function OfflineBanner() {
   const isOnline = useOnlineStatus();
+  const { t } = useTranslation();
 
   return (
     <AnimatePresence>
@@ -16,7 +18,7 @@ export function OfflineBanner() {
         >
           <div className="flex items-center justify-center gap-2 px-4 py-2">
             <WifiOff size={16} />
-            <span>Offline — alles funktioniert weiterhin lokal</span>
+            <span>{t('offline.banner')}</span>
           </div>
         </motion.div>
       )}

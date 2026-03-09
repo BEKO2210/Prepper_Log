@@ -1,6 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
+import i18n from '../i18n/i18n';
 import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, getStatusColor, getStatusBadgeColor, formatDaysUntil, formatDuration, formatDate, computeStats, lookupBarcode, downloadFile, compressImage } from './utils';
 import type { Product } from '../types';
+
+beforeAll(async () => {
+  await i18n.changeLanguage('de');
+});
 
 // Helper to create a product with defaults
 function makeProduct(overrides: Partial<Product> = {}): Product {

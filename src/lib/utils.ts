@@ -1,3 +1,4 @@
+import i18n from '../i18n/i18n';
 import type { ExpiryStatus, Product, DashboardStats } from '../types';
 
 export function getExpiryStatus(expiryDate: string): ExpiryStatus {
@@ -54,29 +55,24 @@ export function getStatusBadgeColor(status: ExpiryStatus): string {
 }
 
 export function getStatusLabel(status: ExpiryStatus): string {
-  switch (status) {
-    case 'expired':
-      return 'Abgelaufen';
-    case 'critical':
-      return 'Kritisch';
-    case 'warning':
-      return 'Warnung';
-    case 'soon':
-      return 'Bald';
-    case 'good':
-      return 'OK';
-  }
+  return i18n.t(`status.${status}`);
+}
+
+function getLocale(): string {
+  const lang = i18n.language || 'de';
+  return lang === 'en' ? 'en-GB' : 'de-DE';
 }
 
 export function formatDate(dateString: string, precision: 'day' | 'month' | 'year' = 'day'): string {
   const date = new Date(dateString);
+  const locale = getLocale();
   switch (precision) {
     case 'year':
       return date.getFullYear().toString();
     case 'month':
-      return date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+      return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     case 'day':
-      return date.toLocaleDateString('de-DE', {
+      return date.toLocaleDateString(locale, {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -85,14 +81,15 @@ export function formatDate(dateString: string, precision: 'day' | 'month' | 'yea
 }
 
 export function formatDaysUntil(days: number): string {
-  if (days === 0) return 'Heute';
-  if (days === 1) return 'Morgen';
-  if (days === -1) return '1 Tag abgelaufen';
+  const t = i18n.t.bind(i18n);
+  if (days === 0) return t('time.today');
+  if (days === 1) return t('time.tomorrow');
+  if (days === -1) return t('time.dayExpired');
 
   const abs = Math.abs(days);
-  const suffix = days < 0 ? ' abgelaufen' : '';
+  const suffix = days < 0 ? t('time.daysExpiredSuffix') : '';
 
-  if (abs < 60) return `${abs} Tage${suffix}`;
+  if (abs < 60) return t('time.days', { count: abs }) + suffix;
 
   const years = Math.floor(abs / 365);
   const remaining = abs % 365;
@@ -100,16 +97,17 @@ export function formatDaysUntil(days: number): string {
   const d = remaining % 30;
 
   const parts: string[] = [];
-  if (years > 0) parts.push(`${years} ${years === 1 ? 'Jahr' : 'Jahre'}`);
-  if (months > 0) parts.push(`${months} ${months === 1 ? 'Monat' : 'Monate'}`);
-  if (d > 0 && years === 0) parts.push(`${d} ${d === 1 ? 'Tag' : 'Tage'}`);
+  if (years > 0) parts.push(t('time.year', { count: years }));
+  if (months > 0) parts.push(t('time.month', { count: months }));
+  if (d > 0 && years === 0) parts.push(t('time.days', { count: d }));
 
   return parts.join(', ') + suffix;
 }
 
 export function formatDuration(totalDays: number): string {
-  if (totalDays < 1) return 'Heute';
-  if (totalDays < 60) return `${totalDays} ${totalDays === 1 ? 'Tag' : 'Tage'}`;
+  const t = i18n.t.bind(i18n);
+  if (totalDays < 1) return t('time.today');
+  if (totalDays < 60) return t('time.days', { count: totalDays });
 
   const years = Math.floor(totalDays / 365);
   const remaining = totalDays % 365;
@@ -117,9 +115,9 @@ export function formatDuration(totalDays: number): string {
   const d = remaining % 30;
 
   const parts: string[] = [];
-  if (years > 0) parts.push(`${years} ${years === 1 ? 'Jahr' : 'Jahre'}`);
-  if (months > 0) parts.push(`${months} ${months === 1 ? 'Monat' : 'Monate'}`);
-  if (d > 0 && years === 0) parts.push(`${d} ${d === 1 ? 'Tag' : 'Tage'}`);
+  if (years > 0) parts.push(t('time.year', { count: years }));
+  if (months > 0) parts.push(t('time.month', { count: months }));
+  if (d > 0 && years === 0) parts.push(t('time.days', { count: d }));
 
   return parts.join(', ');
 }
@@ -174,7 +172,7 @@ export async function compressImage(
   maxSizeKB: number = 500
 ): Promise<string> {
   if (file.size > MAX_INPUT_SIZE_BYTES) {
-    throw new Error('Bild ist zu groß (max. 10 MB). Bitte ein kleineres Bild wählen.');
+    throw new Error(i18n.t('imageErrors.tooLarge'));
   }
 
   return new Promise((resolve, reject) => {
@@ -197,17 +195,16 @@ export async function compressImage(
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          reject(new Error('Canvas context nicht verfügbar'));
+          reject(new Error(i18n.t('imageErrors.canvasError')));
           return;
         }
 
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Try WebP first, fallback to JPEG
         const supportsWebP = canvas.toDataURL('image/webp').startsWith('data:image/webp');
         const format = supportsWebP ? 'image/webp' : 'image/jpeg';
 
-        const maxBase64Bytes = maxSizeKB * 1024 * 1.37; // base64 overhead
+        const maxBase64Bytes = maxSizeKB * 1024 * 1.37;
         let quality = 0.7;
         let dataUrl = canvas.toDataURL(format, quality);
 
@@ -218,10 +215,10 @@ export async function compressImage(
 
         resolve(dataUrl);
       };
-      img.onerror = () => reject(new Error('Bild konnte nicht geladen werden'));
+      img.onerror = () => reject(new Error(i18n.t('imageErrors.loadError')));
       img.src = e.target?.result as string;
     };
-    reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'));
+    reader.onerror = () => reject(new Error(i18n.t('imageErrors.readError')));
     reader.readAsDataURL(file);
   });
 }
@@ -229,7 +226,6 @@ export async function compressImage(
 export async function lookupBarcode(
   barcode: string
 ): Promise<{ name: string; category?: string; imageUrl?: string } | null> {
-  // Validate barcode: must be non-empty, only digits, 8-14 chars (EAN/UPC)
   if (!barcode || !/^\d{8,14}$/.test(barcode)) return null;
 
   const controller = new AbortController();
@@ -251,7 +247,6 @@ export async function lookupBarcode(
     if (data.status !== 1 || !data.product) return null;
 
     const product = data.product;
-    // Take only the first category from the comma-separated API string
     const rawCategory = product.categories as string | undefined;
     const firstCategory = rawCategory?.split(',')[0]?.trim() || undefined;
     return {
@@ -259,7 +254,7 @@ export async function lookupBarcode(
         product.product_name_de ||
         product.product_name ||
         product.brands ||
-        'Unbekanntes Produkt',
+        i18n.t('dbErrors.unknownProduct'),
       category: firstCategory,
       imageUrl: product.image_front_url || undefined,
     };

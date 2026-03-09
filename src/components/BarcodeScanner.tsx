@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { useAppStore } from '../store/useAppStore';
@@ -42,6 +43,7 @@ export function BarcodeScanner() {
   const isOnlineRef = useRef(isOnline);
   isOnlineRef.current = isOnline;
   const { navigateToAddWithScan } = useAppStore();
+  const { t } = useTranslation();
 
   const stopCamera = useCallback(() => {
     controlsRef.current?.stop();
@@ -116,11 +118,11 @@ export function BarcodeScanner() {
     } catch (err) {
       const message =
         err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'Kein Kamera-Zugriff. Bitte in den Browser-Einstellungen erlauben.'
-          : 'Kamera konnte nicht gestartet werden.';
+          ? t('scanner.cameraNoAccess')
+          : t('scanner.cameraError');
       setState({ type: 'error', message });
     }
-  }, [stopCamera, navigateToAddWithScan]);
+  }, [stopCamera, navigateToAddWithScan, t]);
 
   useEffect(() => {
     return () => {
@@ -135,9 +137,9 @@ export function BarcodeScanner() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-gray-100">Barcode scannen</h2>
+      <h2 className="text-2xl font-bold text-gray-100">{t('scanner.title')}</h2>
       <p className="text-sm text-gray-400">
-        Kamera auf den Barcode halten — du wirst automatisch zum Formular weitergeleitet.
+        {t('scanner.description')}
       </p>
 
       {/* Camera View */}
@@ -171,14 +173,14 @@ export function BarcodeScanner() {
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
         >
           <Camera size={20} />
-          Kamera starten
+          {t('scanner.startCamera')}
         </button>
       )}
 
       {state.type === 'scanning' && (
         <div className="flex items-center justify-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-6 py-3">
           <Loader2 size={20} className="animate-spin text-green-400" />
-          <span className="text-gray-300">Suche Barcode...</span>
+          <span className="text-gray-300">{t('scanner.searching')}</span>
           <button onClick={() => { stopCamera(); reset(); }} className="ml-auto text-gray-400 hover:text-gray-200">
             <X size={20} />
           </button>
@@ -189,7 +191,7 @@ export function BarcodeScanner() {
         <div className="flex items-center justify-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-6 py-3">
           <Loader2 size={20} className="animate-spin text-blue-400" />
           <span className="text-gray-300">
-            Lade Produktdaten für {state.barcode}...
+            {t('scanner.loadingProduct', { barcode: state.barcode })}
           </span>
         </div>
       )}
@@ -200,7 +202,7 @@ export function BarcodeScanner() {
           <div className="flex items-center gap-2">
             <Package size={20} className="text-orange-400" />
             <p className="font-semibold text-orange-300">
-              Produkt bereits vorhanden
+              {t('scanner.duplicateFound')}
             </p>
           </div>
           {state.apiName && (
@@ -267,20 +269,20 @@ export function BarcodeScanner() {
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
             >
               <PlusCircle size={16} />
-              Trotzdem hinzufügen
+              {t('scanner.addAnyway')}
             </button>
             <button
               onClick={startCamera}
               className="flex-1 rounded-lg border border-primary-600 px-4 py-2.5 text-sm text-gray-300 hover:bg-primary-700"
             >
-              Nochmal scannen
+              {t('scanner.scanAgain')}
             </button>
           </div>
           <button
             onClick={reset}
             className="w-full text-sm text-gray-400 hover:text-gray-300"
           >
-            Abbrechen
+            {t('scanner.cancel')}
           </button>
         </div>
       )}
@@ -295,13 +297,13 @@ export function BarcodeScanner() {
             onClick={() => navigateToAddWithScan({ barcode: '' })}
             className="w-full rounded-lg border border-primary-600 px-4 py-2 text-sm text-gray-300 hover:bg-primary-700"
           >
-            Manuell eingeben
+            {t('scanner.manualEntry')}
           </button>
           <button
             onClick={reset}
             className="w-full text-sm text-gray-400 hover:text-gray-300"
           >
-            Nochmal versuchen
+            {t('scanner.retry')}
           </button>
         </div>
       )}

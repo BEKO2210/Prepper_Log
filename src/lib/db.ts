@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import { version as appVersion } from '../../package.json';
+import i18n from '../i18n/i18n';
 import type {
   Product,
   StorageLocation,
@@ -136,6 +137,7 @@ export async function exportData(): Promise<string> {
 
 export async function exportCSV(): Promise<string> {
   const products = await db.products.toArray();
+  const t = i18n.t.bind(i18n);
 
   // BOM for Excel UTF-8 compatibility
   const BOM = '\uFEFF';
@@ -143,17 +145,17 @@ export async function exportCSV(): Promise<string> {
   const headers = [
     'Name',
     'Barcode',
-    'Kategorie',
-    'Lagerort',
-    'Menge',
-    'Einheit',
-    'MHD',
-    'MHD-Genauigkeit',
-    'Mindestbestand',
-    'Notizen',
-    'Archiviert',
-    'Erstellt am',
-    'Aktualisiert am',
+    t('form.category'),
+    t('form.storageLocation'),
+    t('form.quantity'),
+    t('form.unit'),
+    t('products.mhd'),
+    t('form.expiryDate'),
+    t('form.minStock'),
+    t('form.notes'),
+    t('products.archive'),
+    t('detail.storedSince'),
+    t('detail.lastEdited'),
   ];
 
   function escCsv(val: string | number | undefined | null): string {
@@ -168,21 +170,23 @@ export async function exportCSV(): Promise<string> {
     return s;
   }
 
+  const locale = i18n.language === 'en' ? 'en-GB' : 'de-DE';
+
   function fmtDate(iso: string): string {
     if (!iso) return '';
     const d = new Date(iso);
-    return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 
   const rows = products.map((p) => [
     escCsv(p.name),
     escCsv(p.barcode),
-    escCsv(p.category),
+    escCsv(t(`categories.${p.category}`)),
     escCsv(p.storageLocation),
     escCsv(p.quantity),
-    escCsv(p.unit),
+    escCsv(t(`units.${p.unit}`)),
     fmtDate(p.expiryDate),
-    escCsv(p.expiryPrecision === 'day' ? 'Tag' : p.expiryPrecision === 'month' ? 'Monat' : 'Jahr'),
+    escCsv(p.expiryPrecision === 'day' ? t('form.precisionDay') : p.expiryPrecision === 'month' ? t('form.precisionMonth') : t('form.precisionYear')),
     escCsv(p.minStock ?? ''),
     escCsv(p.notes),
     p.archived ? 'Ja' : 'Nein',
@@ -194,15 +198,16 @@ export async function exportCSV(): Promise<string> {
 }
 
 export async function importData(jsonString: string): Promise<number> {
+  const t = i18n.t.bind(i18n);
   let data: Record<string, unknown>;
   try {
     data = JSON.parse(jsonString);
   } catch {
-    throw new Error('Ungültige JSON-Datei. Bitte eine gültige Backup-Datei wählen.');
+    throw new Error(t('dbErrors.invalidJson'));
   }
 
   if (!data.products || !Array.isArray(data.products)) {
-    throw new Error('Ungültiges Importformat: Keine Produkte gefunden.');
+    throw new Error(t('dbErrors.invalidFormat'));
   }
 
   const products = data.products as Record<string, unknown>[];
@@ -308,7 +313,8 @@ export class ImportResult extends Error {
   skipped: number;
 
   constructor(imported: number, skipped: number) {
-    const msg = `${imported} Produkte importiert, ${skipped} übersprungen (Duplikate oder ungültig).`;
+    const t = i18n.t.bind(i18n);
+    const msg = t('dbErrors.importResult', { imported, skipped });
     super(msg);
     this.name = 'ImportResult';
     this.imported = imported;
