@@ -31,7 +31,7 @@ import {
   Minus,
   Plus,
 } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
 
 const BORDER_COLORS: Record<string, string> = {
@@ -54,7 +54,7 @@ export function ProductList() {
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
 
-  const filtered = products
+  const filtered = useMemo(() => products
     .filter((p) => p.archived === showArchived)
     .filter((p) => {
       if (filters.search) {
@@ -83,7 +83,8 @@ export function ProductList() {
       daysLeft: getDaysUntilExpiry(p.expiryDate),
       status: getExpiryStatus(p.expiryDate),
     }))
-    .sort((a, b) => a.daysLeft - b.daysLeft);
+    .sort((a, b) => a.daysLeft - b.daysLeft),
+  [products, showArchived, filters]);
 
   const hasActiveFilters =
     filters.search || filters.category || filters.location || filters.status;

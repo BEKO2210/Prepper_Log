@@ -5,9 +5,8 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-function isIOS(): boolean {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
-}
+// Computed once at module load — never changes
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
 
 function isInStandaloneMode(): boolean {
   return (
@@ -30,7 +29,7 @@ export function usePWAInstall() {
       return;
     }
 
-    if (isIOS()) {
+    if (IS_IOS) {
       setShowIOSInstructions(true);
     }
 
@@ -79,7 +78,7 @@ export function usePWAInstall() {
     isInstallable,
     isInstalled,
     showIOSInstructions,
-    isIOS: isIOS(),
+    isIOS: IS_IOS,
     install,
     dismiss,
   };

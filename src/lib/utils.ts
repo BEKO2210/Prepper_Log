@@ -218,6 +218,9 @@ export async function compressImage(
 export async function lookupBarcode(
   barcode: string
 ): Promise<{ name: string; category?: string; imageUrl?: string } | null> {
+  // Validate barcode: must be non-empty, only digits, 8-14 chars (EAN/UPC)
+  if (!barcode || !/^\d{8,14}$/.test(barcode)) return null;
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 4000);
 

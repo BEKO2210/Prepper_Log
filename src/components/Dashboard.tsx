@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDaysUntil } from '../lib/utils';
@@ -15,28 +16,35 @@ import {
 export function Dashboard() {
   const setPage = useAppStore((s) => s.setPage);
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
-  const stats = computeStats(products);
 
-  const activeProducts = products.filter((p) => !p.archived);
+  const { stats, activeProducts, urgentProducts, categoryBreakdown, total } = useMemo(() => {
+    const s = computeStats(products);
+    const active = products.filter((p) => !p.archived);
 
-  const urgentProducts = activeProducts
-    .map((p) => ({ ...p, daysLeft: getDaysUntilExpiry(p.expiryDate), status: getExpiryStatus(p.expiryDate) }))
-    .filter((p) => p.status !== 'good')
-    .sort((a, b) => a.daysLeft - b.daysLeft)
-    .slice(0, 8);
+    const urgent = active
+      .map((p) => ({ ...p, daysLeft: getDaysUntilExpiry(p.expiryDate), status: getExpiryStatus(p.expiryDate) }))
+      .filter((p) => p.status !== 'good')
+      .sort((a, b) => a.daysLeft - b.daysLeft)
+      .slice(0, 8);
 
-  // Category breakdown (top 4)
-  const categoryBreakdown = Object.entries(CATEGORY_LABELS)
-    .map(([key, label]) => ({
-      key,
-      label,
-      count: activeProducts.filter((p) => p.category === key).length,
-    }))
-    .filter((c) => c.count > 0)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 4);
+    const catBreakdown = Object.entries(CATEGORY_LABELS)
+      .map(([key, label]) => ({
+        key,
+        label,
+        count: active.filter((p) => p.category === key).length,
+      }))
+      .filter((c) => c.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 4);
 
-  const total = Math.max(stats.totalProducts, 1);
+    return {
+      stats: s,
+      activeProducts: active,
+      urgentProducts: urgent,
+      categoryBreakdown: catBreakdown,
+      total: Math.max(s.totalProducts, 1),
+    };
+  }, [products]);
 
   // Empty state
   if (activeProducts.length === 0) {

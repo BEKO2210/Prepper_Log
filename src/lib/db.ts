@@ -175,11 +175,11 @@ export async function exportCSV(): Promise<string> {
     escCsv(p.barcode),
     escCsv(p.category),
     escCsv(p.storageLocation),
-    p.quantity,
+    escCsv(p.quantity),
     escCsv(p.unit),
     fmtDate(p.expiryDate),
     escCsv(p.expiryPrecision === 'day' ? 'Tag' : p.expiryPrecision === 'month' ? 'Monat' : 'Jahr'),
-    p.minStock ?? '',
+    escCsv(p.minStock ?? ''),
     escCsv(p.notes),
     p.archived ? 'Ja' : 'Nein',
     fmtDate(p.createdAt),
@@ -187,87 +187,6 @@ export async function exportCSV(): Promise<string> {
   ]);
 
   return BOM + [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\r\n');
-}
-
-export async function exportExcelXML(): Promise<string> {
-  const products = await db.products.toArray();
-
-  function esc(val: string | number | undefined | null): string {
-    return String(val ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  function fmtDate(iso: string): string {
-    if (!iso) return '';
-    const d = new Date(iso);
-    return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  }
-
-  const headers = ['Name', 'Barcode', 'Kategorie', 'Lagerort', 'Menge', 'Einheit', 'MHD', 'Mindestbestand', 'Notizen', 'Status', 'Erstellt'];
-  const colWidths = [180, 120, 100, 120, 60, 60, 90, 90, 200, 80, 90];
-
-  let rows = '';
-  // Header row
-  rows += '<Row ss:StyleID="header">';
-  for (const h of headers) {
-    rows += `<Cell><Data ss:Type="String">${esc(h)}</Data></Cell>`;
-  }
-  rows += '</Row>\n';
-
-  // Data rows
-  for (const p of products) {
-    const isArchived = p.archived;
-    const style = isArchived ? 'archived' : 'data';
-    rows += `<Row ss:StyleID="${style}">`;
-    rows += `<Cell><Data ss:Type="String">${esc(p.name)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${esc(p.barcode)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${esc(p.category)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${esc(p.storageLocation)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="Number">${p.quantity}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${esc(p.unit)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${fmtDate(p.expiryDate)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="Number">${p.minStock ?? 0}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${esc(p.notes)}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${isArchived ? 'Archiviert' : 'Aktiv'}</Data></Cell>`;
-    rows += `<Cell><Data ss:Type="String">${fmtDate(p.createdAt)}</Data></Cell>`;
-    rows += '</Row>\n';
-  }
-
-  const colDefs = colWidths.map((w) => `<Column ss:Width="${w}"/>`).join('');
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-  <Styles>
-    <Style ss:ID="Default"><Font ss:FontName="Calibri" ss:Size="11"/></Style>
-    <Style ss:ID="header">
-      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
-      <Interior ss:Color="#2E7D32" ss:Pattern="Solid"/>
-      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-      <Borders>
-        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1B5E20"/>
-      </Borders>
-    </Style>
-    <Style ss:ID="data">
-      <Font ss:FontName="Calibri" ss:Size="11"/>
-      <Alignment ss:Vertical="Center" ss:WrapText="1"/>
-      <Borders>
-        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E0E0E0"/>
-      </Borders>
-    </Style>
-    <Style ss:ID="archived">
-      <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#999999"/>
-      <Interior ss:Color="#F5F5F5" ss:Pattern="Solid"/>
-      <Alignment ss:Vertical="Center" ss:WrapText="1"/>
-    </Style>
-  </Styles>
-  <Worksheet ss:Name="PrepTrack Vorraete">
-    <Table>
-      ${colDefs}
-      ${rows}
-    </Table>
-  </Worksheet>
-</Workbook>`;
 }
 
 export async function importData(jsonString: string): Promise<number> {
