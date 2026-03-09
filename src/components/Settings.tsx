@@ -104,16 +104,16 @@ export function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-100">Einstellungen</h1>
+        <h2 className="text-2xl font-bold text-gray-100">Einstellungen</h2>
       </div>
 
       {/* PWA Install */}
       {!isInstalled && (
         <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
-          <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <Smartphone size={18} className="text-green-400" />
             App installieren
-          </h2>
+          </h3>
           {isIOS ? (
             <div className="space-y-2 text-sm text-gray-400">
               <p>
@@ -136,7 +136,7 @@ export function Settings() {
                 {isInstallable ? 'Jetzt installieren' : 'App installieren'}
               </button>
               {!isInstallable && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   Tipp: In Chrome/Edge erscheint auch ein Installieren-Symbol in der Adressleiste.
                 </p>
               )}
@@ -156,7 +156,7 @@ export function Settings() {
 
       {/* Appearance */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h2 className="mb-3 font-semibold text-gray-200">Darstellung</h2>
+        <h3 className="mb-3 font-semibold text-gray-200">Darstellung</h3>
         <button
           onClick={toggleDark}
           className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3"
@@ -187,7 +187,7 @@ export function Settings() {
 
       {/* Notifications */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h2 className="mb-3 font-semibold text-gray-200">Benachrichtigungen</h2>
+        <h3 className="mb-3 font-semibold text-gray-200">Benachrichtigungen</h3>
         <button
           onClick={handleToggleNotifications}
           disabled={notifStatus === 'denied' || notifStatus === 'unsupported'}
@@ -207,7 +207,7 @@ export function Settings() {
                 </p>
               )}
               {notifStatus === 'unsupported' && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   Nicht in diesem Browser unterstützt
                 </p>
               )}
@@ -226,7 +226,7 @@ export function Settings() {
           </div>
         </button>
         {notificationsEnabled && (
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs text-gray-400">
             Du wirst 30, 14, 7, 3 und 1 Tag vor dem Ablauf benachrichtigt.
           </p>
         )}
@@ -234,12 +234,12 @@ export function Settings() {
 
       {/* Storage Locations */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h2 className="mb-3 font-semibold text-gray-200">Lagerorte verwalten</h2>
+        <h3 className="mb-3 font-semibold text-gray-200">Lagerorte verwalten</h3>
         <div className="mb-3 flex gap-2">
           <div className="relative flex-1">
             <MapPin
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
             <input
               type="text"
@@ -274,7 +274,7 @@ export function Settings() {
                   }
                   deleteStorageLocation(loc.id!);
                 }}
-                className="rounded p-1 text-gray-500 hover:bg-primary-600 hover:text-red-400"
+                className="rounded p-1 text-gray-400 hover:bg-primary-600 hover:text-red-400"
               >
                 <Trash2 size={14} />
               </button>
@@ -285,7 +285,7 @@ export function Settings() {
 
       {/* Data Management */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h2 className="mb-3 font-semibold text-gray-200">Datenverwaltung</h2>
+        <h3 className="mb-3 font-semibold text-gray-200">Datenverwaltung</h3>
         <div className="space-y-2">
           <button
             onClick={handleExportJSON}
@@ -294,9 +294,9 @@ export function Settings() {
             <FileJson size={20} className="text-blue-400" />
             <div className="text-left">
               <span>JSON-Backup</span>
-              <p className="text-xs text-gray-500">Vollständiges Backup aller Daten</p>
+              <p className="text-xs text-gray-400">Vollständiges Backup aller Daten</p>
             </div>
-            <Download size={16} className="ml-auto text-gray-500" />
+            <Download size={16} className="ml-auto text-gray-400" />
           </button>
 
           <button
@@ -306,16 +306,16 @@ export function Settings() {
             <FileText size={20} className="text-gray-400" />
             <div className="text-left">
               <span>CSV exportieren</span>
-              <p className="text-xs text-gray-500">Für Google Sheets oder Textverarbeitung</p>
+              <p className="text-xs text-gray-400">Für Google Sheets oder Textverarbeitung</p>
             </div>
-            <Download size={16} className="ml-auto text-gray-500" />
+            <Download size={16} className="ml-auto text-gray-400" />
           </button>
 
           <label className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700">
             <Upload size={20} className="text-orange-400" />
             <div className="text-left">
               <span>JSON-Backup importieren</span>
-              <p className="text-xs text-gray-500">Daten aus einem Backup wiederherstellen</p>
+              <p className="text-xs text-gray-400">Daten aus einem Backup wiederherstellen</p>
             </div>
             <input
               type="file"
@@ -343,10 +343,10 @@ export function Settings() {
 
       {/* Spenden */}
       <section className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-4">
-        <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <Heart size={18} className="text-pink-400" />
           Unterstützen
-        </h2>
+        </h3>
         <p className="mb-3 text-sm text-gray-400">
           PrepTrack ist kostenlos und werbefrei. Wenn dir die App gefällt, kannst du die
           Entwicklung mit einer kleinen Spende unterstützen. Danke!
@@ -362,7 +362,7 @@ export function Settings() {
           </svg>
           Mit PayPal spenden
         </a>
-        <p className="mt-2 text-center text-xs text-gray-500">renateweinfurtner@gmx.de</p>
+        <p className="mt-2 text-center text-xs text-gray-400">renateweinfurtner@gmx.de</p>
       </section>
 
       {/* Datenschutz */}
@@ -371,10 +371,10 @@ export function Settings() {
           onClick={() => setShowDatenschutz(!showDatenschutz)}
           className="flex w-full items-center justify-between"
         >
-          <h2 className="flex items-center gap-2 font-semibold text-gray-200">
+          <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Shield size={18} className="text-green-400" />
             Datenschutzerklärung
-          </h2>
+          </h3>
           {showDatenschutz ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
         {showDatenschutz && (
@@ -430,10 +430,10 @@ export function Settings() {
           onClick={() => setShowAGB(!showAGB)}
           className="flex w-full items-center justify-between"
         >
-          <h2 className="flex items-center gap-2 font-semibold text-gray-200">
+          <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <FileText size={18} className="text-blue-400" />
             Allgemeine Geschäftsbedingungen
-          </h2>
+          </h3>
           {showAGB ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </button>
         {showAGB && (
@@ -488,7 +488,7 @@ export function Settings() {
       </section>
 
       {/* App Info */}
-      <section className="space-y-1 text-center text-xs text-gray-600">
+      <section className="space-y-1 text-center text-xs text-gray-400">
         <p>PrepTrack v{appVersion}</p>
         <p>Dein Vorrat. Immer im Blick.</p>
         <p>&copy; {new Date().getFullYear()} Belkis Aslani</p>

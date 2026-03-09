@@ -70,7 +70,7 @@ export function Dashboard() {
           <Package size={40} className="text-primary-600" />
         </div>
         <p className="mt-5 text-xl font-semibold text-gray-200">Noch keine Vorräte</p>
-        <p className="mt-2 max-w-xs text-sm text-gray-500">
+        <p className="mt-2 max-w-xs text-sm text-gray-400">
           Starte mit einem Barcode-Scan oder erfasse dein erstes Produkt manuell.
         </p>
         <div className="mt-6 flex gap-3">
@@ -136,7 +136,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-200">Scannen</p>
-            <p className="text-[0.65rem] text-gray-500">Barcode erfassen</p>
+            <p className="text-[0.65rem] text-gray-400">Barcode erfassen</p>
           </div>
         </button>
         <button
@@ -148,7 +148,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-200">Hinzufügen</p>
-            <p className="text-[0.65rem] text-gray-500">Manuell erfassen</p>
+            <p className="text-[0.65rem] text-gray-400">Manuell erfassen</p>
           </div>
         </button>
       </div>
@@ -174,7 +174,7 @@ export function Dashboard() {
               <div className="bg-green-500 transition-all" style={{ width: `${(stats.goodCount / total) * 100}%` }} />
             )}
           </div>
-          <div className="flex justify-between text-[0.6rem] text-gray-500">
+          <div className="flex justify-between text-[0.6rem] text-gray-400">
             <span>{stats.expiredCount} abgelaufen</span>
             <span>{stats.warningCount + stats.soonCount} Warnung</span>
             <span>{stats.goodCount} OK</span>
@@ -204,7 +204,7 @@ export function Dashboard() {
                     <p className="truncate text-sm font-medium text-gray-200">
                       {product.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       {product.storageLocation} &middot;{' '}
                       {formatDate(product.expiryDate, product.expiryPrecision)}
                     </p>
@@ -222,7 +222,7 @@ export function Dashboard() {
       <div className="grid grid-cols-2 gap-3">
         {categoryBreakdown.length > 0 && (
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-            <h2 className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Kategorien</h2>
+            <h2 className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">Kategorien</h2>
             <div className="space-y-1.5">
               {categoryBreakdown.map(({ key, label, count }) => (
                 <div key={key} className="flex items-center justify-between">
@@ -237,14 +237,14 @@ export function Dashboard() {
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
             <div className="flex items-center gap-2">
               <TrendingDown size={14} className="text-yellow-400" />
-              <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Unterbestand</span>
+              <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">Unterbestand</span>
             </div>
             <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}>
               {stats.lowStockCount}
             </p>
           </div>
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-            <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-500">Lagerorte</span>
+            <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">Lagerorte</span>
             <p className="stat-number mt-1 text-2xl font-bold text-gray-300">{stats.totalLocations}</p>
           </div>
         </div>
