@@ -56,22 +56,12 @@ export function BarcodeScanner() {
       const reader = new BrowserMultiFormatReader();
       readerRef.current = reader;
 
-      const devices = await BrowserMultiFormatReader.listVideoInputDevices();
-      const backCamera = devices.find(
-        (d) =>
-          d.label.toLowerCase().includes('back') ||
-          d.label.toLowerCase().includes('rear') ||
-          d.label.toLowerCase().includes('rück')
-      );
+      const constraints: MediaStreamConstraints = {
+        video: { facingMode: 'environment' },
+      };
 
-      const deviceId = backCamera?.deviceId || devices[0]?.deviceId;
-      if (!deviceId) {
-        setState({ type: 'error', message: 'Keine Kamera gefunden.' });
-        return;
-      }
-
-      await reader.decodeFromVideoDevice(
-        deviceId,
+      await reader.decodeFromConstraints(
+        constraints,
         videoRef.current!,
         async (result) => {
           if (result && !processedRef.current) {
@@ -149,6 +139,7 @@ export function BarcodeScanner() {
         <video
           ref={videoRef}
           className={`aspect-[4/3] w-full object-cover ${cameraActive ? '' : 'hidden'}`}
+          autoPlay
           playsInline
           muted
         />
