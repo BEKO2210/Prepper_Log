@@ -64,7 +64,7 @@ export default function App() {
         <header className="sticky top-0 z-30 border-b border-primary-700 bg-primary-800/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
-              <img src="./icons/icon-48x48.png" alt="PrepTrack" className="h-8 w-8 rounded-lg" />
+              <img src="./icons/icon-48x48.png" alt="PrepTrack" className="h-8 w-8" />
               <h1 className="text-lg font-bold text-gray-100">PrepTrack</h1>
             </div>
           </div>
