@@ -14,8 +14,8 @@ export function registerSWEventHandlers(): void {
             newWorker.state === 'installed' &&
             navigator.serviceWorker.controller
           ) {
-            // New service worker available — notify user
-            if (import.meta.env.DEV) console.log('[PrepTrack] Neues Update verfügbar. Seite neu laden.');
+            // New service worker installed while old one still controls — update available
+            console.log('[PrepTrack] Neues Update verfügbar.');
           }
         });
       });
@@ -23,9 +23,14 @@ export function registerSWEventHandlers(): void {
       // Service Worker not available — non-critical
     });
 
-    // Handle controller change (after skip waiting)
+    // Handle controller change (after skipWaiting in autoUpdate mode)
+    // Reload page to ensure all assets are from the new SW cache
+    let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (import.meta.env.DEV) console.log('[PrepTrack] Service Worker aktualisiert.');
+      if (refreshing) return;
+      refreshing = true;
+      console.log('[PrepTrack] Service Worker aktualisiert. Seite wird neu geladen.');
+      window.location.reload();
     });
   }
 }

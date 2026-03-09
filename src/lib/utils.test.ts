@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, getStatusColor, getStatusBadgeColor, formatDaysUntil, formatDuration, formatDate, computeStats, lookupBarcode } from './utils';
+import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, getStatusColor, getStatusBadgeColor, formatDaysUntil, formatDuration, formatDate, computeStats, lookupBarcode, downloadFile } from './utils';
 import type { Product } from '../types';
 
 // Helper to create a product with defaults
@@ -297,5 +297,63 @@ describe('computeStats edge cases', () => {
     const products = [makeProduct({ quantity: 5, minStock: 5 })];
     const stats = computeStats(products);
     expect(stats.lowStockCount).toBe(0);
+  });
+});
+
+describe('getExpiryStatus boundary precision', () => {
+  it('returns "critical" for exactly 1 day away', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    expect(getExpiryStatus(date.toISOString())).toBe('critical');
+  });
+
+  it('returns "warning" for exactly 8 days', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 8);
+    expect(getExpiryStatus(date.toISOString())).toBe('warning');
+  });
+
+  it('returns "warning" for exactly 14 days', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 14);
+    expect(getExpiryStatus(date.toISOString())).toBe('warning');
+  });
+
+  it('returns "soon" for exactly 15 days', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 15);
+    expect(getExpiryStatus(date.toISOString())).toBe('soon');
+  });
+
+  it('returns "soon" for exactly 30 days', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 30);
+    expect(getExpiryStatus(date.toISOString())).toBe('soon');
+  });
+
+  it('returns "good" for exactly 31 days', () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 31);
+    expect(getExpiryStatus(date.toISOString())).toBe('good');
+  });
+});
+
+describe('formatDaysUntil edge cases', () => {
+  it('formats exactly 365 days as 1 year', () => {
+    expect(formatDaysUntil(365)).toBe('1 Jahr');
+  });
+
+  it('formats exactly -365 days', () => {
+    expect(formatDaysUntil(-365)).toBe('1 Jahr abgelaufen');
+  });
+
+  it('formats 2 days', () => {
+    expect(formatDaysUntil(2)).toBe('2 Tage');
+  });
+});
+
+describe('downloadFile', () => {
+  it('is a function', () => {
+    expect(typeof downloadFile).toBe('function');
   });
 });
