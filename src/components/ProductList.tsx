@@ -398,13 +398,6 @@ function ConsumeModal({
   onClose: () => void;
 }) {
   const product = products.find((p) => p.id === productId);
-  const [amount, setAmount] = useState(1);
-
-  if (!product) return null;
-
-  const step = getStep(product.unit);
-  const max = product.quantity;
-  const isAll = amount >= max;
 
   function getStep(unit: string): number {
     switch (unit) {
@@ -415,6 +408,13 @@ function ConsumeModal({
       default: return 1;
     }
   }
+
+  const step = product ? getStep(product.unit) : 1;
+  const max = product?.quantity ?? 1;
+  const [amount, setAmount] = useState(() => Math.min(step, max));
+  const isAll = amount >= max;
+
+  if (!product) return null;
 
   function adjustAmount(delta: number) {
     setAmount((prev) => {
