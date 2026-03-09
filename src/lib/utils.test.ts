@@ -61,6 +61,8 @@ describe('getStatusLabel', () => {
 describe('formatDaysUntil', () => {
   it('formats negative days as expired', () => {
     expect(formatDaysUntil(-3)).toBe('3 Tage abgelaufen');
+    expect(formatDaysUntil(-1)).toBe('1 Tag abgelaufen');
+    expect(formatDaysUntil(-400)).toBe('1 Jahr, 1 Monat abgelaufen');
   });
 
   it('formats today', () => {
@@ -73,6 +75,9 @@ describe('formatDaysUntil', () => {
 
   it('formats multiple days', () => {
     expect(formatDaysUntil(5)).toBe('5 Tage');
+    expect(formatDaysUntil(45)).toBe('45 Tage');
+    expect(formatDaysUntil(400)).toBe('1 Jahr, 1 Monat');
+    expect(formatDaysUntil(730)).toBe('2 Jahre');
   });
 });
 

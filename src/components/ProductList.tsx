@@ -6,6 +6,7 @@ import {
   getDaysUntilExpiry,
   formatDate,
   formatDaysUntil,
+  formatDuration,
   getStatusBadgeColor,
   getStatusLabel,
 } from '../lib/utils';
@@ -27,6 +28,8 @@ import {
   FileText,
   CheckCircle,
   Info,
+  Minus,
+  Plus,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
@@ -46,6 +49,7 @@ export function ProductList() {
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
   const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
+  const [consumeProduct, setConsumeProduct] = useState<number | null>(null);
 
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
@@ -94,29 +98,31 @@ export function ProductList() {
     return () => clearTimeout(timer);
   }, [toast.visible]);
 
-  async function handleConsume(productId: number) {
+  async function handleConsumeConfirm(productId: number, amount: number) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
 
     await logConsumption({
       productId,
       productName: product.name,
-      quantity: 1,
+      quantity: amount,
       unit: product.unit,
       consumedAt: new Date().toISOString(),
       reason: 'verbraucht',
     });
 
-    if (product.quantity <= 1) {
+    const newQuantity = product.quantity - amount;
+    if (newQuantity <= 0) {
       await archiveProduct(productId);
-      showToast(`„${product.name}" — 1× verbraucht und ins Archiv verschoben`);
+      showToast(`„${product.name}" — ${amount} ${product.unit} verbraucht und ins Archiv verschoben`);
     } else {
       await db.products.update(productId, {
-        quantity: product.quantity - 1,
+        quantity: newQuantity,
         updatedAt: new Date().toISOString(),
       });
-      showToast(`„${product.name}" — 1× verbraucht (noch ${product.quantity - 1} ${product.unit})`);
+      showToast(`„${product.name}" — ${amount} ${product.unit} verbraucht (noch ${newQuantity} ${product.unit})`);
     }
+    setConsumeProduct(null);
   }
 
   async function handleDelete(id: number) {
@@ -289,7 +295,7 @@ export function ProductList() {
                       <Edit3 size={16} />
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleConsume(product.id!); }}
+                      onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }}
                       className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-green-400"
                       title="Verbraucht"
                     >
@@ -354,6 +360,16 @@ export function ProductList() {
         </div>
       )}
 
+      {/* Consume Modal */}
+      {consumeProduct && (
+        <ConsumeModal
+          productId={consumeProduct}
+          products={products}
+          onConfirm={handleConsumeConfirm}
+          onClose={() => setConsumeProduct(null)}
+        />
+      )}
+
       {/* Product Detail Modal */}
       {selectedProduct && (
         <ProductDetailModal
@@ -362,6 +378,151 @@ export function ProductList() {
           onClose={() => setSelectedProduct(null)}
         />
       )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Consume Modal                                                      */
+/* ------------------------------------------------------------------ */
+
+function ConsumeModal({
+  productId,
+  products,
+  onConfirm,
+  onClose,
+}: {
+  productId: number;
+  products: Product[];
+  onConfirm: (productId: number, amount: number) => void;
+  onClose: () => void;
+}) {
+  const product = products.find((p) => p.id === productId);
+  const [amount, setAmount] = useState(1);
+
+  if (!product) return null;
+
+  const step = getStep(product.unit);
+  const max = product.quantity;
+  const isAll = amount >= max;
+
+  function getStep(unit: string): number {
+    switch (unit) {
+      case 'kg': return 0.1;
+      case 'g': return 50;
+      case 'Liter': return 0.25;
+      case 'ml': return 50;
+      default: return 1;
+    }
+  }
+
+  function adjustAmount(delta: number) {
+    setAmount((prev) => {
+      const next = Math.round((prev + delta) * 100) / 100;
+      if (next < step) return step;
+      if (next > max) return max;
+      return next;
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-gray-100">Menge entnehmen</h3>
+          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200">
+            <X size={20} />
+          </button>
+        </div>
+
+        <p className="mb-1 text-sm text-gray-400">
+          {product.name}
+        </p>
+        <p className="mb-5 text-xs text-gray-500">
+          Vorrat: {product.quantity} {product.unit}
+        </p>
+
+        {/* Stepper */}
+        <div className="mb-5 flex items-center justify-center gap-4">
+          <button
+            onClick={() => adjustAmount(-step)}
+            disabled={amount <= step}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-600 text-gray-300 hover:bg-primary-700 disabled:opacity-30"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="min-w-[120px] text-center">
+            <input
+              type="number"
+              value={amount}
+              step={step}
+              min={step}
+              max={max}
+              onChange={(e) => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v > 0 && v <= max) setAmount(Math.round(v * 100) / 100);
+              }}
+              className="w-full bg-transparent text-center text-3xl font-bold text-gray-100 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <span className="text-sm text-gray-400">{product.unit}</span>
+          </div>
+          <button
+            onClick={() => adjustAmount(step)}
+            disabled={amount >= max}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-600 text-gray-300 hover:bg-primary-700 disabled:opacity-30"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+
+        {/* Schnellauswahl */}
+        <div className="mb-5 flex gap-2">
+          {[0.25, 0.5, 1].map((fraction) => {
+            const val = Math.round(max * fraction * 100) / 100;
+            if (val < step || (fraction < 1 && val === max)) return null;
+            const label = fraction === 1 ? 'Alles' : `${Math.round(fraction * 100)}%`;
+            return (
+              <button
+                key={fraction}
+                onClick={() => setAmount(val)}
+                className={`flex-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  amount === val
+                    ? 'border-green-500 bg-green-500/10 text-green-400'
+                    : 'border-primary-600 text-gray-400 hover:bg-primary-700'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {isAll && (
+          <p className="mb-4 rounded-lg border border-orange-500/30 bg-orange-500/5 px-3 py-2 text-xs text-orange-300">
+            Gesamter Vorrat wird entnommen — Produkt wird archiviert.
+          </p>
+        )}
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => onConfirm(productId, amount)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
+          >
+            <ShoppingCart size={16} />
+            {amount} {product.unit} entnehmen
+          </button>
+          <button
+            onClick={onClose}
+            className="rounded-lg border border-primary-600 px-4 py-2.5 text-sm text-gray-400 hover:bg-primary-700"
+          >
+            Abbrechen
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -398,13 +559,22 @@ function ProductDetailModal({
   const isExpired = diffMs <= 0;
   const absDiff = Math.abs(diffMs);
   const totalMinutes = Math.floor(absDiff / 60_000);
-  const days = Math.floor(totalMinutes / 1440);
+  const totalDays = Math.floor(totalMinutes / 1440);
   const hours = Math.floor((totalMinutes % 1440) / 60);
   const minutes = totalMinutes % 60;
+  const years = Math.floor(totalDays / 365);
+  const months = Math.floor((totalDays % 365) / 30);
+  const d = totalDays % 365 % 30;
+
+  const countdownParts: string[] = [];
+  if (years > 0) countdownParts.push(`${years} ${years === 1 ? 'Jahr' : 'Jahre'}`);
+  if (months > 0) countdownParts.push(`${months} ${months === 1 ? 'Monat' : 'Monate'}`);
+  if (d > 0 || (years === 0 && months === 0)) countdownParts.push(`${d} T`);
+  countdownParts.push(`${hours} Std ${minutes} Min`);
 
   const countdownText = isExpired
-    ? `Seit ${days} T ${hours} Std ${minutes} Min abgelaufen`
-    : `${days} T ${hours} Std ${minutes} Min verbleibend`;
+    ? `Seit ${countdownParts.join(', ')} abgelaufen`
+    : `${countdownParts.join(', ')} verbleibend`;
 
   // Einlagerungsdauer
   const createdMs = new Date(product.createdAt).getTime();
@@ -508,7 +678,7 @@ function ProductDetailModal({
             {product.minStock !== undefined && product.minStock > 0 && (
               <DetailItem icon={<Layers size={16} />} label="Mindestbestand" value={`${product.minStock} ${product.unit}`} />
             )}
-            <DetailItem icon={<Clock size={16} />} label="Eingelagert seit" value={`${storedDays} Tage`} />
+            <DetailItem icon={<Clock size={16} />} label="Eingelagert seit" value={formatDuration(storedDays)} />
             {product.updatedAt !== product.createdAt && (
               <DetailItem icon={<Calendar size={16} />} label="Zuletzt bearbeitet" value={new Date(product.updatedAt).toLocaleDateString('de-DE')} />
             )}
