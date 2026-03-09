@@ -9,12 +9,18 @@ import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
-import { Settings } from './components/Settings';
-import { Statistics } from './components/Statistics';
 import { Loader2 } from 'lucide-react';
 
 const BarcodeScanner = lazy(() =>
   import('./components/BarcodeScanner').then((m) => ({ default: m.BarcodeScanner }))
+);
+
+const Settings = lazy(() =>
+  import('./components/Settings').then((m) => ({ default: m.Settings }))
+);
+
+const Statistics = lazy(() =>
+  import('./components/Statistics').then((m) => ({ default: m.Statistics }))
 );
 
 function LazyFallback() {
@@ -42,9 +48,17 @@ function PageContent() {
         </Suspense>
       );
     case 'settings':
-      return <Settings />;
+      return (
+        <Suspense fallback={<LazyFallback />}>
+          <Settings />
+        </Suspense>
+      );
     case 'stats':
-      return <Statistics />;
+      return (
+        <Suspense fallback={<LazyFallback />}>
+          <Statistics />
+        </Suspense>
+      );
   }
 }
 

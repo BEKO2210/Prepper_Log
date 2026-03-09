@@ -61,7 +61,7 @@ export function Statistics() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-100">Statistiken</h1>
+        <h2 className="text-2xl font-bold text-gray-100">Statistiken</h2>
         <p className="text-sm text-gray-400">Übersicht deines Vorrats</p>
       </div>
 
@@ -82,16 +82,16 @@ export function Statistics() {
             <span className="text-sm">Ablaufrate</span>
           </div>
           <p className="mt-1 text-3xl font-bold text-gray-100">{expiryRate}%</p>
-          <p className="text-xs text-gray-500">der archivierten Produkte</p>
+          <p className="text-xs text-gray-400">der archivierten Produkte</p>
         </div>
       </div>
 
       {/* Expiry Distribution */}
       <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <BarChart3 size={18} className="text-green-400" />
           MHD-Verteilung
-        </h2>
+        </h3>
         <div className="space-y-2">
           {[
             { label: 'Abgelaufen', count: expiryDist.expired, color: 'bg-red-500' },
@@ -119,10 +119,10 @@ export function Statistics() {
       {/* Category breakdown */}
       {categoryBreakdown.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <Package size={18} className="text-purple-400" />
             Nach Kategorie
-          </h2>
+          </h3>
           <div className="space-y-2">
             {categoryBreakdown.map(({ key, label, count }) => (
               <div
@@ -140,10 +140,10 @@ export function Statistics() {
       {/* Location breakdown */}
       {locationBreakdown.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <TrendingUp size={18} className="text-cyan-400" />
             Nach Lagerort
-          </h2>
+          </h3>
           <div className="space-y-2">
             {locationBreakdown.map(([name, count]) => (
               <div
@@ -161,10 +161,10 @@ export function Statistics() {
       {/* Top consumed */}
       {topConsumed.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <h2 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
             <TrendingUp size={18} className="text-green-400" />
             Meistverbraucht
-          </h2>
+          </h3>
           <div className="space-y-2">
             {topConsumed.map(([name, count], i) => (
               <div

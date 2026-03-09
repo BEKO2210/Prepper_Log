@@ -135,7 +135,7 @@ export function BarcodeScanner() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-100">Barcode scannen</h1>
+      <h2 className="text-2xl font-bold text-gray-100">Barcode scannen</h2>
       <p className="text-sm text-gray-400">
         Kamera auf den Barcode halten — du wirst automatisch zum Formular weitergeleitet.
       </p>
@@ -229,15 +229,15 @@ export function BarcodeScanner() {
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-400">
                     <div className="flex items-center gap-1.5">
-                      <MapPin size={12} className="text-gray-500" />
+                      <MapPin size={12} className="text-gray-400" />
                       {product.storageLocation}
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Layers size={12} className="text-gray-500" />
+                      <Layers size={12} className="text-gray-400" />
                       {product.quantity} {product.unit}
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Calendar size={12} className="text-gray-500" />
+                      <Calendar size={12} className="text-gray-400" />
                       {formatDate(product.expiryDate, product.expiryPrecision)}
                     </div>
                     <div className={`flex items-center gap-1.5 font-semibold ${
@@ -249,7 +249,7 @@ export function BarcodeScanner() {
                     </div>
                   </div>
                   {product.notes && (
-                    <p className="mt-1.5 text-xs italic text-gray-500">{product.notes}</p>
+                    <p className="mt-1.5 text-xs italic text-gray-400">{product.notes}</p>
                   )}
                 </div>
               );
@@ -278,7 +278,7 @@ export function BarcodeScanner() {
           </div>
           <button
             onClick={reset}
-            className="w-full text-sm text-gray-500 hover:text-gray-300"
+            className="w-full text-sm text-gray-400 hover:text-gray-300"
           >
             Abbrechen
           </button>

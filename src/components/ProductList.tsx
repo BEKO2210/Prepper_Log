@@ -134,9 +134,9 @@ export function ProductList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-100">
+        <h2 className="text-2xl font-bold text-gray-100">
           {showArchived ? 'Archiv' : 'Vorräte'}
-        </h1>
+        </h2>
         <button
           onClick={() => setShowArchived(!showArchived)}
           className="text-sm text-green-400 hover:text-green-300"
@@ -148,7 +148,7 @@ export function ProductList() {
       {/* Search */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Name oder Barcode..."
@@ -225,7 +225,7 @@ export function ProductList() {
       )}
 
       {/* Results count */}
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-400">
         {filtered.length} Produkt{filtered.length !== 1 ? 'e' : ''}
       </p>
 
@@ -257,7 +257,7 @@ export function ProductList() {
                     <p className="truncate font-medium text-gray-200">
                       {product.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       {CATEGORY_LABELS[product.category as ProductCategory] ?? product.category} &middot;{' '}
                       {product.storageLocation}
                     </p>
@@ -338,7 +338,7 @@ export function ProductList() {
         ))}
 
         {filtered.length === 0 && (
-          <div className="py-12 text-center text-gray-500">
+          <div className="py-12 text-center text-gray-400">
             <Package size={40} className="mx-auto mb-2 text-gray-600" />
             {hasActiveFilters ? (
               <p>Kein Treffer für diese Filter.</p>
@@ -434,7 +434,7 @@ function ConsumeModal({
         className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-100">Menge entnehmen</h3>
+          <h2 className="text-lg font-bold text-gray-100">Menge entnehmen</h2>
           <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200">
             <X size={20} />
           </button>
@@ -443,7 +443,7 @@ function ConsumeModal({
         <p className="mb-1 text-sm text-gray-400">
           {product.name}
         </p>
-        <p className="mb-5 text-xs text-gray-500">
+        <p className="mb-5 text-xs text-gray-400">
           Vorrat: {product.quantity} {product.unit}
         </p>
 
@@ -660,7 +660,7 @@ function ProductDetailModal({
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[11px] text-gray-500">
+              <div className="flex justify-between text-[11px] text-gray-400">
                 <span>Eingelagert: {new Date(product.createdAt).toLocaleDateString('de-DE')}</span>
                 <span>MHD: {formatDate(product.expiryDate, product.expiryPrecision)}</span>
               </div>
@@ -689,7 +689,7 @@ function ProductDetailModal({
           {product.notes && (
             <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-300">
-                <FileText size={16} className="text-gray-500" />
+                <FileText size={16} className="text-gray-400" />
                 Bemerkungen
               </div>
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-400">
@@ -706,7 +706,7 @@ function ProductDetailModal({
 function DetailItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-lg border border-primary-700 bg-primary-800/40 px-3 py-2.5">
-      <div className="mb-1 flex items-center gap-1.5 text-[11px] text-gray-500">
+      <div className="mb-1 flex items-center gap-1.5 text-[11px] text-gray-400">
         {icon}
         {label}
       </div>
