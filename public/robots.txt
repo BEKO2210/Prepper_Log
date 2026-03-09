@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://beko2210.github.io/Prepper_Log/sitemap.xml

@@ -26,6 +26,7 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  Info,
 } from 'lucide-react';
 
 export function Settings() {
@@ -36,6 +37,7 @@ export function Settings() {
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
 
@@ -363,6 +365,48 @@ export function Settings() {
           Mit PayPal spenden
         </a>
         <p className="mt-2 text-center text-xs text-gray-400">renateweinfurtner@gmx.de</p>
+      </section>
+
+      {/* Impressum */}
+      <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
+        <button
+          onClick={() => setShowImpressum(!showImpressum)}
+          className="flex w-full items-center justify-between"
+        >
+          <h3 className="flex items-center gap-2 font-semibold text-gray-200">
+            <Info size={18} className="text-blue-400" />
+            Impressum
+          </h3>
+          {showImpressum ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+        </button>
+        {showImpressum && (
+          <div className="mt-3 space-y-3 text-sm text-gray-400">
+            <p className="font-medium text-gray-300">Angaben gemäß § 5 TMG:</p>
+            <p>
+              Belkis Aslani<br />
+              Vogelsangstr. 32<br />
+              71691 Freiberg am Neckar
+            </p>
+
+            <p className="font-medium text-gray-300">Kontakt:</p>
+            <p>E-Mail: belkis.aslani@gmail.com</p>
+
+            <p className="font-medium text-gray-300">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</p>
+            <p>
+              Belkis Aslani<br />
+              Vogelsangstr. 32<br />
+              71691 Freiberg am Neckar
+            </p>
+
+            <p className="font-medium text-gray-300">Haftungsausschluss:</p>
+            <p>
+              Die Inhalte dieser App wurden mit größter Sorgfalt erstellt.
+              Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
+              können wir jedoch keine Gewähr übernehmen. Die Nutzung erfolgt
+              auf eigene Verantwortung.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Datenschutz */}
