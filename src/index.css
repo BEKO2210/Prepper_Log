@@ -36,6 +36,11 @@
     transition: background-color 5000s ease-in-out 0s;
   }
 
+  /* Allow normal touch on video (camera scanner needs it) */
+  video {
+    touch-action: auto;
+  }
+
   /* Safe area padding for notched devices */
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
