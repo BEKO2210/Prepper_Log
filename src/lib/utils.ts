@@ -167,10 +167,16 @@ export function computeStats(products: Product[]): DashboardStats {
   return stats;
 }
 
+const MAX_INPUT_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export async function compressImage(
   file: File | Blob,
   maxSizeKB: number = 500
 ): Promise<string> {
+  if (file.size > MAX_INPUT_SIZE_BYTES) {
+    throw new Error('Bild ist zu groß (max. 10 MB). Bitte ein kleineres Bild wählen.');
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -180,7 +186,7 @@ export async function compressImage(
         let width = img.width;
         let height = img.height;
 
-        const maxDim = 800;
+        const maxDim = 1024;
         if (width > maxDim || height > maxDim) {
           const ratio = Math.min(maxDim / width, maxDim / height);
           width = Math.round(width * ratio);
@@ -197,12 +203,17 @@ export async function compressImage(
 
         ctx.drawImage(img, 0, 0, width, height);
 
-        let quality = 0.8;
-        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // Try WebP first, fallback to JPEG
+        const supportsWebP = canvas.toDataURL('image/webp').startsWith('data:image/webp');
+        const format = supportsWebP ? 'image/webp' : 'image/jpeg';
 
-        while (dataUrl.length > maxSizeKB * 1024 * 1.37 && quality > 0.1) {
+        const maxBase64Bytes = maxSizeKB * 1024 * 1.37; // base64 overhead
+        let quality = 0.7;
+        let dataUrl = canvas.toDataURL(format, quality);
+
+        while (dataUrl.length > maxBase64Bytes && quality > 0.1) {
           quality -= 0.1;
-          dataUrl = canvas.toDataURL('image/jpeg', quality);
+          dataUrl = canvas.toDataURL(format, quality);
         }
 
         resolve(dataUrl);

@@ -169,9 +169,13 @@ export function ProductForm() {
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const compressed = await compressImage(file);
-    updateField('photo', compressed);
-    clearFormDraft();
+    try {
+      const compressed = await compressImage(file);
+      updateField('photo', compressed);
+      clearFormDraft();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Bild konnte nicht verarbeitet werden.');
+    }
     e.target.value = '';
   }
 

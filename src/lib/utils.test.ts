@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, getStatusColor, getStatusBadgeColor, formatDaysUntil, formatDuration, formatDate, computeStats, lookupBarcode, downloadFile } from './utils';
+import { getExpiryStatus, getDaysUntilExpiry, getStatusLabel, getStatusColor, getStatusBadgeColor, formatDaysUntil, formatDuration, formatDate, computeStats, lookupBarcode, downloadFile, compressImage } from './utils';
 import type { Product } from '../types';
 
 // Helper to create a product with defaults
@@ -355,5 +355,67 @@ describe('formatDaysUntil edge cases', () => {
 describe('downloadFile', () => {
   it('is a function', () => {
     expect(typeof downloadFile).toBe('function');
+  });
+});
+
+describe('compressImage', () => {
+  it('rejects files larger than 10MB', async () => {
+    // Create a blob larger than 10MB
+    const bigBlob = new Blob([new ArrayBuffer(11 * 1024 * 1024)], { type: 'image/png' });
+    await expect(compressImage(bigBlob)).rejects.toThrow('zu groß');
+  });
+
+  it('accepts files under 10MB', async () => {
+    // Create a small blob — it won't be a valid image in node, but the size check passes
+    const smallBlob = new Blob([new ArrayBuffer(100)], { type: 'image/png' });
+    // In a test env without canvas, this will reject with image loading error, not size error
+    await expect(compressImage(smallBlob)).rejects.not.toThrow('zu groß');
+  });
+});
+
+describe('CSV injection protection (escCsv pattern)', () => {
+  // Test the same pattern used in db.ts exportCSV's escCsv function
+  function escCsv(val: string | number | undefined | null): string {
+    let s = String(val ?? '');
+    if (s.length > 0 && /^[=+\-@\t\r]/.test(s)) {
+      s = "'" + s;
+    }
+    if (s.includes(';') || s.includes('"') || s.includes('\n')) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  }
+
+  it('prefixes dangerous characters with single quote', () => {
+    expect(escCsv('=CMD()')).toBe("'=CMD()");
+    expect(escCsv('+1234')).toBe("'+1234");
+    expect(escCsv('-1234')).toBe("'-1234");
+    expect(escCsv('@SUM(A1)')).toBe("'@SUM(A1)");
+  });
+
+  it('handles normal strings unchanged', () => {
+    expect(escCsv('Dosentomaten')).toBe('Dosentomaten');
+    expect(escCsv('Keller')).toBe('Keller');
+    expect(escCsv('')).toBe('');
+    expect(escCsv(42)).toBe('42');
+  });
+
+  it('quotes strings containing semicolons or newlines', () => {
+    expect(escCsv('a;b')).toBe('"a;b"');
+    expect(escCsv('line1\nline2')).toBe('"line1\nline2"');
+  });
+
+  it('escapes double quotes inside values', () => {
+    expect(escCsv('he said "hello"')).toBe('"he said ""hello"""');
+  });
+
+  it('handles null and undefined', () => {
+    expect(escCsv(null)).toBe('');
+    expect(escCsv(undefined)).toBe('');
+  });
+
+  it('prefixes tab and carriage return', () => {
+    expect(escCsv('\tattack')).toMatch(/^'/);
+    expect(escCsv('\rattack')).toMatch(/^'/);
   });
 });
