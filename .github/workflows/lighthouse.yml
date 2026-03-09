@@ -25,10 +25,8 @@ jobs:
       - name: Remove oversized source icon
         run: rm -f public/icons/Icon_3117x3117_8MB.png
 
-      - name: Build
+      - name: Build for Lighthouse (relative base)
         run: npm run build
-        env:
-          GITHUB_PAGES: 'true'
 
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v12
