@@ -93,6 +93,16 @@ export function ProductForm() {
 
   const [saving, setSaving] = useState(false);
 
+  function getQuantityStep(unit: string): string {
+    switch (unit) {
+      case 'kg': return '0.1';
+      case 'Liter': return '0.25';
+      case 'g':
+      case 'ml': return '1';
+      default: return '1';
+    }
+  }
+
   // If we restored a draft, clear it now that we've loaded it
   useEffect(() => {
     if (restoredRef.current) {
@@ -164,35 +174,41 @@ export function ProductForm() {
 
     setSaving(true);
 
-    const productData: Omit<Product, 'id'> = {
-      name: form.name.trim(),
-      barcode: form.barcode || undefined,
-      category: form.category,
-      storageLocation: form.storageLocation,
-      quantity: parseInt(form.quantity) || 1,
-      unit: form.unit,
-      expiryDate: new Date(form.expiryDate).toISOString(),
-      expiryPrecision: form.expiryPrecision,
-      photo: form.photo || undefined,
-      minStock: parseInt(form.minStock) || undefined,
-      notes: form.notes || undefined,
-      archived: false,
-      createdAt: editingProductId
-        ? existingProduct?.createdAt || new Date().toISOString()
-        : new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      const productData: Omit<Product, 'id'> = {
+        name: form.name.trim(),
+        barcode: form.barcode || undefined,
+        category: form.category,
+        storageLocation: form.storageLocation,
+        quantity: parseFloat(form.quantity) || 1,
+        unit: form.unit,
+        expiryDate: new Date(form.expiryDate).toISOString(),
+        expiryPrecision: form.expiryPrecision,
+        photo: form.photo || undefined,
+        minStock: parseFloat(form.minStock) || undefined,
+        notes: form.notes || undefined,
+        archived: false,
+        createdAt: editingProductId
+          ? existingProduct?.createdAt || new Date().toISOString()
+          : new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    if (editingProductId) {
-      await updateProduct(editingProductId, productData);
-    } else {
-      await addProduct(productData);
+      if (editingProductId) {
+        await updateProduct(editingProductId, productData);
+      } else {
+        await addProduct(productData);
+      }
+
+      clearFormDraft();
+      setEditingProductId(null);
+      setPage('products');
+    } catch (err) {
+      console.error('Speichern fehlgeschlagen:', err);
+      alert('Fehler beim Speichern. Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
     }
-
-    clearFormDraft();
-    setSaving(false);
-    setEditingProductId(null);
-    setPage('products');
   }
 
   return (
@@ -349,7 +365,8 @@ export function ProductForm() {
             </label>
             <input
               type="number"
-              min="1"
+              min={getQuantityStep(form.unit)}
+              step={getQuantityStep(form.unit)}
               required
               value={form.quantity}
               onChange={(e) => updateField('quantity', e.target.value)}
