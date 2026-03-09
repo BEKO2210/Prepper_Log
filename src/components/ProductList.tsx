@@ -9,19 +9,26 @@ import {
   getStatusBadgeColor,
   getStatusLabel,
 } from '../lib/utils';
-import { CATEGORY_LABELS, type ProductCategory } from '../types';
+import { CATEGORY_LABELS, type ProductCategory, type Product } from '../types';
 import {
   Search,
   Filter,
   Edit3,
   Trash2,
-  Archive,
   Package,
   ChevronDown,
   X,
   ShoppingCart,
+  MapPin,
+  Calendar,
+  Layers,
+  Clock,
+  Tag,
+  FileText,
+  CheckCircle,
+  Info,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
 
 const BORDER_COLORS: Record<string, string> = {
@@ -37,6 +44,8 @@ export function ProductList() {
   const [showFilters, setShowFilters] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+  const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
 
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
@@ -75,6 +84,16 @@ export function ProductList() {
   const hasActiveFilters =
     filters.search || filters.category || filters.location || filters.status;
 
+  const showToast = useCallback((message: string) => {
+    setToast({ message, visible: true });
+  }, []);
+
+  useEffect(() => {
+    if (!toast.visible) return;
+    const timer = setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3000);
+    return () => clearTimeout(timer);
+  }, [toast.visible]);
+
   async function handleConsume(productId: number) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
@@ -90,11 +109,13 @@ export function ProductList() {
 
     if (product.quantity <= 1) {
       await archiveProduct(productId);
+      showToast(`„${product.name}" — 1× verbraucht und ins Archiv verschoben`);
     } else {
       await db.products.update(productId, {
         quantity: product.quantity - 1,
         updatedAt: new Date().toISOString(),
       });
+      showToast(`„${product.name}" — 1× verbraucht (noch ${product.quantity - 1} ${product.unit})`);
     }
   }
 
@@ -206,7 +227,8 @@ export function ProductList() {
         {filtered.map((product) => (
           <div
             key={product.id}
-            className={`border-l-4 ${BORDER_COLORS[product.status]} rounded-r-lg border border-primary-700 bg-primary-800/60 p-3`}
+            onClick={() => setSelectedProduct(product.id!)}
+            className={`border-l-4 ${BORDER_COLORS[product.status]} cursor-pointer rounded-r-lg border border-primary-700 bg-primary-800/60 p-3 transition-colors hover:bg-primary-800`}
           >
             <div className="flex items-start gap-3">
               {product.photo ? (
@@ -260,28 +282,21 @@ export function ProductList() {
                 {!showArchived && (
                   <div className="mt-2 flex gap-1">
                     <button
-                      onClick={() => setEditingProductId(product.id!)}
+                      onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }}
                       className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"
                       title="Bearbeiten"
                     >
                       <Edit3 size={16} />
                     </button>
                     <button
-                      onClick={() => handleConsume(product.id!)}
+                      onClick={(e) => { e.stopPropagation(); handleConsume(product.id!); }}
                       className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-green-400"
                       title="Verbraucht"
                     >
                       <ShoppingCart size={16} />
                     </button>
                     <button
-                      onClick={() => archiveProduct(product.id!)}
-                      className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-orange-400"
-                      title="Archivieren"
-                    >
-                      <Archive size={16} />
-                    </button>
-                    <button
-                      onClick={() => setConfirmDelete(product.id!)}
+                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }}
                       className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-red-400"
                       title="Löschen"
                     >
@@ -328,6 +343,203 @@ export function ProductList() {
           </div>
         )}
       </div>
+
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 animate-fade-in">
+          <div className="flex items-center gap-2 rounded-xl border border-green-500/30 bg-primary-900/95 px-4 py-3 shadow-lg backdrop-blur">
+            <CheckCircle size={18} className="shrink-0 text-green-400" />
+            <span className="text-sm text-gray-200">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <ProductDetailModal
+          productId={selectedProduct}
+          products={products}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Product Detail Popup                                               */
+/* ------------------------------------------------------------------ */
+
+function ProductDetailModal({
+  productId,
+  products,
+  onClose,
+}: {
+  productId: number;
+  products: Product[];
+  onClose: () => void;
+}) {
+  const product = products.find((p) => p.id === productId);
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!product) return null;
+
+  const status = getExpiryStatus(product.expiryDate);
+  const daysLeft = getDaysUntilExpiry(product.expiryDate);
+
+  // Countdown berechnen (bis auf Minuten genau)
+  const expiryMs = new Date(product.expiryDate).getTime();
+  const diffMs = expiryMs - now;
+  const isExpired = diffMs <= 0;
+  const absDiff = Math.abs(diffMs);
+  const totalMinutes = Math.floor(absDiff / 60_000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+
+  const countdownText = isExpired
+    ? `Seit ${days} T ${hours} Std ${minutes} Min abgelaufen`
+    : `${days} T ${hours} Std ${minutes} Min verbleibend`;
+
+  // Einlagerungsdauer
+  const createdMs = new Date(product.createdAt).getTime();
+  const storedDiff = now - createdMs;
+  const storedDays = Math.floor(storedDiff / 86_400_000);
+
+  // Fortschrittsbalken: Einlagerung bis Ablauf
+  const totalSpan = expiryMs - createdMs;
+  const elapsed = now - createdMs;
+  const progressPercent = totalSpan > 0 ? Math.max(0, Math.min(100, (elapsed / totalSpan) * 100)) : 100;
+
+  const progressColor =
+    status === 'expired' || status === 'critical'
+      ? 'bg-red-500'
+      : status === 'warning'
+        ? 'bg-orange-400'
+        : status === 'soon'
+          ? 'bg-yellow-400'
+          : 'bg-green-500';
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative mx-4 mb-4 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-primary-600 bg-primary-900 shadow-2xl sm:mb-0"
+      >
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-primary-700 bg-primary-900/95 px-5 py-4 backdrop-blur">
+          <div className="flex items-center gap-3 min-w-0">
+            <Info size={20} className="shrink-0 text-green-400" />
+            <h2 className="truncate text-lg font-bold text-gray-100">
+              {product.name}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="space-y-5 p-5">
+          {/* Foto */}
+          {product.photo && (
+            <img
+              src={product.photo}
+              alt={product.name}
+              className="h-48 w-full rounded-xl object-cover"
+            />
+          )}
+
+          {/* Status Badge + Countdown */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span
+                className={`rounded-full px-3 py-1 text-sm font-semibold ${getStatusBadgeColor(status)}`}
+              >
+                {getStatusLabel(status)}
+              </span>
+              <span className="text-sm font-medium text-gray-300">
+                {formatDaysUntil(daysLeft)}
+              </span>
+            </div>
+
+            {/* Zeitbalken */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Clock size={14} />
+                <span>{countdownText}</span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-primary-700">
+                <div
+                  className={`h-full rounded-full transition-all ${progressColor}`}
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-gray-500">
+                <span>Eingelagert: {new Date(product.createdAt).toLocaleDateString('de-DE')}</span>
+                <span>MHD: {formatDate(product.expiryDate, product.expiryPrecision)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Detail-Raster */}
+          <div className="grid grid-cols-2 gap-3">
+            <DetailItem icon={<Tag size={16} />} label="Kategorie" value={CATEGORY_LABELS[product.category as ProductCategory] ?? product.category} />
+            <DetailItem icon={<MapPin size={16} />} label="Lagerort" value={product.storageLocation} />
+            <DetailItem icon={<Layers size={16} />} label="Menge" value={`${product.quantity} ${product.unit}`} />
+            <DetailItem icon={<Calendar size={16} />} label="MHD" value={formatDate(product.expiryDate, product.expiryPrecision)} />
+            {product.barcode && (
+              <DetailItem icon={<Package size={16} />} label="Barcode" value={product.barcode} />
+            )}
+            {product.minStock !== undefined && product.minStock > 0 && (
+              <DetailItem icon={<Layers size={16} />} label="Mindestbestand" value={`${product.minStock} ${product.unit}`} />
+            )}
+            <DetailItem icon={<Clock size={16} />} label="Eingelagert seit" value={`${storedDays} Tage`} />
+            {product.updatedAt !== product.createdAt && (
+              <DetailItem icon={<Calendar size={16} />} label="Zuletzt bearbeitet" value={new Date(product.updatedAt).toLocaleDateString('de-DE')} />
+            )}
+          </div>
+
+          {/* Bemerkungen */}
+          {product.notes && (
+            <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-300">
+                <FileText size={16} className="text-gray-500" />
+                Bemerkungen
+              </div>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-400">
+                {product.notes}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-primary-700 bg-primary-800/40 px-3 py-2.5">
+      <div className="mb-1 flex items-center gap-1.5 text-[11px] text-gray-500">
+        {icon}
+        {label}
+      </div>
+      <p className="truncate text-sm font-medium text-gray-200">{value}</p>
     </div>
   );
 }
