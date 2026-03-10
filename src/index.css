@@ -123,6 +123,30 @@ html:not(.dark) .text-gray-500 {
   color: #9ca3af; /* gray-400 */
 }
 
+html:not(.dark) .bg-primary-900\/40 {
+  background-color: rgb(243 244 246 / 0.5);
+}
+
+html:not(.dark) .bg-primary-900\/95 {
+  background-color: rgb(249 250 251 / 0.95);
+}
+
+html:not(.dark) .bg-primary-800\/40 {
+  background-color: rgb(255 255 255 / 0.6);
+}
+
+html:not(.dark) .bg-primary-800\/50 {
+  background-color: rgb(255 255 255 / 0.5);
+}
+
+html:not(.dark) input:-webkit-autofill,
+html:not(.dark) input:-webkit-autofill:hover,
+html:not(.dark) input:-webkit-autofill:focus,
+html:not(.dark) select:-webkit-autofill {
+  -webkit-text-fill-color: #1f2937;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+}
+
 /* ===== Shutter Button (native camera style) ===== */
 .shutter-btn {
   width: 72px;
