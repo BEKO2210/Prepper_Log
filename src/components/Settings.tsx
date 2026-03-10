@@ -35,6 +35,8 @@ const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'pt', label: 'Português', flag: '🇵🇹' },
   { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
 ];
 
 export function Settings() {

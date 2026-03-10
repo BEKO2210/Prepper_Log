@@ -63,6 +63,8 @@ const LOCALE_MAP: Record<string, string> = {
   en: 'en-GB',
   pt: 'pt-BR',
   ar: 'ar-SA',
+  it: 'it-IT',
+  fr: 'fr-FR',
 };
 
 export function getLocale(): string {
