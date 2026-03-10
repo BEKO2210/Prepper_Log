@@ -232,6 +232,24 @@ export async function compressImage(
   });
 }
 
+export async function fetchAndCompressImage(
+  imageUrl: string,
+  maxSizeKB = 500
+): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const response = await fetch(imageUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    const file = new File([blob], 'product.jpg', { type: blob.type });
+    return await compressImage(file, maxSizeKB);
+  } catch {
+    return null;
+  }
+}
+
 export async function lookupBarcode(
   barcode: string
 ): Promise<{ name: string; category?: string; imageUrl?: string } | null> {

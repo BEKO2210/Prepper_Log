@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addProduct, updateProduct } from '../lib/db';
 import { useAppStore } from '../store/useAppStore';
-import { compressImage } from '../lib/utils';
+import { compressImage, fetchAndCompressImage } from '../lib/utils';
 import {
   DEFAULT_UNITS,
   type Product,
@@ -131,7 +131,13 @@ export function ProductForm() {
   useEffect(() => {
     if (scannedData && !editingProductId) {
       setForm((prev) => ({ ...prev, barcode: scannedData.barcode || prev.barcode, name: scannedData.name || prev.name }));
+      const imageUrl = scannedData.imageUrl;
       setScannedData(null);
+      if (imageUrl) {
+        fetchAndCompressImage(imageUrl).then((base64) => {
+          if (base64) setForm((prev) => ({ ...prev, photo: base64 }));
+        });
+      }
     }
   }, [scannedData, editingProductId, setScannedData]);
 
