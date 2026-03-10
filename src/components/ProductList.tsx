@@ -36,11 +36,11 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
 
 const BORDER_COLORS: Record<string, string> = {
-  expired: 'border-l-red-500',
-  critical: 'border-l-red-400',
-  warning: 'border-l-orange-400',
-  soon: 'border-l-yellow-400',
-  good: 'border-l-green-400',
+  expired: 'border-s-red-500',
+  critical: 'border-s-red-400',
+  warning: 'border-s-orange-400',
+  soon: 'border-s-yellow-400',
+  good: 'border-s-green-400',
 };
 
 export function ProductList() {
@@ -132,13 +132,13 @@ export function ProductList() {
 
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={18} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder={t('products.searchPlaceholder')}
             value={filters.search}
             onChange={(e) => setFilter('search', e.target.value)}
-            className="w-full rounded-lg border border-primary-600 bg-primary-800 py-2 pl-10 pr-4 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+            className="w-full rounded-lg border border-primary-600 bg-primary-800 py-2 ps-10 pe-4 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
           />
         </div>
         <button
@@ -191,7 +191,7 @@ export function ProductList() {
           <div
             key={product.id}
             onClick={() => setSelectedProduct(product.id!)}
-            className={`border-l-4 ${BORDER_COLORS[product.status]} cursor-pointer rounded-r-lg border border-primary-700 bg-primary-800/60 p-3 transition-colors hover:bg-primary-800`}
+            className={`border-s-4 ${BORDER_COLORS[product.status]} cursor-pointer rounded-e-lg border border-primary-700 bg-primary-800/60 p-3 transition-colors hover:bg-primary-800`}
           >
             <div className="flex items-start gap-3">
               {product.photo ? (

@@ -187,7 +187,7 @@ export function BarcodeScanner() {
         <div className="flex items-center justify-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-6 py-3">
           <Loader2 size={20} className="animate-spin text-green-400" />
           <span className="text-gray-300">{t('scanner.searching')}</span>
-          <button onClick={() => { stopCamera(); reset(); }} className="ml-auto text-gray-400 hover:text-gray-200">
+          <button onClick={() => { stopCamera(); reset(); }} className="ms-auto text-gray-400 hover:text-gray-200">
             <X size={20} />
           </button>
         </div>

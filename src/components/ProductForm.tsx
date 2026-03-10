@@ -215,7 +215,7 @@ export function ProductForm() {
             {form.photo ? (
               <div className="relative">
                 <img src={form.photo} alt={t('form.productImage')} className="h-20 w-20 rounded-lg object-cover" />
-                <button type="button" onClick={() => updateField('photo', '')} className="absolute -right-1 -top-1 rounded-full bg-red-600 p-0.5"><X size={12} className="text-white" /></button>
+                <button type="button" onClick={() => updateField('photo', '')} className="absolute -end-1 -top-1 rounded-full bg-red-600 p-0.5"><X size={12} className="text-white" /></button>
               </div>
             ) : (
               <div className="flex gap-2">
