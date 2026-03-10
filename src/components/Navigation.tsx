@@ -35,7 +35,7 @@ export function Navigation() {
               className={`flex min-w-[3rem] flex-col items-center gap-0.5 px-2 py-2 text-xs transition-colors ${
                 isActive
                   ? 'text-green-400'
-                  : 'text-gray-400 hover:text-gray-300'
+                  : 'text-gray-300 hover:text-gray-200'
               }`}
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}

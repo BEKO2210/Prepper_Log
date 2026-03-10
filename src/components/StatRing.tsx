@@ -68,7 +68,7 @@ export function StatRing({
           {value}
         </text>
       </svg>
-      <span className="text-[0.6rem] uppercase tracking-widest text-gray-500">
+      <span className="text-[0.6rem] uppercase tracking-widest text-gray-400">
         {label}
       </span>
     </div>

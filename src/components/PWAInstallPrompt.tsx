@@ -32,7 +32,7 @@ export function PWAInstallPrompt() {
               <Download size={24} className="text-green-400" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-semibold text-gray-100">{t('pwa.installTitle')}</h3>
+              <p className="font-semibold text-gray-100">{t('pwa.installTitle')}</p>
 
               {isInstallable && (
                 <>
