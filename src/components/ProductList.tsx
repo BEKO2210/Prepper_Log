@@ -235,6 +235,13 @@ export function ProductList() {
                       </button>
                     </div>
                   )}
+                  {showArchived && (
+                    <div className="mt-2 flex gap-1">
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-red-400" title={t('products.delete')}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               {confirmDelete === product.id && (

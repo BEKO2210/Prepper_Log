@@ -5,6 +5,35 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.2.0] - 2026-03-10
+
+### Added
+- **Italian (IT) language** — complete translation for all 222+ keys
+- **French (FR) language** — complete translation for all 222+ keys
+- **Portuguese (PT) language** — complete translation for all 222+ keys
+- **Arabic (AR) RTL layout support** — logical CSS properties (`border-s`, `ps`, `pe`, `ms`, `me`, `start`, `end`) for correct mirroring in RTL mode
+- **Automatic product image download** — barcode scan now fetches and compresses product photos from Open Food Facts API
+- **Archive delete** — products in the archive view can now be deleted
+
+### Changed
+- PrepTrack now supports **6 languages**: German, English, Portuguese, Arabic, Italian, French
+- Status color strip on product cards uses dedicated `<div>` element instead of `border-s-{color}` classes (fixes light mode CSS specificity conflict)
+- README.md completely rewritten with prominent 6-language showcase, updated features, and optimized screenshot sizes
+- CONTRIBUTING.md updated with all 6 supported languages
+- CHANGELOG.md updated with project statistics
+
+### Fixed
+- **Status color strip invisible in light mode** — `html:not(.dark) .border-primary-700` had higher CSS specificity than `.border-s-{color}`, overriding status colors
+- **Lighthouse accessibility: color contrast** — StatRing labels (`text-gray-500` to `text-gray-400`), navigation inactive labels (`text-gray-400` to `text-gray-300`)
+- **Lighthouse accessibility: heading order** — PWAInstallPrompt `<h3>` changed to `<p>` (no parent `<h2>` existed)
+
+### Removed
+- `REVIEW_REPORT.md` — internal code review document (not needed for public repo)
+- `code-review/` directory — internal review artifacts
+- `public/icons/Icon_3117x3117_8MB.png` — 7.3 MB source icon (CI/CD already removed it before deploy)
+
+---
+
 ## [1.1.0] - 2026-03-09
 
 ### Added
@@ -95,16 +124,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Project Statistics
 
 ```
-Source Code .................. ~4,500 lines
+Source Code .................. ~5,000 lines
 Source Files ................. 26 TypeScript/TSX
+Translation Files ............ 6 (de, en, pt, ar, it, fr)
+Translation Keys ............. 222+ per language
 Build Size (total) ........... ~1.3 MB
-  JS (minified) .............. ~930 KB
+  JS (minified) .............. ~560 KB (main) + ~420 KB (scanner, lazy)
   CSS (minified) ............. ~28 KB
-Runtime Dependencies ......... 10
+Runtime Dependencies ......... 12
 Dev Dependencies ............. 14
 Test Framework ............... Vitest
 Tests ........................ 59 (all passing)
-Languages .................... German (DE), English (EN), Portuguese (PT), Arabic (AR)
+Languages .................... DE, EN, PT, AR (RTL), IT, FR
 Lighthouse PWA Score ......... 100
 ```
 
