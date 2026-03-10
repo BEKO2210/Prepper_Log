@@ -1,10 +1,9 @@
-name: Deploy PrepTrack to GitHub Pages
+name: Deploy PrepTrack
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,20 +15,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x, 22.x]
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.x
           cache: 'npm'
 
       - name: Install dependencies
@@ -39,36 +39,18 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run tests
-        run: npm run test --if-present
-
-      - name: Remove oversized source icon
-        run: rm -f public/icons/Icon_3117x3117_8MB.png
+        run: npm run test
 
       - name: Build
         run: npm run build
         env:
           GITHUB_PAGES: 'true'
 
-      - name: Audit dependencies
-        run: npm audit --audit-level=high || true
-
-      # Upload build artifact only from Node 20.x for deploy job
-      - name: Upload build artifact
-        if: matrix.node-version == '20.x'
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
 
-  deploy:
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
