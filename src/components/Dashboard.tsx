@@ -14,12 +14,12 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-const URGENT_BORDER_COLORS: Record<string, string> = {
-  expired: 'border-s-red-500',
-  critical: 'border-s-red-400',
-  warning: 'border-s-orange-400',
-  soon: 'border-s-yellow-400',
-  good: 'border-s-green-400',
+const URGENT_STATUS_COLORS: Record<string, string> = {
+  expired: 'bg-red-500',
+  critical: 'bg-red-400',
+  warning: 'bg-orange-400',
+  soon: 'bg-yellow-400',
+  good: 'bg-green-400',
 };
 
 const URGENT_TEXT_COLORS: Record<string, string> = {
@@ -146,12 +146,15 @@ export function Dashboard() {
           </div>
           <div className="space-y-2">
             {urgentProducts.map((product) => (
-              <div key={product.id} className={`flex items-center justify-between border-s-4 ${URGENT_BORDER_COLORS[product.status]} rounded-e-lg bg-primary-900/40 p-3`}>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-gray-200">{product.name}</p>
-                  <p className="text-xs text-gray-400">{product.storageLocation} &middot; {formatDate(product.expiryDate, product.expiryPrecision)}</p>
+              <div key={product.id} className="flex overflow-hidden rounded-lg bg-primary-900/40">
+                <div className={`w-1 shrink-0 ${URGENT_STATUS_COLORS[product.status]}`} />
+                <div className="flex flex-1 items-center justify-between p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-200">{product.name}</p>
+                    <p className="text-xs text-gray-400">{product.storageLocation} &middot; {formatDate(product.expiryDate, product.expiryPrecision)}</p>
+                  </div>
+                  <span className={`shrink-0 text-xs font-bold ${URGENT_TEXT_COLORS[product.status]}`}>{formatDaysUntil(product.daysLeft)}</span>
                 </div>
-                <span className={`shrink-0 text-xs font-bold ${URGENT_TEXT_COLORS[product.status]}`}>{formatDaysUntil(product.daysLeft)}</span>
               </div>
             ))}
           </div>

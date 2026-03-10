@@ -35,12 +35,12 @@ import {
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
 
-const BORDER_COLORS: Record<string, string> = {
-  expired: 'border-s-red-500',
-  critical: 'border-s-red-400',
-  warning: 'border-s-orange-400',
-  soon: 'border-s-yellow-400',
-  good: 'border-s-green-400',
+const STATUS_COLORS: Record<string, string> = {
+  expired: 'bg-red-500',
+  critical: 'bg-red-400',
+  warning: 'bg-orange-400',
+  soon: 'bg-yellow-400',
+  good: 'bg-green-400',
 };
 
 export function ProductList() {
@@ -191,59 +191,62 @@ export function ProductList() {
           <div
             key={product.id}
             onClick={() => setSelectedProduct(product.id!)}
-            className={`border-s-4 ${BORDER_COLORS[product.status]} cursor-pointer rounded-e-lg border border-primary-700 bg-primary-800/60 p-3 transition-colors hover:bg-primary-800`}
+            className="flex cursor-pointer overflow-hidden rounded-lg border border-primary-700 bg-primary-800/60 transition-colors hover:bg-primary-800"
           >
-            <div className="flex items-start gap-3">
-              {product.photo ? (
-                <img src={product.photo} alt="" loading="lazy" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
-              ) : (
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary-700">
-                  <Package size={24} className="text-gray-600" />
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-gray-200">{product.name}</p>
-                    <p className="text-xs text-gray-400">
-                      {t(`categories.${product.category}`)} &middot; {product.storageLocation}
-                    </p>
-                  </div>
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadgeColor(product.status)}`}>
-                    {t(`status.${product.status}`)}
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
-                  <span>{t('products.mhd')}: {formatDate(product.expiryDate, product.expiryPrecision)} ({formatDaysUntil(product.daysLeft)})</span>
-                  <span>{product.quantity} {product.unit}</span>
-                  {product.minStock !== undefined && product.minStock > 0 && product.quantity < product.minStock && (
-                    <span className="text-yellow-400">{t('products.lowStockWarning', { min: product.minStock })}</span>
-                  )}
-                </div>
-                {!showArchived && (
-                  <div className="mt-2 flex gap-1">
-                    <button onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200" title={t('products.edit')}>
-                      <Edit3 size={16} />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-green-400" title={t('products.consumed')}>
-                      <ShoppingCart size={16} />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-red-400" title={t('products.delete')}>
-                      <Trash2 size={16} />
-                    </button>
+            <div className={`w-1 shrink-0 ${STATUS_COLORS[product.status]}`} />
+            <div className="flex-1 p-3">
+              <div className="flex items-start gap-3">
+                {product.photo ? (
+                  <img src={product.photo} alt="" loading="lazy" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+                ) : (
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary-700">
+                    <Package size={24} className="text-gray-600" />
                   </div>
                 )}
-              </div>
-            </div>
-            {confirmDelete === product.id && (
-              <div className="mt-2 flex items-center justify-between rounded-lg border border-red-500/30 bg-red-500/10 p-2">
-                <span className="text-sm text-red-400">{t('products.confirmDelete')}</span>
-                <div className="flex gap-2">
-                  <button onClick={(e) => { e.stopPropagation(); handleDelete(product.id!); }} className="rounded bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500">{t('products.deleteBtn')}</button>
-                  <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }} className="rounded bg-primary-700 px-3 py-1 text-xs text-gray-300 hover:bg-primary-600">{t('products.cancel')}</button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-gray-200">{product.name}</p>
+                      <p className="text-xs text-gray-400">
+                        {t(`categories.${product.category}`)} &middot; {product.storageLocation}
+                      </p>
+                    </div>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadgeColor(product.status)}`}>
+                      {t(`status.${product.status}`)}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
+                    <span>{t('products.mhd')}: {formatDate(product.expiryDate, product.expiryPrecision)} ({formatDaysUntil(product.daysLeft)})</span>
+                    <span>{product.quantity} {product.unit}</span>
+                    {product.minStock !== undefined && product.minStock > 0 && product.quantity < product.minStock && (
+                      <span className="text-yellow-400">{t('products.lowStockWarning', { min: product.minStock })}</span>
+                    )}
+                  </div>
+                  {!showArchived && (
+                    <div className="mt-2 flex gap-1">
+                      <button onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200" title={t('products.edit')}>
+                        <Edit3 size={16} />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-green-400" title={t('products.consumed')}>
+                        <ShoppingCart size={16} />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-red-400" title={t('products.delete')}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
+              {confirmDelete === product.id && (
+                <div className="mt-2 flex items-center justify-between rounded-lg border border-red-500/30 bg-red-500/10 p-2">
+                  <span className="text-sm text-red-400">{t('products.confirmDelete')}</span>
+                  <div className="flex gap-2">
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(product.id!); }} className="rounded bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500">{t('products.deleteBtn')}</button>
+                    <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }} className="rounded bg-primary-700 px-3 py-1 text-xs text-gray-300 hover:bg-primary-600">{t('products.cancel')}</button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ))}
 
