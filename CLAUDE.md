@@ -4,7 +4,7 @@
 
 PrepTrack — Offline-first PWA zur Vorratsverwaltung.
 React 18 + TypeScript, Vite 6, Tailwind CSS 3, Zustand, Dexie.js (IndexedDB).
-Sprachen: Deutsch (de), Englisch (en), Portugiesisch (pt). Lizenz: Apache 2.0.
+Sprachen: Deutsch (de), Englisch (en), Portugiesisch (pt), Arabisch (ar). Lizenz: Apache 2.0.
 
 ## Befehle
 

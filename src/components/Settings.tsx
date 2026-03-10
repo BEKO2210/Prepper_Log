@@ -34,6 +34,7 @@ const LANGUAGES = [
   { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'pt', label: 'Português', flag: '🇵🇹' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
 ];
 
 export function Settings() {
@@ -121,20 +122,20 @@ export function Settings() {
           <Globe size={18} className="text-blue-400" />
           {t('settings.language')}
         </h3>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                 i18n.language.startsWith(lang.code)
                   ? 'border-green-500 bg-green-500/10 text-green-400'
                   : 'border-primary-600 text-gray-300 hover:bg-primary-700'
               }`}
             >
               <span className="text-lg">{lang.flag}</span>
-              <span>{lang.label}</span>
-              <span className="text-xs uppercase text-gray-400">{lang.code}</span>
+              <span className="truncate">{lang.label}</span>
+              <span className="ml-auto text-xs uppercase text-gray-400">{lang.code}</span>
             </button>
           ))}
         </div>
