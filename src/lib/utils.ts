@@ -236,15 +236,61 @@ export async function fetchAndCompressImage(
   imageUrl: string,
   maxSizeKB = 500
 ): Promise<string | null> {
+  // Strategy 1: fetch() + compressImage (works if server sends CORS headers)
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 6000);
     const response = await fetch(imageUrl, { signal: controller.signal });
     clearTimeout(timeoutId);
-    if (!response.ok) return null;
-    const blob = await response.blob();
-    const file = new File([blob], 'product.jpg', { type: blob.type });
-    return await compressImage(file, maxSizeKB);
+    if (response.ok) {
+      const blob = await response.blob();
+      const file = new File([blob], 'product.jpg', { type: blob.type });
+      return await compressImage(file, maxSizeKB);
+    }
+  } catch {
+    // CORS blocked or network error — try fallback
+  }
+
+  // Strategy 2: Image element with crossOrigin + canvas (different CORS path)
+  try {
+    return await new Promise<string | null>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      const timeout = setTimeout(() => { img.src = ''; resolve(null); }, 8000);
+      img.onload = () => {
+        clearTimeout(timeout);
+        try {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1024;
+          if (width > maxDim || height > maxDim) {
+            const ratio = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { resolve(null); return; }
+          ctx.drawImage(img, 0, 0, width, height);
+          const supportsWebP = canvas.toDataURL('image/webp').startsWith('data:image/webp');
+          const format = supportsWebP ? 'image/webp' : 'image/jpeg';
+          const maxBase64Bytes = maxSizeKB * 1024 * 1.37;
+          let quality = 0.7;
+          let dataUrl = canvas.toDataURL(format, quality);
+          while (dataUrl.length > maxBase64Bytes && quality > 0.1) {
+            quality -= 0.1;
+            dataUrl = canvas.toDataURL(format, quality);
+          }
+          resolve(dataUrl);
+        } catch {
+          resolve(null); // Canvas tainted — no CORS headers at all
+        }
+      };
+      img.onerror = () => { clearTimeout(timeout); resolve(null); };
+      img.src = imageUrl;
+    });
   } catch {
     return null;
   }
