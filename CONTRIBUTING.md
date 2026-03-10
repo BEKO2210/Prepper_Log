@@ -70,7 +70,7 @@ PrepTrack is an offline-first PWA built with:
 - **Tailwind CSS 3** — Styling
 - **Zustand** — State management (routing via `useAppStore.currentPage`, NOT React Router)
 - **Dexie.js** — IndexedDB wrapper for local data storage
-- **react-i18next** — Internationalization (German default, English)
+- **react-i18next** — Internationalization (6 languages: DE, EN, PT, AR, IT, FR)
 
 ### Key Patterns
 
@@ -102,7 +102,7 @@ notificationSchedules: ++id, productId, notifyAt, sent, [productId+daysBefore]
 
 - All user-facing text must use i18n translation keys
 - German (`de`) is the default language
-- When adding new text, add keys to both `src/i18n/locales/de/translation.json` and `src/i18n/locales/en/translation.json`
+- When adding new text, add keys to all 6 translation files: `src/i18n/locales/{de,en,pt,ar,it,fr}/translation.json`
 - Use correct German umlauts (ä, ö, ü, ß)
 
 ### Components
@@ -141,7 +141,7 @@ chore: update dependencies
 
 - Clean, readable code
 - No unnecessary complexity
-- Translation keys for all new UI text (DE + EN)
+- Translation keys for all new UI text (all 6 languages: DE, EN, PT, AR, IT, FR)
 - No security vulnerabilities (XSS, injection, etc.)
 - Proper offline support (no assumptions about network availability)
 - Dark mode compatibility

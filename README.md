@@ -24,6 +24,7 @@
 
 <p align="center">
   <a href="#-features">Features</a>&nbsp;&bull;
+  <a href="#-languages">Languages</a>&nbsp;&bull;
   <a href="#-screenshots">Screenshots</a>&nbsp;&bull;
   <a href="#-tech-stack">Tech Stack</a>&nbsp;&bull;
   <a href="#-getting-started">Getting Started</a>&nbsp;&bull;
@@ -32,7 +33,7 @@
 </p>
 
 <p align="center">
-  <a href="#-deutsch">🇩🇪 Deutsche Version weiter unten</a>
+  <a href="#-deutsch">Deutsche Version weiter unten</a>
 </p>
 
 ---
@@ -45,11 +46,33 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 
 ---
 
+## 🌍 Languages
+
+PrepTrack supports **6 languages** with full translations for every screen, notification, and message:
+
+<table>
+<tr>
+<td align="center" width="16%"><h3>🇩🇪</h3><strong>Deutsch</strong><br><sub>Default</sub></td>
+<td align="center" width="16%"><h3>🇬🇧</h3><strong>English</strong><br><sub>&nbsp;</sub></td>
+<td align="center" width="16%"><h3>🇵🇹</h3><strong>Portugues</strong><br><sub>&nbsp;</sub></td>
+<td align="center" width="16%"><h3>🇸🇦</h3><strong>العربية</strong><br><sub>RTL</sub></td>
+<td align="center" width="16%"><h3>🇮🇹</h3><strong>Italiano</strong><br><sub>&nbsp;</sub></td>
+<td align="center" width="16%"><h3>🇫🇷</h3><strong>Francais</strong><br><sub>&nbsp;</sub></td>
+</tr>
+</table>
+
+- **Auto-detection** — the app detects your browser language on first visit
+- **Language switcher** — change anytime in Settings with country flags
+- **Full RTL support** — Arabic layout mirrors correctly (logical CSS properties)
+- **Persistent** — your choice is saved to localStorage
+
+---
+
 ## ✨ Features
 
 | Feature | Description |
 |---------|-------------|
-| **Barcode Scanner** | Scan barcodes with your camera. Auto-lookup via Open Food Facts API. Duplicate detection. |
+| **Barcode Scanner** | Scan barcodes with your camera. Auto-lookup via Open Food Facts API with **automatic product image download**. Duplicate detection. |
 | **Product Management** | Name, category, location, quantity, unit, expiry date (day/month/year precision), photo, notes. |
 | **Expiry Tracking** | Color-coded warnings: Red (expired/critical), Orange (warning), Yellow (soon), Green (OK). |
 | **Dashboard** | StatRing visualization, expiry distribution bar, urgent products, category overview, low stock counter. |
@@ -60,8 +83,8 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 | **Data Import** | Restore from backup with automatic duplicate detection. |
 | **Offline-First** | Fully functional offline. All data in IndexedDB. Service Worker caches assets, fonts, and API responses. |
 | **Installable PWA** | Install as native app on Android, iOS, and Desktop. |
-| **Dark & Light Mode** | Dark theme by default. Toggle to light theme anytime. |
-| **Multi-Language** | German (default), English, Portuguese, and Arabic. Language switcher with country flags in settings. |
+| **Dark & Light Mode** | Dark theme by default. Toggle to light theme anytime. Accessible color contrast in both modes. |
+| **6 Languages** | German, English, Portuguese, Arabic (RTL), Italian, and French. Auto-detection + manual switcher. |
 
 ---
 
@@ -71,18 +94,18 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 <summary><strong>🌙 Dark Mode</strong></summary>
 <br>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Dashboard_dunkel.jpg" width="250" alt="Dashboard Dark" />
+  <img src="public/screenshots/Screenshot_Dashboard_dunkel.jpg" width="220" alt="Dashboard Dark" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Vorräte_dunkel.jpg" width="250" alt="Supplies Dark" />
+  <img src="public/screenshots/Screenshot_Vorräte_dunkel.jpg" width="220" alt="Supplies Dark" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Produkt_detail_dunkel.jpg" width="250" alt="Product Detail Dark" />
+  <img src="public/screenshots/Screenshot_Produkt_detail_dunkel.jpg" width="220" alt="Product Detail Dark" />
 </p>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_dunkel.jpg" width="250" alt="Add Product Dark" />
+  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_dunkel.jpg" width="220" alt="Add Product Dark" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Scanner_dunkel.jpg" width="250" alt="Scanner Dark" />
+  <img src="public/screenshots/Screenshot_Scanner_dunkel.jpg" width="220" alt="Scanner Dark" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Statistik_dunkel.jpg" width="250" alt="Statistics Dark" />
+  <img src="public/screenshots/Screenshot_Statistik_dunkel.jpg" width="220" alt="Statistics Dark" />
 </p>
 </details>
 
@@ -90,28 +113,28 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 <summary><strong>☀️ Light Mode</strong></summary>
 <br>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Dashboard_hell.jpg" width="250" alt="Dashboard Light" />
+  <img src="public/screenshots/Screenshot_Dashboard_hell.jpg" width="220" alt="Dashboard Light" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Vorräte_hell.jpg" width="250" alt="Supplies Light" />
+  <img src="public/screenshots/Screenshot_Vorräte_hell.jpg" width="220" alt="Supplies Light" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Produkt_detail_hell.jpg" width="250" alt="Product Detail Light" />
+  <img src="public/screenshots/Screenshot_Produkt_detail_hell.jpg" width="220" alt="Product Detail Light" />
 </p>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_hell.jpg" width="250" alt="Add Product Light" />
+  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_hell.jpg" width="220" alt="Add Product Light" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Scanner_hell.jpg" width="250" alt="Scanner Light" />
+  <img src="public/screenshots/Screenshot_Scanner_hell.jpg" width="220" alt="Scanner Light" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Statistik_hell.jpg" width="250" alt="Statistics Light" />
+  <img src="public/screenshots/Screenshot_Statistik_hell.jpg" width="220" alt="Statistics Light" />
 </p>
 </details>
 
 <details>
-<summary><strong>🌐 Language Switcher (Multi-Language)</strong></summary>
+<summary><strong>🌐 Language Switcher</strong></summary>
 <br>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Einstellungen_hell_en.jpg" width="250" alt="Settings English Light" />
+  <img src="public/screenshots/Screenshot_Einstellungen_hell_en.jpg" width="220" alt="Settings English Light" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Einstellungen_dunkel_en.jpg" width="250" alt="Settings English Dark" />
+  <img src="public/screenshots/Screenshot_Einstellungen_dunkel_en.jpg" width="220" alt="Settings English Dark" />
 </p>
 </details>
 
@@ -123,15 +146,15 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 |----------|-----------|---------|
 | **Framework** | React 18 + TypeScript | Interactive SPA with type safety |
 | **Bundler** | Vite 6 | Fast dev server, optimized builds |
-| **Styling** | Tailwind CSS 3 | Utility-first, dark mode support |
+| **Styling** | Tailwind CSS 3 | Utility-first, dark mode, RTL-ready (logical properties) |
 | **State** | Zustand | Lightweight, no boilerplate |
 | **Database** | Dexie.js (IndexedDB) | Offline-first, reactive queries |
 | **PWA** | vite-plugin-pwa (Workbox) | Auto-update, runtime caching |
 | **Scanner** | @zxing/browser | Barcode/EAN recognition via camera |
-| **i18n** | react-i18next | Multi-language support (DE/EN/PT/AR) |
+| **i18n** | react-i18next | 6 languages (DE/EN/PT/AR/IT/FR), auto-detection |
 | **Icons** | Lucide React | Consistent, lightweight SVG icons |
 | **Animation** | Framer Motion | Smooth UI transitions |
-| **API** | Open Food Facts | Free product database |
+| **API** | Open Food Facts | Free product database with images |
 | **CI/CD** | GitHub Actions | Auto-deploy to GitHub Pages |
 | **Testing** | Vitest | Unit tests (59 tests) |
 
@@ -242,7 +265,7 @@ src/
 │   └── usePWAInstall.ts      PWA installation
 ├── i18n/                 Internationalization
 │   ├── i18n.ts               i18next configuration
-│   └── locales/              Translation files (de, en, pt, ar)
+│   └── locales/              Translation files (de, en, pt, ar, it, fr)
 ├── lib/                  Business Logic
 │   ├── db.ts                 Dexie.js database, CRUD, export/import
 │   ├── utils.ts              Expiry calculation, formatting, barcode lookup
@@ -349,11 +372,33 @@ PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App**
 
 ---
 
+## 🌍 Sprachen
+
+PrepTrack unterstützt **6 Sprachen** mit vollständigen Übersetzungen für jeden Bildschirm, jede Benachrichtigung und Meldung:
+
+<table>
+<tr>
+<td align="center" width="16%"><h3>🇩🇪</h3><strong>Deutsch</strong><br><sub>Standard</sub></td>
+<td align="center" width="16%"><h3>🇬🇧</h3><strong>English</strong><br><sub>&nbsp;</sub></td>
+<td align="center" width="16%"><h3>🇵🇹</h3><strong>Portugues</strong><br><sub>&nbsp;</sub></td>
+<td align="center" width="16%"><h3>🇸🇦</h3><strong>العربية</strong><br><sub>RTL</sub></td>
+<td align="center" width="16%"><h3>🇮🇹</h3><strong>Italiano</strong><br><sub>&nbsp;</sub></td>
+<td align="center" width="16%"><h3>🇫🇷</h3><strong>Francais</strong><br><sub>&nbsp;</sub></td>
+</tr>
+</table>
+
+- **Automatische Erkennung** — die App erkennt deine Browsersprache beim ersten Besuch
+- **Sprachumschalter** — jederzeit in den Einstellungen mit Länderflaggen umschaltbar
+- **Volle RTL-Unterstützung** — arabisches Layout wird korrekt gespiegelt (logische CSS-Properties)
+- **Persistent** — deine Auswahl wird in localStorage gespeichert
+
+---
+
 ## ✨ Funktionen
 
 | Funktion | Beschreibung |
 |----------|-------------|
-| **Barcode-Scanner** | Barcode scannen mit der Kamera. Automatische Erkennung via Open Food Facts API. Duplikat-Warnung. |
+| **Barcode-Scanner** | Barcode scannen mit der Kamera. Automatische Erkennung via Open Food Facts API mit **automatischem Produktbild-Download**. Duplikat-Warnung. |
 | **Produktverwaltung** | Name, Kategorie, Lagerort, Menge, Einheit, MHD (Tag/Monat/Jahr), Foto, Notizen. |
 | **MHD-Tracking** | Farbcodierte Warnung: Rot (abgelaufen/kritisch), Orange (Warnung), Gelb (bald), Grün (OK). |
 | **Dashboard** | StatRing-Visualisierung, MHD-Verteilung, dringende Produkte, Kategorien, Unterbestand. |
@@ -364,8 +409,8 @@ PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App**
 | **Daten-Import** | Backup wiederherstellen mit automatischer Duplikat-Erkennung. |
 | **Offline-First** | Vollständig offline nutzbar. Alle Daten in IndexedDB. Service Worker cached alles. |
 | **Installierbar** | Als PWA auf Android, iOS und Desktop installierbar. Fühlt sich an wie native App. |
-| **Dark & Light Mode** | Dunkles Design als Standard. Jederzeit umschaltbar. |
-| **Mehrsprachig** | Deutsch (Standard), Englisch, Portugiesisch und Arabisch. Sprachumschalter mit Länderflaggen in den Einstellungen. |
+| **Dark & Light Mode** | Dunkles Design als Standard. Jederzeit umschaltbar. Barrierefreier Kontrast in beiden Modi. |
+| **6 Sprachen** | Deutsch, Englisch, Portugiesisch, Arabisch (RTL), Italienisch und Französisch. Auto-Erkennung + manueller Umschalter. |
 
 ---
 
@@ -375,18 +420,18 @@ PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App**
 <summary><strong>🌙 Dunkler Modus</strong></summary>
 <br>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Dashboard_dunkel.jpg" width="250" alt="Dashboard Dunkel" />
+  <img src="public/screenshots/Screenshot_Dashboard_dunkel.jpg" width="220" alt="Dashboard Dunkel" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Vorräte_dunkel.jpg" width="250" alt="Vorräte Dunkel" />
+  <img src="public/screenshots/Screenshot_Vorräte_dunkel.jpg" width="220" alt="Vorräte Dunkel" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Produkt_detail_dunkel.jpg" width="250" alt="Produktdetail Dunkel" />
+  <img src="public/screenshots/Screenshot_Produkt_detail_dunkel.jpg" width="220" alt="Produktdetail Dunkel" />
 </p>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_dunkel.jpg" width="250" alt="Produkt hinzufügen Dunkel" />
+  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_dunkel.jpg" width="220" alt="Produkt hinzufügen Dunkel" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Scanner_dunkel.jpg" width="250" alt="Scanner Dunkel" />
+  <img src="public/screenshots/Screenshot_Scanner_dunkel.jpg" width="220" alt="Scanner Dunkel" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Statistik_dunkel.jpg" width="250" alt="Statistik Dunkel" />
+  <img src="public/screenshots/Screenshot_Statistik_dunkel.jpg" width="220" alt="Statistik Dunkel" />
 </p>
 </details>
 
@@ -394,28 +439,28 @@ PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App**
 <summary><strong>☀️ Heller Modus</strong></summary>
 <br>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Dashboard_hell.jpg" width="250" alt="Dashboard Hell" />
+  <img src="public/screenshots/Screenshot_Dashboard_hell.jpg" width="220" alt="Dashboard Hell" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Vorräte_hell.jpg" width="250" alt="Vorräte Hell" />
+  <img src="public/screenshots/Screenshot_Vorräte_hell.jpg" width="220" alt="Vorräte Hell" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Produkt_detail_hell.jpg" width="250" alt="Produktdetail Hell" />
+  <img src="public/screenshots/Screenshot_Produkt_detail_hell.jpg" width="220" alt="Produktdetail Hell" />
 </p>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_hell.jpg" width="250" alt="Produkt hinzufügen Hell" />
+  <img src="public/screenshots/Screenshot_Produkt_hinzufügen_hell.jpg" width="220" alt="Produkt hinzufügen Hell" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Scanner_hell.jpg" width="250" alt="Scanner Hell" />
+  <img src="public/screenshots/Screenshot_Scanner_hell.jpg" width="220" alt="Scanner Hell" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Statistik_hell.jpg" width="250" alt="Statistik Hell" />
+  <img src="public/screenshots/Screenshot_Statistik_hell.jpg" width="220" alt="Statistik Hell" />
 </p>
 </details>
 
 <details>
-<summary><strong>🌐 Sprachumschalter (Englisch)</strong></summary>
+<summary><strong>🌐 Sprachumschalter</strong></summary>
 <br>
 <p align="center">
-  <img src="public/screenshots/Screenshot_Einstellungen_hell_en.jpg" width="250" alt="Einstellungen Englisch Hell" />
+  <img src="public/screenshots/Screenshot_Einstellungen_hell_en.jpg" width="220" alt="Einstellungen Englisch Hell" />
   &nbsp;
-  <img src="public/screenshots/Screenshot_Einstellungen_dunkel_en.jpg" width="250" alt="Einstellungen Englisch Dunkel" />
+  <img src="public/screenshots/Screenshot_Einstellungen_dunkel_en.jpg" width="220" alt="Einstellungen Englisch Dunkel" />
 </p>
 </details>
 
