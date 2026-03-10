@@ -9,7 +9,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - **Internationalization (i18n)** — Full multi-language support using react-i18next
-- **German (DE)**, **English (EN)**, and **Portuguese (PT)** translations for all UI text
+- **German (DE)**, **English (EN)**, **Portuguese (PT)**, and **Arabic (AR)** translations for all UI text
 - **Language switcher** in Settings with country flag icons and language codes
 - **Browser language detection** — automatically selects the user's preferred language
 - **Language persistence** via localStorage (`preptrack-language`)
@@ -104,7 +104,7 @@ Runtime Dependencies ......... 10
 Dev Dependencies ............. 14
 Test Framework ............... Vitest
 Tests ........................ 59 (all passing)
-Languages .................... German (DE), English (EN), Portuguese (PT)
+Languages .................... German (DE), English (EN), Portuguese (PT), Arabic (AR)
 Lighthouse PWA Score ......... 100
 ```
 

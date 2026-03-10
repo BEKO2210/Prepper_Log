@@ -61,7 +61,7 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 | **Offline-First** | Fully functional offline. All data in IndexedDB. Service Worker caches assets, fonts, and API responses. |
 | **Installable PWA** | Install as native app on Android, iOS, and Desktop. |
 | **Dark & Light Mode** | Dark theme by default. Toggle to light theme anytime. |
-| **Multi-Language** | German (default), English, and Portuguese. Language switcher with country flags in settings. |
+| **Multi-Language** | German (default), English, Portuguese, and Arabic. Language switcher with country flags in settings. |
 
 ---
 
@@ -128,7 +128,7 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 | **Database** | Dexie.js (IndexedDB) | Offline-first, reactive queries |
 | **PWA** | vite-plugin-pwa (Workbox) | Auto-update, runtime caching |
 | **Scanner** | @zxing/browser | Barcode/EAN recognition via camera |
-| **i18n** | react-i18next | Multi-language support (DE/EN/PT) |
+| **i18n** | react-i18next | Multi-language support (DE/EN/PT/AR) |
 | **Icons** | Lucide React | Consistent, lightweight SVG icons |
 | **Animation** | Framer Motion | Smooth UI transitions |
 | **API** | Open Food Facts | Free product database |
@@ -242,7 +242,7 @@ src/
 │   └── usePWAInstall.ts      PWA installation
 ├── i18n/                 Internationalization
 │   ├── i18n.ts               i18next configuration
-│   └── locales/              Translation files (de, en, pt)
+│   └── locales/              Translation files (de, en, pt, ar)
 ├── lib/                  Business Logic
 │   ├── db.ts                 Dexie.js database, CRUD, export/import
 │   ├── utils.ts              Expiry calculation, formatting, barcode lookup
@@ -365,7 +365,7 @@ PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App**
 | **Offline-First** | Vollständig offline nutzbar. Alle Daten in IndexedDB. Service Worker cached alles. |
 | **Installierbar** | Als PWA auf Android, iOS und Desktop installierbar. Fühlt sich an wie native App. |
 | **Dark & Light Mode** | Dunkles Design als Standard. Jederzeit umschaltbar. |
-| **Mehrsprachig** | Deutsch (Standard), Englisch und Portugiesisch. Sprachumschalter mit Länderflaggen in den Einstellungen. |
+| **Mehrsprachig** | Deutsch (Standard), Englisch, Portugiesisch und Arabisch. Sprachumschalter mit Länderflaggen in den Einstellungen. |
 
 ---
 
