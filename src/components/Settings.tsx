@@ -137,7 +137,7 @@ export function Settings() {
             >
               <span className="text-lg">{lang.flag}</span>
               <span className="truncate">{lang.label}</span>
-              <span className="ml-auto text-xs uppercase text-gray-400">{lang.code}</span>
+              <span className="ms-auto text-xs uppercase text-gray-400">{lang.code}</span>
             </button>
           ))}
         </div>
@@ -235,7 +235,7 @@ export function Settings() {
             ) : (
               <BellOff size={20} className="text-gray-400" />
             )}
-            <div className="text-left">
+            <div className="text-start">
               <span className="text-gray-200">{t('settings.expiryReminders')}</span>
               {notifStatus === 'denied' && (
                 <p className="text-xs text-red-400">
@@ -275,7 +275,7 @@ export function Settings() {
           <div className="relative flex-1">
             <MapPin
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
             <input
               type="text"
@@ -283,7 +283,7 @@ export function Settings() {
               onChange={(e) => setNewLocation(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddLocation()}
               placeholder={t('settings.newLocationPlaceholder')}
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 py-2 pl-9 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+              className="w-full rounded-lg border border-primary-600 bg-primary-900 py-2 ps-9 pe-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
             />
           </div>
           <button
@@ -328,11 +328,11 @@ export function Settings() {
             className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
           >
             <FileJson size={20} className="text-blue-400" />
-            <div className="text-left">
+            <div className="text-start">
               <span>{t('settings.jsonBackup')}</span>
               <p className="text-xs text-gray-400">{t('settings.jsonBackupDesc')}</p>
             </div>
-            <Download size={16} className="ml-auto text-gray-400" />
+            <Download size={16} className="ms-auto text-gray-400" />
           </button>
 
           <button
@@ -340,16 +340,16 @@ export function Settings() {
             className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
           >
             <FileText size={20} className="text-gray-400" />
-            <div className="text-left">
+            <div className="text-start">
               <span>{t('settings.csvExport')}</span>
               <p className="text-xs text-gray-400">{t('settings.csvExportDesc')}</p>
             </div>
-            <Download size={16} className="ml-auto text-gray-400" />
+            <Download size={16} className="ms-auto text-gray-400" />
           </button>
 
           <label className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700">
             <Upload size={20} className="text-orange-400" />
-            <div className="text-left">
+            <div className="text-start">
               <span>{t('settings.jsonImport')}</span>
               <p className="text-xs text-gray-400">{t('settings.jsonImportDesc')}</p>
             </div>

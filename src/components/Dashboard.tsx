@@ -15,11 +15,11 @@ import {
 } from 'lucide-react';
 
 const URGENT_BORDER_COLORS: Record<string, string> = {
-  expired: 'border-l-red-500',
-  critical: 'border-l-red-400',
-  warning: 'border-l-orange-400',
-  soon: 'border-l-yellow-400',
-  good: 'border-l-green-400',
+  expired: 'border-s-red-500',
+  critical: 'border-s-red-400',
+  warning: 'border-s-orange-400',
+  soon: 'border-s-yellow-400',
+  good: 'border-s-green-400',
 };
 
 const URGENT_TEXT_COLORS: Record<string, string> = {
@@ -98,7 +98,7 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button onClick={() => setPage('scanner')} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-left hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+        <button onClick={() => setPage('scanner')} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-600/20">
             <ScanBarcode size={20} className="text-green-400" />
           </div>
@@ -107,7 +107,7 @@ export function Dashboard() {
             <p className="text-[0.65rem] text-gray-400">{t('dashboard.scanBarcode')}</p>
           </div>
         </button>
-        <button onClick={() => setPage('add')} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-left hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+        <button onClick={() => setPage('add')} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600/20">
             <PlusCircle size={20} className="text-blue-400" />
           </div>
@@ -146,7 +146,7 @@ export function Dashboard() {
           </div>
           <div className="space-y-2">
             {urgentProducts.map((product) => (
-              <div key={product.id} className={`flex items-center justify-between border-l-4 ${URGENT_BORDER_COLORS[product.status]} rounded-r-lg bg-primary-900/40 p-3`}>
+              <div key={product.id} className={`flex items-center justify-between border-s-4 ${URGENT_BORDER_COLORS[product.status]} rounded-e-lg bg-primary-900/40 p-3`}>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-gray-200">{product.name}</p>
                   <p className="text-xs text-gray-400">{product.storageLocation} &middot; {formatDate(product.expiryDate, product.expiryPrecision)}</p>
