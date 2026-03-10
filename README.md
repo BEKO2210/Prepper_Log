@@ -106,7 +106,7 @@ PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing
 </details>
 
 <details>
-<summary><strong>🌐 Language Switcher (English)</strong></summary>
+<summary><strong>🌐 Language Switcher (Multi-Language)</strong></summary>
 <br>
 <p align="center">
   <img src="public/screenshots/Screenshot_Einstellungen_hell_en.jpg" width="250" alt="Settings English Light" />
