@@ -115,7 +115,18 @@ export function ProductForm() {
     }
   }, [existingProduct]);
 
-  useEffect(() => { populatedRef.current = false; }, [editingProductId]);
+  useEffect(() => {
+    populatedRef.current = false;
+    if (!editingProductId) {
+      setForm((prev) => {
+        // Only reset if the form was populated with editing data
+        if (prev.name && !restoredRef.current) {
+          return { ...defaultForm, storageLocation: prev.storageLocation || '' };
+        }
+        return prev;
+      });
+    }
+  }, [editingProductId]);
 
   useEffect(() => {
     if (scannedData && !editingProductId) {

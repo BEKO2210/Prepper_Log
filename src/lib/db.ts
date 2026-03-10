@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie';
 import { version as appVersion } from '../../package.json';
 import i18n from '../i18n/i18n';
+import { getLocale } from './utils';
 import type {
   Product,
   StorageLocation,
@@ -71,9 +72,11 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: number): Promise<void> {
-  await db.products.delete(id);
-  await db.consumptionLogs.where('productId').equals(id).delete();
-  await db.notificationSchedules.where('productId').equals(id).delete();
+  await db.transaction('rw', db.products, db.consumptionLogs, db.notificationSchedules, async () => {
+    await db.products.delete(id);
+    await db.consumptionLogs.where('productId').equals(id).delete();
+    await db.notificationSchedules.where('productId').equals(id).delete();
+  });
 }
 
 export async function archiveProduct(id: number): Promise<void> {
@@ -170,7 +173,7 @@ export async function exportCSV(): Promise<string> {
     return s;
   }
 
-  const locale = i18n.language === 'en' ? 'en-GB' : 'de-DE';
+  const locale = getLocale();
 
   function fmtDate(iso: string): string {
     if (!iso) return '';
@@ -185,13 +188,13 @@ export async function exportCSV(): Promise<string> {
     escCsv(p.storageLocation),
     escCsv(p.quantity),
     escCsv(t(`units.${p.unit}`)),
-    fmtDate(p.expiryDate),
+    escCsv(fmtDate(p.expiryDate)),
     escCsv(p.expiryPrecision === 'day' ? t('form.precisionDay') : p.expiryPrecision === 'month' ? t('form.precisionMonth') : t('form.precisionYear')),
     escCsv(p.minStock ?? ''),
     escCsv(p.notes),
-    p.archived ? 'Ja' : 'Nein',
-    fmtDate(p.createdAt),
-    fmtDate(p.updatedAt),
+    escCsv(p.archived ? t('common.yes') : t('common.no')),
+    escCsv(fmtDate(p.createdAt)),
+    escCsv(fmtDate(p.updatedAt)),
   ]);
 
   return BOM + [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\r\n');
@@ -244,7 +247,8 @@ export async function importData(jsonString: string): Promise<number> {
           !product.name ||
           typeof product.name !== 'string' ||
           !product.expiryDate ||
-          typeof product.expiryDate !== 'string'
+          typeof product.expiryDate !== 'string' ||
+          isNaN(new Date(String(product.expiryDate)).getTime())
         ) {
           skipped++;
           continue;

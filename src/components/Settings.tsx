@@ -44,7 +44,7 @@ export function Settings() {
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
-  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
   const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
@@ -85,12 +85,12 @@ export function Settings() {
     try {
       const text = await file.text();
       const count = await importData(text);
-      setImportStatus(t('import.success', { count }));
+      setImportStatus({ message: t('import.success', { count }), type: 'success' });
     } catch (err) {
       if (err instanceof ImportResult) {
-        setImportStatus(err.message);
+        setImportStatus({ message: err.message, type: 'warning' });
       } else {
-        setImportStatus(t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }));
+        setImportStatus({ message: t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), type: 'error' });
       }
     }
 
@@ -362,14 +362,14 @@ export function Settings() {
           {importStatus && (
             <p
               className={`rounded-lg px-3 py-2 text-sm ${
-                importStatus.toLowerCase().includes('fehler') || importStatus.toLowerCase().includes('error')
+                importStatus.type === 'error'
                   ? 'bg-red-500/10 text-red-400'
-                  : importStatus.includes('übersprungen') || importStatus.includes('skipped')
+                  : importStatus.type === 'warning'
                     ? 'bg-orange-500/10 text-orange-400'
                     : 'bg-green-500/10 text-green-400'
               }`}
             >
-              {importStatus}
+              {importStatus.message}
             </p>
           )}
         </div>

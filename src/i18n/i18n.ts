@@ -28,4 +28,18 @@ i18n
     },
   });
 
+// Set dir attribute for RTL languages (Arabic)
+function updateDirection(lng: string) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
+  }
+}
+
+i18n.on('languageChanged', updateDirection);
+
+// Set initial direction
+if (i18n.language) {
+  updateDirection(i18n.language);
+}
+
 export default i18n;

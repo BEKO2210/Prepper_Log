@@ -58,9 +58,16 @@ export function getStatusLabel(status: ExpiryStatus): string {
   return i18n.t(`status.${status}`);
 }
 
-function getLocale(): string {
-  const lang = i18n.language || 'de';
-  return lang === 'en' ? 'en-GB' : 'de-DE';
+const LOCALE_MAP: Record<string, string> = {
+  de: 'de-DE',
+  en: 'en-GB',
+  pt: 'pt-BR',
+  ar: 'ar-SA',
+};
+
+export function getLocale(): string {
+  const lang = (i18n.language || 'de').split('-')[0];
+  return LOCALE_MAP[lang] || 'de-DE';
 }
 
 export function formatDate(dateString: string, precision: 'day' | 'month' | 'year' = 'day'): string {

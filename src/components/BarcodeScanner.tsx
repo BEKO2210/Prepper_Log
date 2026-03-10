@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { useAppStore } from '../store/useAppStore';
-import { lookupBarcode, formatDate, getDaysUntilExpiry, formatDaysUntil, getExpiryStatus, getStatusBadgeColor, getStatusLabel } from '../lib/utils';
+import { lookupBarcode, formatDate, getDaysUntilExpiry, formatDaysUntil, getExpiryStatus, getStatusBadgeColor } from '../lib/utils';
 import { db } from '../lib/db';
 import type { Product } from '../types';
 import {
@@ -58,6 +58,7 @@ export function BarcodeScanner() {
 
   const startCamera = useCallback(async () => {
     try {
+      stopCamera();
       processedRef.current = false;
       setState({ type: 'scanning' });
       const reader = new BrowserMultiFormatReader();
@@ -67,9 +68,14 @@ export function BarcodeScanner() {
         video: { facingMode: 'environment' },
       };
 
+      if (!videoRef.current) {
+        setState({ type: 'error', message: t('scanner.cameraError') });
+        return;
+      }
+
       const controls = await reader.decodeFromConstraints(
         constraints,
-        videoRef.current!,
+        videoRef.current,
         async (result) => {
           if (result && !processedRef.current) {
             processedRef.current = true;
@@ -226,7 +232,7 @@ export function BarcodeScanner() {
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-medium text-gray-200">{product.name}</p>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadgeColor(status)}`}>
-                      {getStatusLabel(status)}
+                      {t(`status.${status}`)}
                     </span>
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-400">

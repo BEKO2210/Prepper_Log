@@ -9,7 +9,7 @@ import {
   formatDaysUntil,
   formatDuration,
   getStatusBadgeColor,
-  getStatusLabel,
+  getLocale,
 } from '../lib/utils';
 import type { ProductCategory, Product } from '../types';
 import {
@@ -210,13 +210,13 @@ export function ProductList() {
                     </p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadgeColor(product.status)}`}>
-                    {getStatusLabel(product.status)}
+                    {t(`status.${product.status}`)}
                   </span>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
                   <span>{t('products.mhd')}: {formatDate(product.expiryDate, product.expiryPrecision)} ({formatDaysUntil(product.daysLeft)})</span>
                   <span>{product.quantity} {product.unit}</span>
-                  {product.minStock && product.quantity < product.minStock && (
+                  {product.minStock !== undefined && product.minStock > 0 && product.quantity < product.minStock && (
                     <span className="text-yellow-400">{t('products.lowStockWarning', { min: product.minStock })}</span>
                   )}
                 </div>
@@ -344,7 +344,7 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
 function ProductDetailModal({ productId, products, onClose }: { productId: number; products: Product[]; onClose: () => void }) {
   const product = products.find((p) => p.id === productId);
   const [now, setNow] = useState(Date.now());
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 60_000);
@@ -353,7 +353,7 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
 
   if (!product) return null;
 
-  const locale = i18n.language === 'en' ? 'en-GB' : 'de-DE';
+  const locale = getLocale();
   const status = getExpiryStatus(product.expiryDate);
   const daysLeft = getDaysUntilExpiry(product.expiryDate);
 
@@ -404,7 +404,7 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
           {product.photo && <img src={product.photo} alt={product.name} className="h-48 w-full rounded-xl object-cover" />}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className={`rounded-full px-3 py-1 text-sm font-semibold ${getStatusBadgeColor(status)}`}>{getStatusLabel(status)}</span>
+              <span className={`rounded-full px-3 py-1 text-sm font-semibold ${getStatusBadgeColor(status)}`}>{t(`status.${status}`)}</span>
               <span className="text-sm font-medium text-gray-300">{formatDaysUntil(daysLeft)}</span>
             </div>
             <div className="space-y-1.5">
