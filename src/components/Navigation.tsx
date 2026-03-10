@@ -19,7 +19,7 @@ const NAV_ITEMS = [
 ];
 
 export function Navigation() {
-  const { currentPage, setPage } = useAppStore();
+  const { currentPage, setPage, setEditingProductId } = useAppStore();
   const { t } = useTranslation();
 
   return (
@@ -31,7 +31,7 @@ export function Navigation() {
           return (
             <button
               key={id}
-              onClick={() => setPage(id)}
+              onClick={() => { if (id === 'add') setEditingProductId(null); setPage(id); }}
               className={`flex min-w-[3rem] flex-col items-center gap-0.5 px-2 py-2 text-xs transition-colors ${
                 isActive
                   ? 'text-green-400'

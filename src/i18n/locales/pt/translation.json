@@ -303,5 +303,9 @@
     "invalidFormat": "Formato de importação inválido: Nenhum produto encontrado.",
     "importResult": "{{imported}} produtos importados, {{skipped}} ignorados (duplicados ou inválidos).",
     "unknownProduct": "Produto desconhecido"
+  },
+  "common": {
+    "yes": "Sim",
+    "no": "Não"
   }
 }

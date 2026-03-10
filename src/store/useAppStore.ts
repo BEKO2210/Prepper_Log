@@ -34,9 +34,13 @@ const NOTIF_KEY = 'preptrack-notifications-enabled';
 const FORM_STORAGE_KEY = 'preptrack-form-draft';
 
 function getStoredNotifications(): boolean {
-  const stored = localStorage.getItem(NOTIF_KEY);
-  if (stored !== null) return stored === 'true';
-  return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+  try {
+    const stored = localStorage.getItem(NOTIF_KEY);
+    if (stored !== null) return stored === 'true';
+    return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+  } catch {
+    return false;
+  }
 }
 
 function getInitialPage(): Page {
@@ -47,6 +51,8 @@ function getInitialPage(): Page {
       const data = JSON.parse(raw);
       if (Date.now() - data.timestamp < 10 * 60 * 1000) {
         return 'add';
+      } else {
+        sessionStorage.removeItem(FORM_STORAGE_KEY);
       }
     }
   } catch {
@@ -80,7 +86,7 @@ export const useAppStore = create<AppState>((set) => ({
     set({ scannedData: data, currentPage: 'add', editingProductId: null }),
   notificationsEnabled: getStoredNotifications(),
   setNotificationsEnabled: (enabled) => {
-    localStorage.setItem(NOTIF_KEY, String(enabled));
+    try { localStorage.setItem(NOTIF_KEY, String(enabled)); } catch { /* storage unavailable */ }
     set({ notificationsEnabled: enabled });
   },
 }));

@@ -28,7 +28,7 @@ export function StatRing({
         height={size}
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-90"
-        aria-label={`${value} von ${max} ${label}`}
+        aria-label={`${value} / ${max} ${label}`}
       >
         <circle
           cx={center}
