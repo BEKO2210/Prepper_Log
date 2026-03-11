@@ -26,6 +26,7 @@
   <a href="#-features">Features</a>&nbsp;&bull;
   <a href="#-languages">Languages</a>&nbsp;&bull;
   <a href="#-screenshots">Screenshots</a>&nbsp;&bull;
+  <a href="#-preview-video">Preview Video</a>&nbsp;&bull;
   <a href="#-tech-stack">Tech Stack</a>&nbsp;&bull;
   <a href="#-getting-started">Getting Started</a>&nbsp;&bull;
   <a href="#-contributing">Contributing</a>&nbsp;&bull;
@@ -137,6 +138,22 @@ PrepTrack supports **6 languages** with full translations for every screen, noti
   <img src="public/screenshots/Screenshot_Einstellungen_dunkel_en.jpg" width="220" alt="Settings English Dark" />
 </p>
 </details>
+
+---
+
+## 🎬 Preview Video
+
+<p align="center">
+  <a href="https://github.com/BEKO2210/Prepper_Log/blob/main/public/preview_video.mp4">
+    <img src="https://img.shields.io/badge/▶_Watch_Preview-PrepTrack-2ea44f?style=for-the-badge&logo=github" alt="Watch Preview Video" />
+  </a>
+</p>
+
+<p align="center">
+  <video src="https://github.com/BEKO2210/Prepper_Log/raw/main/public/preview_video.mp4" controls width="600">
+    Your browser does not support the video tag. <a href="https://github.com/BEKO2210/Prepper_Log/blob/main/public/preview_video.mp4">Watch the video here</a>.
+  </video>
+</p>
 
 ---
 
@@ -463,6 +480,22 @@ PrepTrack unterstützt **6 Sprachen** mit vollständigen Übersetzungen für jed
   <img src="public/screenshots/Screenshot_Einstellungen_dunkel_en.jpg" width="220" alt="Einstellungen Englisch Dunkel" />
 </p>
 </details>
+
+---
+
+## 🎬 Vorschau-Video
+
+<p align="center">
+  <a href="https://github.com/BEKO2210/Prepper_Log/blob/main/public/preview_video.mp4">
+    <img src="https://img.shields.io/badge/▶_Video_ansehen-PrepTrack-2ea44f?style=for-the-badge&logo=github" alt="Vorschau-Video ansehen" />
+  </a>
+</p>
+
+<p align="center">
+  <video src="https://github.com/BEKO2210/Prepper_Log/raw/main/public/preview_video.mp4" controls width="600">
+    Dein Browser unterstützt das Video-Tag nicht. <a href="https://github.com/BEKO2210/Prepper_Log/blob/main/public/preview_video.mp4">Video hier ansehen</a>.
+  </video>
+</p>
 
 ---
 
