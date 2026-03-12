@@ -8,7 +8,6 @@ import type { ProductCategory } from '../types';
 import { StatRing } from './StatRing';
 import {
   Package,
-  ScanBarcode,
   PlusCircle,
   TrendingDown,
   ChevronRight,
@@ -32,6 +31,7 @@ const URGENT_TEXT_COLORS: Record<string, string> = {
 
 export function Dashboard() {
   const setPage = useAppStore((s) => s.setPage);
+  const setEditingProductId = useAppStore((s) => s.setEditingProductId);
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const { t } = useTranslation();
 
@@ -73,13 +73,9 @@ export function Dashboard() {
         <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
         <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
         <div className="mt-6 flex gap-3">
-          <button onClick={() => setPage('scanner')} className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform">
-            <ScanBarcode size={18} />
-            {t('dashboard.scan')}
-          </button>
-          <button onClick={() => setPage('add')} className="flex items-center gap-2 rounded-xl border border-primary-600 px-5 py-3 font-medium text-gray-300 hover:bg-primary-700">
+          <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform">
             <PlusCircle size={18} />
-            {t('dashboard.manual')}
+            {t('nav.add')}
           </button>
         </div>
       </div>
@@ -98,12 +94,12 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button onClick={() => setPage('scanner')} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+        <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-600/20">
-            <ScanBarcode size={20} className="text-green-400" />
+            <PlusCircle size={20} className="text-green-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-200">{t('dashboard.scan')}</p>
+            <p className="text-sm font-medium text-gray-200">{t('nav.add')}</p>
             <p className="text-[0.65rem] text-gray-400">{t('dashboard.scanBarcode')}</p>
           </div>
         </button>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Page = 'dashboard' | 'products' | 'add' | 'scanner' | 'settings' | 'stats';
+type Page = 'dashboard' | 'products' | 'add' | 'settings' | 'stats';
 
 interface FilterState {
   search: string;
