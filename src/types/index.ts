@@ -2,6 +2,7 @@ export type ExpiryStatus = 'expired' | 'critical' | 'warning' | 'soon' | 'good';
 
 export interface Product {
   id?: number;
+  syncId?: string;
   name: string;
   barcode?: string;
   category: ProductCategory;
@@ -71,9 +72,11 @@ export const DEFAULT_UNITS = [
 
 export interface StorageLocation {
   id?: number;
+  syncId?: string;
   name: string;
   icon?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export const DEFAULT_LOCATIONS = [
@@ -89,13 +92,19 @@ export const DEFAULT_LOCATIONS = [
 
 export interface ConsumptionLog {
   id?: number;
-  productId: number;
+  syncId?: string;
+  productId?: number;
+  productSyncId?: string;
   productName: string;
   quantity: number;
   unit: string;
   consumedAt: string;
+  updatedAt?: string;
   reason: 'verbraucht' | 'abgelaufen' | 'beschadigt' | 'sonstiges';
 }
+
+export type SyncEntityType = 'product' | 'storageLocation' | 'consumptionLog';
+export type SyncOperation = 'upsert' | 'delete';
 
 export interface NotificationSchedule {
   id?: number;

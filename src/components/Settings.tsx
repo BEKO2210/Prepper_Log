@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { version as appVersion } from '../../package.json';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -8,6 +8,13 @@ import { useDarkMode } from '../hooks/useDarkMode';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
+import { getSyncConfig, saveSyncConfig } from '../lib/syncConfig';
+import {
+  getSyncRuntimeState,
+  pairSyncDevice,
+  runSyncNow,
+  subscribeSyncRuntime,
+} from '../lib/sync';
 import {
   Bell,
   BellOff,
@@ -28,6 +35,8 @@ import {
   ChevronUp,
   Info,
   Globe,
+  Cloud,
+  RefreshCw,
 } from 'lucide-react';
 
 const LANGUAGES = [
@@ -39,6 +48,13 @@ const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
 ];
 
+function formatSyncTime(value?: string): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleString();
+}
+
 export function Settings() {
   const [isDark, toggleDark] = useDarkMode();
   const { notificationsEnabled, setNotificationsEnabled } = useAppStore();
@@ -47,6 +63,13 @@ export function Settings() {
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
+  const [syncConfigState, setSyncConfigState] = useState(() => getSyncConfig());
+  const [syncServerUrl, setSyncServerUrl] = useState(syncConfigState.serverUrl);
+  const [syncDeviceName, setSyncDeviceName] = useState(syncConfigState.deviceName || '');
+  const [syncCode, setSyncCode] = useState('');
+  const [syncBusy, setSyncBusy] = useState(false);
+  const [syncNotice, setSyncNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [syncRuntime, setSyncRuntime] = useState(() => getSyncRuntimeState());
   const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
@@ -110,7 +133,87 @@ export function Settings() {
     i18n.changeLanguage(langCode);
   }
 
+  useEffect(() => {
+    return subscribeSyncRuntime((next) => {
+      setSyncRuntime(next);
+    });
+  }, []);
+
+  function handleSaveSyncSettings() {
+    const next = saveSyncConfig({
+      ...syncConfigState,
+      serverUrl: syncServerUrl.trim(),
+      deviceName: syncDeviceName.trim(),
+    });
+    setSyncConfigState(next);
+    setSyncNotice({ type: 'success', message: 'Sync-Einstellungen gespeichert.' });
+  }
+
+  async function handlePairSyncDevice() {
+    if (!syncServerUrl.trim() || !syncCode.trim() || !syncDeviceName.trim()) {
+      setSyncNotice({
+        type: 'error',
+        message: 'Server URL, Sync-Code und Gerätename sind erforderlich.',
+      });
+      return;
+    }
+
+    setSyncBusy(true);
+    setSyncNotice(null);
+    try {
+      await pairSyncDevice({
+        serverUrl: syncServerUrl.trim(),
+        syncCode: syncCode.trim(),
+        deviceName: syncDeviceName.trim(),
+      });
+      setSyncCode('');
+      const next = getSyncConfig();
+      setSyncConfigState(next);
+      setSyncNotice({ type: 'success', message: 'Gerät erfolgreich gekoppelt.' });
+      await runSyncNow('pairing');
+    } catch (err) {
+      setSyncNotice({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Koppeln fehlgeschlagen.',
+      });
+    } finally {
+      setSyncBusy(false);
+    }
+  }
+
+  function handleToggleSyncEnabled(enabled: boolean) {
+    const next = saveSyncConfig({
+      ...syncConfigState,
+      enabled,
+      serverUrl: syncServerUrl.trim(),
+      deviceName: syncDeviceName.trim(),
+    });
+    setSyncConfigState(next);
+    setSyncNotice(null);
+    void runSyncNow(enabled ? 'enable' : 'disable').catch(() => undefined);
+  }
+
+  async function handleSyncNowClick() {
+    setSyncBusy(true);
+    setSyncNotice(null);
+    try {
+      await runSyncNow('manual');
+      setSyncNotice({ type: 'success', message: 'Sync abgeschlossen.' });
+    } catch (err) {
+      setSyncNotice({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Sync fehlgeschlagen.',
+      });
+    } finally {
+      setSyncBusy(false);
+    }
+  }
+
   const notifStatus = getNotificationPermissionStatus();
+  const syncIsPaired =
+    syncConfigState.householdId.length > 0 &&
+    syncConfigState.deviceId.length > 0 &&
+    syncConfigState.deviceToken.length > 0;
 
   return (
     <div className="space-y-6">
@@ -372,6 +475,129 @@ export function Settings() {
               }`}
             >
               {importStatus.message}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Sync */}
+      <section className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4">
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <Cloud size={18} className="text-sky-400" />
+          LAN Sync (optional)
+        </h3>
+
+        <p className="mb-3 text-xs text-gray-400">
+          Daten bleiben lokal nutzbar. Sync ist optional und wird nur mit deinem eigenen Backend verwendet.
+        </p>
+
+        <div className="space-y-2">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-400">Server URL</label>
+            <input
+              type="url"
+              value={syncServerUrl}
+              onChange={(e) => setSyncServerUrl(e.target.value)}
+              placeholder="http://192.168.0.20:8787"
+              className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-400">Gerätename</label>
+            <input
+              type="text"
+              value={syncDeviceName}
+              onChange={(e) => setSyncDeviceName(e.target.value)}
+              placeholder="z. B. iPhone Küche"
+              className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+            />
+          </div>
+
+          {!syncIsPaired && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-400">Sync-Code</label>
+              <input
+                type="password"
+                value={syncCode}
+                onChange={(e) => setSyncCode(e.target.value)}
+                placeholder="gemeinsamer Haushalt-Code"
+                className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <button
+              onClick={handleSaveSyncSettings}
+              className="rounded-lg bg-primary-700 px-3 py-2 text-sm text-gray-200 hover:bg-primary-600"
+            >
+              Einstellungen speichern
+            </button>
+
+            {!syncIsPaired ? (
+              <button
+                onClick={handlePairSyncDevice}
+                disabled={syncBusy}
+                className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Gerät koppeln
+              </button>
+            ) : (
+              <button
+                onClick={handleSyncNowClick}
+                disabled={syncBusy || !syncConfigState.enabled}
+                className="flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <RefreshCw size={15} className={syncBusy ? 'animate-spin' : ''} />
+                Jetzt synchronisieren
+              </button>
+            )}
+          </div>
+
+          {syncIsPaired && (
+            <button
+              onClick={() => handleToggleSyncEnabled(!syncConfigState.enabled)}
+              className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3"
+            >
+              <span className="text-sm text-gray-200">Hintergrund-Sync</span>
+              <div
+                className={`relative h-6 w-11 rounded-full transition-colors ${
+                  syncConfigState.enabled ? 'bg-sky-600' : 'bg-gray-500'
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    syncConfigState.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                  }`}
+                />
+              </div>
+            </button>
+          )}
+
+          <div className="rounded-lg border border-primary-700 bg-primary-800/60 px-3 py-2 text-xs text-gray-400">
+            <p>Status: <span className="text-gray-300">{syncRuntime.status}</span></p>
+            <p>Ausstehende Änderungen: <span className="text-gray-300">{syncRuntime.pendingChanges}</span></p>
+            <p>Letzter Erfolg: <span className="text-gray-300">{formatSyncTime(syncRuntime.lastSuccessAt)}</span></p>
+            {syncRuntime.lastError && (
+              <p className="text-red-400">Fehler: {syncRuntime.lastError}</p>
+            )}
+            {syncIsPaired && (
+              <p className="mt-1 break-all text-[11px] text-gray-500">
+                Haushalt: {syncConfigState.householdId}
+              </p>
+            )}
+          </div>
+
+          {syncNotice && (
+            <p
+              className={`rounded-lg px-3 py-2 text-sm ${
+                syncNotice.type === 'error'
+                  ? 'bg-red-500/10 text-red-400'
+                  : 'bg-green-500/10 text-green-400'
+              }`}
+            >
+              {syncNotice.message}
             </p>
           )}
         </div>

@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+sync-backend/node_modules/
 
 # Build output
 dist/
@@ -19,6 +20,10 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+sync-backend/.env
+
+# Local sync backend data
+sync-backend/data/
 
 # Logs
 *.log
