@@ -47,7 +47,15 @@ function shouldQueueSyncChange(): boolean {
 }
 
 function toSyncProductPayload(product: Omit<Product, 'id'>): Record<string, unknown> {
-  return { ...product };
+  return {
+    ...product,
+    // Explicit null for optional fields so JSON serialization preserves intentional clears.
+    // Receivers distinguish null (cleared) from absent key (unknown/fallback).
+    barcode: product.barcode ?? null,
+    photo: product.photo ?? null,
+    minStock: product.minStock ?? null,
+    notes: product.notes ?? null,
+  };
 }
 
 function toSyncLocationPayload(location: Omit<StorageLocation, 'id'>): Record<string, unknown> {
@@ -456,7 +464,8 @@ export async function applyProductUpsertFromSync(
   const next: Omit<Product, 'id'> = {
     syncId,
     name: typeof payload.name === 'string' ? payload.name : existing?.name ?? 'Produkt',
-    barcode: typeof payload.barcode === 'string' ? payload.barcode : existing?.barcode,
+    // For optional fields: null means explicitly cleared; absent key falls back to existing value.
+    barcode: 'barcode' in payload ? (typeof payload.barcode === 'string' ? payload.barcode : undefined) : existing?.barcode,
     category:
       typeof payload.category === 'string'
         ? (payload.category as Product['category'])
@@ -477,12 +486,11 @@ export async function applyProductUpsertFromSync(
         : payload.expiryPrecision === 'day'
           ? 'day'
           : existing?.expiryPrecision ?? 'day',
-    photo: typeof payload.photo === 'string' ? payload.photo : existing?.photo,
-    minStock:
-      typeof payload.minStock === 'number' && Number.isFinite(payload.minStock)
-        ? payload.minStock
-        : existing?.minStock,
-    notes: typeof payload.notes === 'string' ? payload.notes : existing?.notes,
+    photo: 'photo' in payload ? (typeof payload.photo === 'string' ? payload.photo : undefined) : existing?.photo,
+    minStock: 'minStock' in payload
+      ? (typeof payload.minStock === 'number' && Number.isFinite(payload.minStock) ? payload.minStock : undefined)
+      : existing?.minStock,
+    notes: 'notes' in payload ? (typeof payload.notes === 'string' ? payload.notes : undefined) : existing?.notes,
     archived: typeof payload.archived === 'boolean' ? payload.archived : existing?.archived ?? false,
     createdAt: toIso(payload.createdAt, existing?.createdAt ?? now),
     updatedAt: toIso(payload.updatedAt, existing?.updatedAt ?? now),

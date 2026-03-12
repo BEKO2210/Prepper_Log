@@ -8,7 +8,7 @@ import { useDarkMode } from '../hooks/useDarkMode';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
-import { getSyncConfig, saveSyncConfig } from '../lib/syncConfig';
+import { getSyncConfig, saveSyncConfig, clearSyncPairing } from '../lib/syncConfig';
 import {
   getSyncRuntimeState,
   pairSyncDevice,
@@ -67,6 +67,7 @@ export function Settings() {
   const [syncServerUrl, setSyncServerUrl] = useState(syncConfigState.serverUrl);
   const [syncDeviceName, setSyncDeviceName] = useState(syncConfigState.deviceName || '');
   const [syncCode, setSyncCode] = useState('');
+  const [showRepair, setShowRepair] = useState(false);
   const [syncBusy, setSyncBusy] = useState(false);
   const [syncNotice, setSyncNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [syncRuntime, setSyncRuntime] = useState(() => getSyncRuntimeState());
@@ -167,6 +168,7 @@ export function Settings() {
         deviceName: syncDeviceName.trim(),
       });
       setSyncCode('');
+      setShowRepair(false);
       const next = getSyncConfig();
       setSyncConfigState(next);
       setSyncNotice({ type: 'success', message: 'Gerät erfolgreich gekoppelt.' });
@@ -514,7 +516,7 @@ export function Settings() {
             />
           </div>
 
-          {!syncIsPaired && (
+          {(!syncIsPaired || showRepair) && (
             <div>
               <label className="mb-1 block text-xs font-medium text-gray-400">Sync-Code</label>
               <input
@@ -535,13 +537,13 @@ export function Settings() {
               Einstellungen speichern
             </button>
 
-            {!syncIsPaired ? (
+            {!syncIsPaired || showRepair ? (
               <button
                 onClick={handlePairSyncDevice}
                 disabled={syncBusy}
                 className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Gerät koppeln
+                {showRepair ? 'Neu koppeln' : 'Gerät koppeln'}
               </button>
             ) : (
               <button
@@ -554,6 +556,29 @@ export function Settings() {
               </button>
             )}
           </div>
+
+          {syncIsPaired && !showRepair && (
+            <button
+              onClick={() => {
+                clearSyncPairing();
+                setSyncConfigState(getSyncConfig());
+                setSyncCode('');
+                setShowRepair(true);
+                setSyncNotice(null);
+              }}
+              className="w-full text-xs text-gray-500 hover:text-gray-300"
+            >
+              Neu koppeln (anderen Server oder Code verwenden)
+            </button>
+          )}
+          {showRepair && (
+            <button
+              onClick={() => { setSyncCode(''); setShowRepair(false); }}
+              className="w-full text-xs text-gray-500 hover:text-gray-300"
+            >
+              Abbrechen
+            </button>
+          )}
 
           {syncIsPaired && (
             <button
