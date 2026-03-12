@@ -33,7 +33,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { archiveProduct, deleteProduct, logConsumption } from '../lib/db';
+import { archiveProduct, deleteProduct, logConsumption, updateProduct } from '../lib/db';
 
 const STATUS_COLORS: Record<string, string> = {
   expired: 'bg-red-500',
@@ -108,7 +108,7 @@ export function ProductList() {
       await archiveProduct(productId);
       showToast(t('consume.toastConsumedAndArchived', { name: product.name, amount, unit: product.unit }));
     } else {
-      await db.products.update(productId, { quantity: newQuantity, updatedAt: new Date().toISOString() });
+      await updateProduct(productId, { quantity: newQuantity });
       showToast(t('consume.toastConsumed', { name: product.name, amount, unit: product.unit, remaining: newQuantity }));
     }
     setConsumeProduct(null);

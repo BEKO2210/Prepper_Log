@@ -1,0 +1,16 @@
+services:
+  preptrack-sync:
+    build:
+      context: ./sync-backend
+    container_name: preptrack-sync
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      PORT: "8787"
+      DB_PATH: "/data/sync.db"
+    volumes:
+      - preptrack_sync_data:/data
+
+volumes:
+  preptrack_sync_data:
