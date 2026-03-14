@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { version as appVersion } from '../../package.json';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, ImportResult } from '../lib/db';
+import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { requestNotificationPermission, getNotificationPermissionStatus } from '../lib/notifications';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { usePWAInstall } from '../hooks/usePWAInstall';
@@ -28,6 +28,7 @@ import {
   ChevronUp,
   Info,
   Globe,
+  Loader2,
 } from 'lucide-react';
 
 const LANGUAGES = [
@@ -47,6 +48,7 @@ export function Settings() {
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
+  const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
   const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
@@ -80,17 +82,30 @@ export function Settings() {
     downloadFile(data, `preptrack-export-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
   }
 
+  async function startImageLoading(productIds: number[]) {
+    if (productIds.length === 0) return;
+    setImageLoadProgress({ loaded: 0, total: productIds.length });
+    await loadImportedImages(productIds, (loaded, total) => {
+      setImageLoadProgress({ loaded, total });
+    });
+    setImageLoadProgress(null);
+  }
+
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       const text = await file.text();
-      const count = await importData(text);
-      setImportStatus({ message: t('import.success', { count }), type: 'success' });
+      const result = await importData(text);
+      setImportStatus({ message: t('import.success', { count: result.imported }), type: 'success' });
+      // Bilder im Hintergrund nachladen
+      startImageLoading(result.productsNeedingImages);
     } catch (err) {
       if (err instanceof ImportResult) {
         setImportStatus({ message: err.message, type: 'warning' });
+        // Auch bei teilweisem Import Bilder nachladen
+        startImageLoading(err.productsNeedingImages);
       } else {
         setImportStatus({ message: t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), type: 'error' });
       }
@@ -373,6 +388,27 @@ export function Settings() {
             >
               {importStatus.message}
             </p>
+          )}
+
+          {imageLoadProgress && (
+            <div className="space-y-2 rounded-lg bg-blue-500/10 px-3 py-2">
+              <div className="flex items-center gap-2 text-sm text-blue-400">
+                <Loader2 size={16} className="animate-spin" />
+                <span>
+                  {t('import.loadingImages', {
+                    loaded: imageLoadProgress.loaded,
+                    total: imageLoadProgress.total,
+                    defaultValue: 'Lade Produktbilder… {{loaded}} / {{total}}',
+                  })}
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary-700">
+                <div
+                  className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                  style={{ width: `${(imageLoadProgress.loaded / imageLoadProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
       </section>
