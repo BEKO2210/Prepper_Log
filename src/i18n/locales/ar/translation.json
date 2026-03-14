@@ -284,7 +284,8 @@
   "import": {
     "success": "تم استيراد {{count}} منتجات بنجاح.",
     "error": "خطأ: {{message}}",
-    "importFailed": "فشل الاستيراد"
+    "importFailed": "فشل الاستيراد",
+    "loadingImages": "جاري تحميل صور المنتجات… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} انتهت صلاحيته!",

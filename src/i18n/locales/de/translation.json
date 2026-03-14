@@ -284,7 +284,8 @@
   "import": {
     "success": "{{count}} Produkte erfolgreich importiert.",
     "error": "Fehler: {{message}}",
-    "importFailed": "Import fehlgeschlagen"
+    "importFailed": "Import fehlgeschlagen",
+    "loadingImages": "Lade Produktbilder… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} ist abgelaufen!",
