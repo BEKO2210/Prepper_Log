@@ -29,6 +29,12 @@ import {
   Info,
   Globe,
   Loader2,
+  Camera,
+  Image,
+  BellRing,
+  WifiOff,
+  Lock,
+  HardDrive,
 } from 'lucide-react';
 
 const LANGUAGES = [
@@ -49,6 +55,7 @@ export function Settings() {
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
   const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
   const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
@@ -132,6 +139,39 @@ export function Settings() {
       <div>
         <h2 className="text-2xl font-bold text-gray-100">{t('settings.title')}</h2>
       </div>
+
+      {/* Über PrepTrack / Info */}
+      <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
+        <button
+          onClick={() => setShowInfo(!showInfo)}
+          className="flex w-full items-center justify-between"
+        >
+          <h3 className="flex items-center gap-2 font-semibold text-gray-200">
+            <Info size={18} className="text-green-400" />
+            {t('onboarding.features')}
+          </h3>
+          {showInfo ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+        </button>
+        {showInfo && (
+          <div className="mt-4 space-y-3">
+            <div className="space-y-2.5">
+              {[
+                { icon: <WifiOff size={16} className="text-blue-400" />, text: t('onboarding.featureOffline') },
+                { icon: <Camera size={16} className="text-green-400" />, text: t('onboarding.featureCamera') },
+                { icon: <Image size={16} className="text-purple-400" />, text: t('onboarding.featureImages') },
+                { icon: <BellRing size={16} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
+                { icon: <HardDrive size={16} className="text-orange-400" />, text: t('onboarding.featureExport') },
+                { icon: <Lock size={16} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-lg bg-primary-700/30 px-3 py-2.5">
+                  <span className="mt-0.5 shrink-0">{item.icon}</span>
+                  <span className="text-sm text-gray-300">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Language */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
