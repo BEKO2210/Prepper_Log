@@ -1,11 +1,11 @@
 {
   "nav": {
-    "dashboard": "Tableau de bord",
-    "products": "Provisions",
+    "dashboard": "Accueil",
+    "products": "Stock",
     "add": "Ajouter",
     "scanner": "Scanner",
-    "stats": "Statistiques",
-    "settings": "Param\u00e8tres"
+    "stats": "Stats",
+    "settings": "R\u00e9glages"
   },
   "dashboard": {
     "noProducts": "Aucune provision encore",

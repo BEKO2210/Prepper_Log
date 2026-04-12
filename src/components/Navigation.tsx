@@ -25,7 +25,7 @@ export function Navigation() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-primary-700 bg-primary-800/95 backdrop-blur-sm safe-bottom">
-      <div className="mx-auto flex max-w-lg items-center justify-around">
+      <div className="mx-auto grid max-w-lg grid-cols-5 items-center">
         {/* Left nav items */}
         {LEFT_ITEMS.map(({ id, labelKey, icon: Icon }) => {
           const isActive = currentPage === id;
@@ -34,7 +34,7 @@ export function Navigation() {
             <button
               key={id}
               onClick={() => setPage(id)}
-              className={`flex min-w-[3rem] flex-col items-center gap-0.5 px-2 py-2 text-xs transition-colors ${
+              className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 transition-colors ${
                 isActive
                   ? 'text-green-400'
                   : 'text-gray-300 hover:text-gray-200'
@@ -43,7 +43,7 @@ export function Navigation() {
               aria-current={isActive ? 'page' : undefined}
             >
               <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="leading-none">{label}</span>
+              <span className="w-full truncate text-center text-[10px] leading-tight">{label}</span>
             </button>
           );
         })}
@@ -72,7 +72,7 @@ export function Navigation() {
             <button
               key={id}
               onClick={() => setPage(id)}
-              className={`flex min-w-[3rem] flex-col items-center gap-0.5 px-2 py-2 text-xs transition-colors ${
+              className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-2 transition-colors ${
                 isActive
                   ? 'text-green-400'
                   : 'text-gray-300 hover:text-gray-200'
@@ -81,7 +81,7 @@ export function Navigation() {
               aria-current={isActive ? 'page' : undefined}
             >
               <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="leading-none">{label}</span>
+              <span className="w-full truncate text-center text-[10px] leading-tight">{label}</span>
             </button>
           );
         })}
