@@ -284,7 +284,8 @@
   "import": {
     "success": "{{count}} produtos importados com sucesso.",
     "error": "Erro: {{message}}",
-    "importFailed": "Importação falhou"
+    "importFailed": "Importação falhou",
+    "loadingImages": "Carregando imagens dos produtos… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} venceu!",
@@ -303,6 +304,28 @@
     "invalidFormat": "Formato de importação inválido: Nenhum produto encontrado.",
     "importResult": "{{imported}} produtos importados, {{skipped}} ignorados (duplicados ou inválidos).",
     "unknownProduct": "Produto desconhecido"
+  },
+  "onboarding": {
+    "title": "Bem-vindo ao PrepTrack",
+    "subtitle": "Seu gerenciador digital de estoque",
+    "getStarted": "Como começar",
+    "step1Title": "Cadastrar produtos",
+    "step1Desc": "Escaneie códigos de barras ou adicione produtos manualmente com validade, categoria e local de armazenamento.",
+    "step2Title": "Acompanhe a validade",
+    "step2Desc": "Receba notificações automáticas 30, 14, 7, 3 e 1 dia antes do vencimento.",
+    "step3Title": "Backup e sincronização",
+    "step3Desc": "Exporte seus dados como backup JSON. Na importação, as imagens dos produtos são carregadas automaticamente via código de barras.",
+    "features": "Funcionalidades",
+    "featureOffline": "Offline-first — funciona completamente sem internet",
+    "featureCamera": "Scanner de código de barras com detecção automática da câmera principal",
+    "featureImages": "Imagens dos produtos carregadas automaticamente do Open Food Facts",
+    "featureNotifications": "Lembretes locais de validade — sem necessidade de nuvem",
+    "featureExport": "Backup JSON e exportação CSV dos seus dados",
+    "featurePrivacy": "100% privado — todos os dados ficam no seu dispositivo",
+    "startScan": "Escanear código de barras",
+    "startManual": "Adicionar manualmente",
+    "startImport": "Importar backup",
+    "dismiss": "Entendi, vamos lá!"
   },
   "common": {
     "yes": "Sim",

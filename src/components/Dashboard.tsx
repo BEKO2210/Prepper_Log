@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../lib/db';
+import { db, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDaysUntil } from '../lib/utils';
 import { useAppStore } from '../store/useAppStore';
 import type { ProductCategory } from '../types';
@@ -11,6 +11,14 @@ import {
   PlusCircle,
   TrendingDown,
   ChevronRight,
+  Upload,
+  Camera,
+  Image,
+  BellRing,
+  WifiOff,
+  Lock,
+  HardDrive,
+  Loader2,
 } from 'lucide-react';
 
 const URGENT_STATUS_COLORS: Record<string, string> = {
@@ -34,6 +42,40 @@ export function Dashboard() {
   const setEditingProductId = useAppStore((s) => s.setEditingProductId);
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const { t } = useTranslation();
+  const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
+  const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const result = await importData(text);
+      setImportStatus({ message: t('import.success', { count: result.imported }), type: 'success' });
+      if (result.productsNeedingImages.length > 0) {
+        setImageLoadProgress({ loaded: 0, total: result.productsNeedingImages.length });
+        await loadImportedImages(result.productsNeedingImages, (loaded, total) => {
+          setImageLoadProgress({ loaded, total });
+        });
+        setImageLoadProgress(null);
+      }
+    } catch (err) {
+      if (err instanceof ImportResult) {
+        setImportStatus({ message: err.message, type: 'warning' });
+        if (err.productsNeedingImages.length > 0) {
+          setImageLoadProgress({ loaded: 0, total: err.productsNeedingImages.length });
+          await loadImportedImages(err.productsNeedingImages, (loaded, total) => {
+            setImageLoadProgress({ loaded, total });
+          });
+          setImageLoadProgress(null);
+        }
+      } else {
+        setImportStatus({ message: t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), type: 'error' });
+      }
+    }
+    e.target.value = '';
+  }
 
   const { stats, activeProducts, urgentProducts, categoryBreakdown, total } = useMemo(() => {
     const s = computeStats(products);
@@ -66,9 +108,14 @@ export function Dashboard() {
 
   if (activeProducts.length === 0) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-primary-700 bg-primary-800">
-          <Package size={40} className="text-primary-600" />
+      <div className="space-y-5 pb-4">
+        {/* Header */}
+        <div className="text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl border border-green-500/30 bg-green-500/10">
+            <Package size={40} className="text-green-400" />
+          </div>
+          <h2 className="mt-4 text-2xl font-bold text-gray-100">{t('onboarding.title')}</h2>
+          <p className="mt-1 text-sm text-gray-400">{t('onboarding.subtitle')}</p>
         </div>
         <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
         <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
@@ -77,6 +124,59 @@ export function Dashboard() {
             <PlusCircle size={18} />
             {t('nav.add')}
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            className="hidden"
+          />
+        </div>
+
+        {/* Import Status */}
+        {importStatus && (
+          <p className={`rounded-lg px-3 py-2 text-sm ${
+            importStatus.type === 'error' ? 'bg-red-500/10 text-red-400'
+              : importStatus.type === 'warning' ? 'bg-orange-500/10 text-orange-400'
+                : 'bg-green-500/10 text-green-400'
+          }`}>
+            {importStatus.message}
+          </p>
+        )}
+
+        {imageLoadProgress && (
+          <div className="space-y-2 rounded-lg bg-blue-500/10 px-3 py-2">
+            <div className="flex items-center gap-2 text-sm text-blue-400">
+              <Loader2 size={16} className="animate-spin" />
+              <span>{t('import.loadingImages', { loaded: imageLoadProgress.loaded, total: imageLoadProgress.total })}</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary-700">
+              <div
+                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                style={{ width: `${(imageLoadProgress.loaded / imageLoadProgress.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Feature-Übersicht */}
+        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">{t('onboarding.features')}</h3>
+          <div className="space-y-2">
+            {[
+              { icon: <WifiOff size={15} className="text-blue-400" />, text: t('onboarding.featureOffline') },
+              { icon: <Camera size={15} className="text-green-400" />, text: t('onboarding.featureCamera') },
+              { icon: <Image size={15} className="text-purple-400" />, text: t('onboarding.featureImages') },
+              { icon: <BellRing size={15} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
+              { icon: <HardDrive size={15} className="text-orange-400" />, text: t('onboarding.featureExport') },
+              { icon: <Lock size={15} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-2.5">
+                <span className="mt-0.5 shrink-0">{item.icon}</span>
+                <span className="text-xs text-gray-400">{item.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

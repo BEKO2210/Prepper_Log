@@ -284,7 +284,8 @@
   "import": {
     "success": "{{count}} products successfully imported.",
     "error": "Error: {{message}}",
-    "importFailed": "Import failed"
+    "importFailed": "Import failed",
+    "loadingImages": "Loading product images… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} has expired!",
@@ -303,6 +304,28 @@
     "invalidFormat": "Invalid import format: No products found.",
     "importResult": "{{imported}} products imported, {{skipped}} skipped (duplicates or invalid).",
     "unknownProduct": "Unknown product"
+  },
+  "onboarding": {
+    "title": "Welcome to PrepTrack",
+    "subtitle": "Your digital supply manager",
+    "getStarted": "Getting started",
+    "step1Title": "Add products",
+    "step1Desc": "Scan barcodes or add products manually with expiry date, category and storage location.",
+    "step2Title": "Track expiry dates",
+    "step2Desc": "Get automatic notifications 30, 14, 7, 3 and 1 day before expiry.",
+    "step3Title": "Backup & Sync",
+    "step3Desc": "Export your data as JSON backup. On import, product images are automatically loaded via barcode.",
+    "features": "Features",
+    "featureOffline": "Offline-first — works completely without internet",
+    "featureCamera": "Barcode scanner with automatic main camera detection",
+    "featureImages": "Product images loaded automatically from Open Food Facts",
+    "featureNotifications": "Local expiry reminders — no cloud needed",
+    "featureExport": "JSON backup & CSV export for your data",
+    "featurePrivacy": "100% private — all data stays on your device",
+    "startScan": "Scan barcode",
+    "startManual": "Add manually",
+    "startImport": "Import backup",
+    "dismiss": "Got it, let's go!"
   },
   "common": {
     "yes": "Yes",

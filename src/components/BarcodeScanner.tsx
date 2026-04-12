@@ -32,6 +32,99 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
+/**
+ * Wählt die beste Rückkamera aus (Hauptkamera, nicht Weitwinkel/Tele).
+ * Strategie: Alle Rückkameras enumerieren, dann die mit der höchsten
+ * Auflösung (= Hauptsensor) bevorzugen. Fallback: facingMode environment.
+ */
+async function selectBestRearCamera(): Promise<MediaStreamConstraints> {
+  const baseVideo: MediaTrackConstraints = {
+    facingMode: { ideal: 'environment' },
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+  };
+
+  try {
+    // Erst einen temporären Stream holen, damit enumerateDevices Labels liefert
+    const tempStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    tempStream.getTracks().forEach(t => t.stop());
+
+    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+    // Nur ein Kamera? Direkt nutzen
+    if (videoDevices.length <= 1) {
+      return { video: baseVideo };
+    }
+
+    // Rückkameras identifizieren (Label enthält oft "back", "rear", "rück", "hinten", "environment")
+    // Weitwinkel-Kameras filtern ("wide", "ultra", "weitwinkel", "0.5")
+    const rearCams = videoDevices.filter(d => {
+      const label = d.label.toLowerCase();
+      // Frontkameras ausschließen
+      if (label.includes('front') || label.includes('selfie') || label.includes('vorder')) return false;
+      return true;
+    });
+
+    const candidates = rearCams.length > 0 ? rearCams : videoDevices;
+
+    // Weitwinkel-Kameras ans Ende sortieren, Hauptkamera bevorzugen
+    const scored = candidates.map(d => {
+      const label = d.label.toLowerCase();
+      let score = 0;
+      // Weitwinkel-Indikatoren → niedrigerer Score
+      if (label.includes('wide') || label.includes('weitwinkel') || label.includes('ultra')) score -= 10;
+      if (label.includes('0.5')) score -= 10;
+      // Tele-Indikatoren → leicht niedriger
+      if (label.includes('tele') || label.includes('zoom')) score -= 5;
+      // Macro → niedriger
+      if (label.includes('macro') || label.includes('makro')) score -= 5;
+      // "main", "rear", "back", "camera 0" → höherer Score
+      if (label.includes('main') || label.includes('haupt')) score += 10;
+      if (label.includes('rear') || label.includes('back') || label.includes('hinten')) score += 5;
+      if (label.includes('camera2 0') || label.includes('camera 0')) score += 3;
+      return { device: d, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    const bestDevice = scored[0].device;
+
+    // Capabilities prüfen um Zoom auf 1x zu setzen (verhindert Weitwinkel-Default)
+    try {
+      const testStream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: bestDevice.deviceId } }
+      });
+      const track = testStream.getVideoTracks()[0];
+      const capabilities = track.getCapabilities?.() as (MediaTrackCapabilities & { zoom?: { min: number; max: number } }) | undefined;
+      testStream.getTracks().forEach(t => t.stop());
+
+      const videoConstraints: MediaTrackConstraints & Record<string, unknown> = {
+        deviceId: { exact: bestDevice.deviceId },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+      };
+
+      // Zoom auf 1x setzen wenn verfügbar
+      if (capabilities?.zoom) {
+        videoConstraints['zoom'] = { ideal: 1.0 };
+      }
+
+      return { video: videoConstraints };
+    } catch {
+      return {
+        video: {
+          deviceId: { exact: bestDevice.deviceId },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        }
+      };
+    }
+  } catch {
+    // Fallback: einfache Constraints
+    return { video: baseVideo };
+  }
+}
+
 export function BarcodeScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
@@ -64,9 +157,7 @@ export function BarcodeScanner() {
       const reader = new BrowserMultiFormatReader();
       readerRef.current = reader;
 
-      const constraints: MediaStreamConstraints = {
-        video: { facingMode: 'environment' },
-      };
+      const constraints = await selectBestRearCamera();
 
       if (!videoRef.current) {
         setState({ type: 'error', message: t('scanner.cameraError') });
@@ -121,6 +212,24 @@ export function BarcodeScanner() {
 
       controlsRef.current = controls;
       setCameraActive(true);
+
+      // Nach Stream-Start: Autofokus erzwingen (manche Geräte ignorieren initiale Constraints)
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        const track = stream.getVideoTracks()[0];
+        if (track) {
+          try {
+            const caps = track.getCapabilities?.() as (MediaTrackCapabilities & { focusMode?: string[] }) | undefined;
+            if (caps?.focusMode?.includes('continuous')) {
+              await track.applyConstraints(
+                { focusMode: 'continuous' } as MediaTrackConstraints
+              );
+            }
+          } catch {
+            // Fokus-Constraint nicht unterstützt — kein Problem
+          }
+        }
+      }
     } catch (err) {
       const message =
         err instanceof DOMException && err.name === 'NotAllowedError'
