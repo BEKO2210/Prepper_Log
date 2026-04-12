@@ -222,17 +222,7 @@
   "whatsNew": {
     "title": "What's New",
     "subtitle": "Changes in version {{version}}",
-    "close": "Got it",
-    "items": [
-      "New app logo and refreshed icons (all sizes)",
-      "Stable bottom navigation — the menu no longer shifts when switching languages",
-      "Onboarding screen on empty dashboard and new info section in settings",
-      "Product images are automatically reloaded on import",
-      "Optional LAN sync for multiple devices on your home network",
-      "Inline barcode scanner directly inside the product form",
-      "Support section reworded as voluntary contribution to stay legally compliant",
-      "New versioning (2.0.0 · Stable) with update popup"
-    ]
+    "close": "Got it"
   },
   "status": {
     "expired": "Expired",

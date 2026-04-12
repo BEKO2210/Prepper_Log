@@ -1,0 +1,123 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2026-04-12T12:09:49.283Z",
+  "sinceTag": "v1.1.0",
+  "items": [
+    {
+      "message": "feat: v2.0.0 — rechtssichere freiwillige Unterstützung + Was-ist-neu Popup",
+      "sha": "311fdf9"
+    },
+    {
+      "message": "fix(nav): Bottom-Nav stabilisieren bei Sprachwechsel",
+      "sha": "edaba69"
+    },
+    {
+      "message": "fix: repair broken merge of improve-nav + add-sync-backend",
+      "sha": "ca5a4e4"
+    },
+    {
+      "message": "chore: update app icons and favicon to new logo",
+      "sha": "bacb74e"
+    },
+    {
+      "message": "Add files via upload",
+      "sha": "a969fc5"
+    },
+    {
+      "message": "feat: Onboarding-Seite bei leerem Dashboard + Info-Sektion in Settings",
+      "sha": "46ac076"
+    },
+    {
+      "message": "feat: Produktbilder automatisch per Barcode beim Import nachladen",
+      "sha": "aa6f233"
+    },
+    {
+      "message": "chore: update package-lock.json after npm install",
+      "sha": "f2cba82"
+    },
+    {
+      "message": "fix: Hauptkamera statt Weitwinkel auswählen + Autofokus erzwingen",
+      "sha": "05f8a69"
+    },
+    {
+      "message": "Fix field-clear propagation in product sync and allow re-pairing",
+      "sha": "d0e63de"
+    },
+    {
+      "message": "Refactor navigation and remove barcode scanner functionality; integrate inline barcode scanning in ProductForm",
+      "sha": "5de551f"
+    },
+    {
+      "message": "feat(sync-backend): initialize backend with Fastify, SQLite, and CORS support",
+      "sha": "fe39d66"
+    },
+    {
+      "message": "Add preview video section to README (EN + DE)",
+      "sha": "a52918f"
+    },
+    {
+      "message": "Fix API image download with CORS fallback",
+      "sha": "5c60c51"
+    },
+    {
+      "message": "Simplify CI/CD: single job, main-only, no matrix",
+      "sha": "1ea7d26"
+    },
+    {
+      "message": "Polish repo for public release: README, CHANGELOG, cleanup",
+      "sha": "94a2820"
+    },
+    {
+      "message": "Allow deleting products from the archive view",
+      "sha": "89ad59b"
+    },
+    {
+      "message": "Fix status color strip not visible in light mode",
+      "sha": "353a136"
+    },
+    {
+      "message": "Auto-load product images from Open Food Facts API after barcode scan",
+      "sha": "b7bb222"
+    },
+    {
+      "message": "Fix Lighthouse accessibility: contrast ratios and heading order",
+      "sha": "2585a1c"
+    },
+    {
+      "message": "Add missing light mode overrides for opacity variants and autofill",
+      "sha": "31dc71d"
+    },
+    {
+      "message": "Fix Arabic (RTL) layout: replace physical CSS with logical properties",
+      "sha": "23f5051"
+    },
+    {
+      "message": "Add code review report for Italian/French language support",
+      "sha": "8b45f21"
+    },
+    {
+      "message": "Add Italian (it) and French (fr) language support",
+      "sha": "93ca182"
+    },
+    {
+      "message": "Update language switcher summary in README",
+      "sha": "4d05c75"
+    },
+    {
+      "message": "Fix 15+ bugs found during comprehensive code review",
+      "sha": "b2f000f"
+    },
+    {
+      "message": "Add Arabic (AR) language support and fix language switcher layout",
+      "sha": "55994b4"
+    },
+    {
+      "message": "Fix Portuguese flag: use Portugal 🇵🇹 instead of Brazil 🇧🇷",
+      "sha": "d8fb9d8"
+    },
+    {
+      "message": "Add Portuguese (PT) language support",
+      "sha": "1f41fc8"
+    }
+  ]
+}

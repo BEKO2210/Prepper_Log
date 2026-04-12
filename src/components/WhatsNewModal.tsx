@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { version as appVersion } from '../../package.json';
+import releaseNotes from '../generated/release-notes.json';
 import { Sparkles, X } from 'lucide-react';
 
 const STORAGE_KEY = 'preptrack-last-seen-version';
 
+type ReleaseItem = { message: string; sha: string };
+
 export function WhatsNewModal() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -29,11 +32,12 @@ export function WhatsNewModal() {
     setOpen(false);
   }
 
-  if (!open) return null;
+  const items = useMemo<ReleaseItem[]>(
+    () => (Array.isArray(releaseNotes.items) ? (releaseNotes.items as ReleaseItem[]) : []),
+    []
+  );
 
-  const items = (i18n.getResource(i18n.language, 'translation', 'whatsNew.items') as string[] | undefined) ??
-    (t('whatsNew.items', { returnObjects: true }) as unknown as string[]);
-  const list = Array.isArray(items) ? items : [];
+  if (!open) return null;
 
   return (
     <div
@@ -65,14 +69,28 @@ export function WhatsNewModal() {
         <p className="mb-4 text-sm text-gray-400">
           {t('whatsNew.subtitle', { version: appVersion })}
         </p>
-        <ul className="mb-5 space-y-2.5">
-          {list.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 rounded-lg bg-primary-700/40 px-3 py-2 text-sm text-gray-200">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
+
+        {items.length > 0 ? (
+          <ul className="mb-5 space-y-2">
+            {items.map((item) => (
+              <li
+                key={item.sha}
+                className="flex items-start gap-2 rounded-lg bg-primary-700/40 px-3 py-2 text-sm text-gray-200"
+              >
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" />
+                <span className="flex-1 break-words">{item.message}</span>
+                <code className="mt-0.5 shrink-0 rounded bg-primary-900/60 px-1.5 py-0.5 font-mono text-[10px] text-gray-400">
+                  {item.sha}
+                </code>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mb-5 rounded-lg bg-primary-700/30 px-3 py-4 text-center text-sm text-gray-400">
+            {t('whatsNew.empty', { defaultValue: '—' })}
+          </p>
+        )}
+
         <button
           onClick={dismiss}
           className="w-full rounded-lg bg-green-600 px-4 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-colors hover:bg-green-500"

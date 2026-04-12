@@ -7,10 +7,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predev": "node scripts/generate-release-notes.mjs",
     "build": "tsc -b && vite build",
+    "prebuild": "node scripts/generate-release-notes.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "release-notes": "node scripts/generate-release-notes.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {

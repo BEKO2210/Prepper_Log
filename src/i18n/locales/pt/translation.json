@@ -222,17 +222,7 @@
   "whatsNew": {
     "title": "O que há de novo",
     "subtitle": "Mudanças na versão {{version}}",
-    "close": "Entendi",
-    "items": [
-      "Novo logotipo do app e ícones atualizados (todos os tamanhos)",
-      "Navegação inferior estável — o menu não se desloca mais ao trocar de idioma",
-      "Tela de introdução no painel vazio e nova seção de informações nas configurações",
-      "Imagens dos produtos recarregadas automaticamente na importação",
-      "Sincronização LAN opcional para vários dispositivos na sua rede doméstica",
-      "Scanner de código de barras integrado diretamente no formulário do produto",
-      "Seção de apoio reformulada como contribuição voluntária para conformidade legal",
-      "Nova numeração (2.0.0 · Estável) com popup de atualização"
-    ]
+    "close": "Entendi"
   },
   "status": {
     "expired": "Vencido",

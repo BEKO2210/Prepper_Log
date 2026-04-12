@@ -222,17 +222,7 @@
   "whatsNew": {
     "title": "Was ist neu",
     "subtitle": "Änderungen in Version {{version}}",
-    "close": "Verstanden",
-    "items": [
-      "Neues App-Logo und aktualisierte Icons (alle Größen)",
-      "Stabile Bottom-Navigation — das Menü verschiebt sich beim Sprachwechsel nicht mehr",
-      "Onboarding-Seite bei leerem Dashboard und neue Info-Sektion in den Einstellungen",
-      "Produktbilder werden beim Import automatisch nachgeladen",
-      "Optionaler LAN-Sync für mehrere Geräte im Heimnetz",
-      "Inline-Barcode-Scanner direkt im Produktformular",
-      "Unterstützung rechtssicher als freiwillige Zuwendung formuliert (§ 10b EStG)",
-      "Neue Versionierung (2.0.0 · Stabil) mit Popup bei Updates"
-    ]
+    "close": "Verstanden"
   },
   "status": {
     "expired": "Abgelaufen",
