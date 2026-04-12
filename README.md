@@ -41,7 +41,7 @@
 
 ## What is PrepTrack?
 
-PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing your emergency supplies, pantry, and stockpile. Scan barcodes, track expiry dates, receive local notifications — all data stays on your device. No cloud. No accounts. No tracking.
+PrepTrack is a **free, ad-free, offline-first Progressive Web App** for managing your emergency supplies, pantry, and stockpile. Scan barcodes, track expiry dates, receive local notifications — all data stays on your device by default. No accounts. No tracking.
 
 > **Built for preppers, self-sufficiency enthusiasts, and anyone who wants to keep their supplies organized.**
 
@@ -82,6 +82,7 @@ PrepTrack supports **6 languages** with full translations for every screen, noti
 | **Consumption Log** | Mark products as consumed, expired, or damaged. View statistics. |
 | **Data Export** | JSON backup (complete) and CSV export (Excel/Google Sheets compatible with proper encoding). |
 | **Data Import** | Restore from backup with automatic duplicate detection. |
+| **Optional LAN Sync** | Pair devices with a shared sync code and sync via your own Docker-hosted backend. |
 | **Offline-First** | Fully functional offline. All data in IndexedDB. Service Worker caches assets, fonts, and API responses. |
 | **Installable PWA** | Install as native app on Android, iOS, and Desktop. |
 | **Dark & Light Mode** | Dark theme by default. Toggle to light theme anytime. Accessible color contrast in both modes. |
@@ -172,6 +173,7 @@ PrepTrack supports **6 languages** with full translations for every screen, noti
 | **Icons** | Lucide React | Consistent, lightweight SVG icons |
 | **Animation** | Framer Motion | Smooth UI transitions |
 | **API** | Open Food Facts | Free product database with images |
+| **Optional Backend** | Fastify + SQLite (Docker) | LAN device synchronization |
 | **CI/CD** | GitHub Actions | Auto-deploy to GitHub Pages |
 | **Testing** | Vitest | Unit tests (59 tests) |
 
@@ -205,9 +207,19 @@ The app is available at `http://localhost:5173`.
 ```bash
 npm run build      # Production build (tsc + vite)
 npm run preview    # Preview production build locally
-npm run test       # Run all tests (Vitest)
+npm run test       # Frontend + sync backend tests (Vitest)
 npx tsc --noEmit   # Type check without building
+npm --prefix sync-backend run test # Sync backend integration tests only
 ```
+
+### Optional LAN Sync Backend
+
+```bash
+docker compose -f docker-compose.sync.yml up -d --build
+curl http://localhost:8787/health
+```
+
+Open Settings in the app, enter your backend URL (for example `http://192.168.0.20:8787`), set a shared sync code, and pair each device.
 
 ### Deploy (GitHub Pages)
 
@@ -252,7 +264,7 @@ npx tsc --noEmit   # Type check without building
 
 PrepTrack takes your privacy seriously:
 
-- **All data stored locally** on your device (IndexedDB). No cloud. No servers. No accounts.
+- **Default mode is local-only** on your device (IndexedDB). Optional self-hosted LAN sync can be enabled in Settings.
 - **No tracking.** No analytics. No cookies. No ads. No data shared with third parties.
 - **External service:** Only the Open Food Facts API is contacted during barcode scans (open-source, non-profit). Only the barcode is transmitted.
 - **Notifications** are generated locally. No push tokens sent to external servers.
@@ -383,7 +395,7 @@ See [LICENSE](LICENSE) for the full license text.
 
 ## Was ist PrepTrack?
 
-PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App** zur Verwaltung von Vorräten. Produkte scannen, Mindesthaltbarkeitsdaten tracken, Benachrichtigungen erhalten — alle Daten bleiben auf deinem Gerät. Keine Cloud. Keine Accounts. Kein Tracking.
+PrepTrack ist eine **kostenlose, werbefreie, Offline-first Progressive Web App** zur Verwaltung von Vorräten. Produkte scannen, Mindesthaltbarkeitsdaten tracken, Benachrichtigungen erhalten — standardmäßig bleiben alle Daten auf deinem Gerät. Keine Accounts. Kein Tracking.
 
 > **Entwickelt für Prepper, Selbstversorger und alle, die ihren Vorrat im Griff haben wollen.**
 
@@ -565,7 +577,7 @@ npx tsc --noEmit   # Type-Check ohne Build
 
 ## 🔒 Datenschutz
 
-- **Alle Daten lokal** auf deinem Gerät (IndexedDB). Keine Cloud. Keine Server. Keine Accounts.
+- **Standardmodus ist lokal** auf deinem Gerät (IndexedDB). Optional kann ein selbst gehosteter LAN-Sync in den Einstellungen aktiviert werden.
 - **Kein Tracking.** Keine Analytics. Keine Cookies. Keine Werbung.
 - **Externer Dienst:** Nur die Open Food Facts API wird beim Barcode-Scan kontaktiert (Open Source, gemeinnützig). Es wird nur der Barcode übermittelt.
 - **Benachrichtigungen** werden lokal erzeugt. Keine Push-Tokens an externe Server.

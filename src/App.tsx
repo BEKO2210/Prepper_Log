@@ -2,6 +2,7 @@ import { useEffect, lazy, Suspense } from 'react';
 import { useAppStore } from './store/useAppStore';
 import { seedDefaults } from './lib/db';
 import { startNotificationChecker } from './lib/notifications';
+import { startSyncEngine } from './lib/sync';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
@@ -69,7 +70,11 @@ export default function App() {
     );
 
     const interval = startNotificationChecker();
-    return () => clearInterval(interval);
+    const stopSync = startSyncEngine();
+    return () => {
+      clearInterval(interval);
+      stopSync();
+    };
   }, []);
 
   return (
