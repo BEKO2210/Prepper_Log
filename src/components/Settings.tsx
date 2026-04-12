@@ -37,6 +37,13 @@ import {
   Globe,
   Cloud,
   RefreshCw,
+  WifiOff,
+  Camera,
+  Image as ImageIcon,
+  BellRing,
+  HardDrive,
+  Lock,
+  Loader2,
 } from 'lucide-react';
 
 const LANGUAGES = [
@@ -74,6 +81,8 @@ export function Settings() {
   const [showImpressum, setShowImpressum] = useState(false);
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
   const { t, i18n } = useTranslation();
 
   async function handleToggleNotifications() {
@@ -254,7 +263,7 @@ export function Settings() {
               {[
                 { icon: <WifiOff size={16} className="text-blue-400" />, text: t('onboarding.featureOffline') },
                 { icon: <Camera size={16} className="text-green-400" />, text: t('onboarding.featureCamera') },
-                { icon: <Image size={16} className="text-purple-400" />, text: t('onboarding.featureImages') },
+                { icon: <ImageIcon size={16} className="text-purple-400" />, text: t('onboarding.featureImages') },
                 { icon: <BellRing size={16} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
                 { icon: <HardDrive size={16} className="text-orange-400" />, text: t('onboarding.featureExport') },
                 { icon: <Lock size={16} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },

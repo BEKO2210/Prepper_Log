@@ -11,7 +11,6 @@ import {
   PlusCircle,
   TrendingDown,
   ChevronRight,
-  Upload,
   Camera,
   Image,
   BellRing,

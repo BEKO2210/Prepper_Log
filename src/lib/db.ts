@@ -1,7 +1,7 @@
 import Dexie, { type Table } from 'dexie';
 import { version as appVersion } from '../../package.json';
 import i18n from '../i18n/i18n';
-import { getLocale } from './utils';
+import { getLocale, lookupBarcode, fetchAndCompressImage } from './utils';
 import { isSyncEnabled } from './syncConfig';
 import type {
   Product,
