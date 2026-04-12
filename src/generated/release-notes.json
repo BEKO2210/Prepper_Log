@@ -1,8 +1,12 @@
 {
   "version": "2.0.0",
-  "generatedAt": "2026-04-12T12:09:49.283Z",
+  "generatedAt": "2026-04-12T12:18:58.629Z",
   "sinceTag": "v1.1.0",
   "items": [
+    {
+      "message": "feat: Was-ist-neu Popup liest automatisch Git-Commit-Messages",
+      "sha": "7c62595"
+    },
     {
       "message": "feat: v2.0.0 — rechtssichere freiwillige Unterstützung + Was-ist-neu Popup",
       "sha": "311fdf9"

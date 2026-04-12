@@ -42,15 +42,28 @@
   </head>
   <body class="bg-primary-900 text-gray-100 antialiased">
     <script>
-      // Apply dark mode synchronously before React renders to prevent flash
+      // Apply dark/light mode synchronously before React renders to prevent flash.
+      // Writes the resolved value back to localStorage so the React hook always
+      // reads a defined value and can't disagree about the default.
       (function() {
-        var stored = localStorage.getItem('preptrack-dark-mode');
-        if (stored === 'false') {
-          document.documentElement.classList.remove('dark');
-        } else if (stored === null) {
-          if (!window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        try {
+          var key = 'preptrack-dark-mode';
+          var stored = localStorage.getItem(key);
+          var isDark;
+          if (stored === 'true' || stored === 'false') {
+            isDark = stored === 'true';
+          } else {
+            // First visit: follow OS preference, default to dark
+            isDark = !window.matchMedia || !window.matchMedia('(prefers-color-scheme: light)').matches;
+            localStorage.setItem(key, String(isDark));
+          }
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
             document.documentElement.classList.remove('dark');
           }
+        } catch (e) {
+          // localStorage gesperrt (Privatmodus) — falle auf den HTML-Default zurück
         }
       })();
     </script>
