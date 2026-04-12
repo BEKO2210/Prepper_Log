@@ -704,7 +704,7 @@ export function Settings() {
         </div>
       </section>
 
-      {/* Spenden */}
+      {/* Freiwillige Unterstützung */}
       <section className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <Heart size={18} className="text-pink-400" />
@@ -714,7 +714,7 @@ export function Settings() {
           {t('settings.supportDesc')}
         </p>
         <a
-          href="https://www.paypal.com/donate?business=renateweinfurtner%40gmx.de&currency_code=EUR&item_name=PrepTrack%20Spende"
+          href="https://www.paypal.com/paypalme/renateweinfurtner"
           target="_blank"
           rel="noopener noreferrer"
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0070ba] px-4 py-3 font-medium text-white hover:bg-[#005ea6] active:scale-[0.98] transition-transform"
@@ -725,6 +725,9 @@ export function Settings() {
           {t('settings.donatePayPal')}
         </a>
         <p className="mt-2 text-center text-xs text-gray-400">renateweinfurtner@gmx.de</p>
+        <p className="mt-3 rounded-lg border border-primary-700 bg-primary-900/40 px-3 py-2 text-xs leading-relaxed text-gray-400">
+          {t('settings.supportLegal')}
+        </p>
       </section>
 
       {/* Impressum */}
@@ -848,8 +851,13 @@ export function Settings() {
       </section>
 
       {/* App Info */}
-      <section className="space-y-1 text-center text-xs text-gray-400">
-        <p>PrepTrack v{appVersion}</p>
+      <section className="space-y-1.5 text-center text-xs text-gray-400">
+        <p className="flex items-center justify-center gap-2">
+          <span>PrepTrack v{appVersion}</span>
+          <span className="rounded-full border border-green-500/40 bg-green-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-green-400">
+            {t('settings.versionStatus')}
+          </span>
+        </p>
         <p>{t('settings.appSlogan')}</p>
         <p>&copy; {new Date().getFullYear()} Belkis Aslani</p>
       </section>

@@ -162,9 +162,11 @@
     "csvExportDesc": "Für Google Sheets oder Textverarbeitung",
     "jsonImport": "JSON-Backup importieren",
     "jsonImportDesc": "Daten aus einem Backup wiederherstellen",
-    "support": "Unterstützen",
-    "supportDesc": "PrepTrack ist kostenlos und werbefrei. Wenn dir die App gefällt, kannst du die Entwicklung mit einer kleinen Spende unterstützen. Danke!",
-    "donatePayPal": "Mit PayPal spenden",
+    "support": "Freiwillige Unterstützung",
+    "supportDesc": "PrepTrack ist kostenlos und werbefrei. Wenn dir die App gefällt, kannst du die Entwicklung freiwillig unterstützen. Danke!",
+    "supportLegal": "Hinweis: Es handelt sich um eine freiwillige Zuwendung an eine Privatperson — keine steuerlich absetzbare Spende im Sinne des § 10b EStG. Es besteht kein Anspruch auf eine Spendenbescheinigung oder auf besondere Leistungen.",
+    "donatePayPal": "Mit PayPal unterstützen",
+    "versionStatus": "Stabil",
     "impressum": "Impressum",
     "impressumTMG": "Angaben gemäß § 5 TMG:",
     "impressumContact": "Kontakt:",
@@ -195,8 +197,8 @@
     "termsLiabilityText": "Die Nutzung erfolgt auf eigene Verantwortung. Der Anbieter haftet nicht für Schäden, die durch die Nutzung der App entstehen, insbesondere nicht für den Verlust von Daten. Regelmäßige Backups werden empfohlen.",
     "termsIP": "5. Geistiges Eigentum",
     "termsIPText": "Alle Rechte an der App liegen beim Anbieter. Die App darf für den persönlichen Gebrauch frei genutzt werden.",
-    "termsDonations": "6. Spenden",
-    "termsDonationsText": "Spenden sind freiwillig und begründen kein Vertragsverhältnis. Es besteht kein Anspruch auf besondere Leistungen.",
+    "termsDonations": "6. Freiwillige Unterstützung",
+    "termsDonationsText": "Freiwillige Unterstützungen sind persönliche Zuwendungen an den Anbieter — keine steuerlich absetzbaren Spenden im Sinne des § 10b EStG. Sie erfolgen freiwillig, begründen kein Vertragsverhältnis und es besteht weder Anspruch auf eine Spendenbescheinigung noch auf besondere Leistungen.",
     "appSlogan": "Dein Vorrat. Immer im Blick.",
     "language": "Sprache",
     "installError": "Die Installation konnte nicht automatisch gestartet werden.\n\nSo installierst du PrepTrack manuell:\n1. Chrome/Edge: Klicke auf das Installieren-Symbol in der Adressleiste (oder Menu > App installieren)\n2. Safari (iOS): Tippe auf Teilen > Zum Home-Bildschirm\n3. Firefox: Menu > Seite installieren"
@@ -216,6 +218,11 @@
     "byCategory": "Nach Kategorie",
     "byLocation": "Nach Lagerort",
     "mostConsumed": "Meistverbraucht"
+  },
+  "whatsNew": {
+    "title": "Was ist neu",
+    "subtitle": "Änderungen in Version {{version}}",
+    "close": "Verstanden"
   },
   "status": {
     "expired": "Abgelaufen",

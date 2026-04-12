@@ -162,9 +162,11 @@
     "csvExportDesc": "For Google Sheets or word processing",
     "jsonImport": "Import JSON backup",
     "jsonImportDesc": "Restore data from a backup",
-    "support": "Support",
-    "supportDesc": "PrepTrack is free and ad-free. If you like the app, you can support development with a small donation. Thank you!",
-    "donatePayPal": "Donate with PayPal",
+    "support": "Voluntary Support",
+    "supportDesc": "PrepTrack is free and ad-free. If you like the app, you can voluntarily support its development. Thank you!",
+    "supportLegal": "Note: This is a voluntary contribution to a private individual — not a tax-deductible charitable donation. No donation receipt will be issued and there is no entitlement to any special services in return.",
+    "donatePayPal": "Support via PayPal",
+    "versionStatus": "Stable",
     "impressum": "Legal Notice",
     "impressumTMG": "Information according to § 5 TMG:",
     "impressumContact": "Contact:",
@@ -195,8 +197,8 @@
     "termsLiabilityText": "Use is at your own risk. The provider is not liable for damages resulting from the use of the app, especially not for data loss. Regular backups are recommended.",
     "termsIP": "5. Intellectual Property",
     "termsIPText": "All rights to the app belong to the provider. The app may be used freely for personal use.",
-    "termsDonations": "6. Donations",
-    "termsDonationsText": "Donations are voluntary and do not establish a contractual relationship. There is no entitlement to special services.",
+    "termsDonations": "6. Voluntary Support",
+    "termsDonationsText": "Voluntary contributions are personal gifts to the provider — not tax-deductible charitable donations under German § 10b EStG. They are given voluntarily, do not establish a contractual relationship, and grant no entitlement to a donation receipt or to any special services.",
     "appSlogan": "Your supplies. Always in sight.",
     "language": "Language",
     "installError": "The installation could not be started automatically.\n\nTo install PrepTrack manually:\n1. Chrome/Edge: Click the install icon in the address bar (or Menu > Install app)\n2. Safari (iOS): Tap Share > Add to Home Screen\n3. Firefox: Menu > Install site"
@@ -216,6 +218,11 @@
     "byCategory": "By Category",
     "byLocation": "By Location",
     "mostConsumed": "Most Consumed"
+  },
+  "whatsNew": {
+    "title": "What's New",
+    "subtitle": "Changes in version {{version}}",
+    "close": "Got it"
   },
   "status": {
     "expired": "Expired",
