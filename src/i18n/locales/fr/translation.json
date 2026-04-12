@@ -284,7 +284,8 @@
   "import": {
     "success": "{{count}} produits import\u00e9s avec succ\u00e8s.",
     "error": "Erreur : {{message}}",
-    "importFailed": "L'importation a \u00e9chou\u00e9"
+    "importFailed": "L'importation a \u00e9chou\u00e9",
+    "loadingImages": "Chargement des images… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} a expir\u00e9 !",
@@ -303,6 +304,28 @@
     "invalidFormat": "Format d'importation invalide : aucun produit trouv\u00e9.",
     "importResult": "{{imported}} produits import\u00e9s, {{skipped}} ignor\u00e9(s) (doublons ou invalides).",
     "unknownProduct": "Produit inconnu"
+  },
+  "onboarding": {
+    "title": "Bienvenue sur PrepTrack",
+    "subtitle": "Votre gestionnaire de provisions num\u00e9rique",
+    "getStarted": "Pour commencer",
+    "step1Title": "Ajouter des produits",
+    "step1Desc": "Scannez des codes-barres ou ajoutez des produits manuellement avec date de p\u00e9remption, cat\u00e9gorie et lieu de stockage.",
+    "step2Title": "Suivre les dates de p\u00e9remption",
+    "step2Desc": "Recevez des notifications automatiques 30, 14, 7, 3 et 1 jour avant l'expiration.",
+    "step3Title": "Sauvegarde et synchronisation",
+    "step3Desc": "Exportez vos donn\u00e9es en sauvegarde JSON. Lors de l'importation, les images des produits sont charg\u00e9es automatiquement via le code-barres.",
+    "features": "Fonctionnalit\u00e9s",
+    "featureOffline": "Hors ligne d'abord \u2014 fonctionne compl\u00e8tement sans internet",
+    "featureCamera": "Scanner de codes-barres avec d\u00e9tection automatique de la cam\u00e9ra principale",
+    "featureImages": "Images des produits charg\u00e9es automatiquement depuis Open Food Facts",
+    "featureNotifications": "Rappels locaux de p\u00e9remption \u2014 pas de cloud n\u00e9cessaire",
+    "featureExport": "Sauvegarde JSON et export CSV de vos donn\u00e9es",
+    "featurePrivacy": "100% priv\u00e9 \u2014 toutes les donn\u00e9es restent sur votre appareil",
+    "startScan": "Scanner un code-barres",
+    "startManual": "Ajouter manuellement",
+    "startImport": "Importer une sauvegarde",
+    "dismiss": "Compris, c'est parti !"
   },
   "common": {
     "yes": "Oui",

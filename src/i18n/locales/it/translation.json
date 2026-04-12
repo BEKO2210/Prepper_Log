@@ -284,7 +284,8 @@
   "import": {
     "success": "{{count}} prodotti importati con successo.",
     "error": "Errore: {{message}}",
-    "importFailed": "Importazione fallita"
+    "importFailed": "Importazione fallita",
+    "loadingImages": "Caricamento immagini prodotti… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} \u00e8 scaduto!",
@@ -303,6 +304,28 @@
     "invalidFormat": "Formato di importazione non valido: nessun prodotto trovato.",
     "importResult": "{{imported}} prodotti importati, {{skipped}} saltati (duplicati o non validi).",
     "unknownProduct": "Prodotto sconosciuto"
+  },
+  "onboarding": {
+    "title": "Benvenuto in PrepTrack",
+    "subtitle": "Il tuo gestore digitale delle scorte",
+    "getStarted": "Come iniziare",
+    "step1Title": "Aggiungi prodotti",
+    "step1Desc": "Scansiona codici a barre o aggiungi prodotti manualmente con scadenza, categoria e luogo di conservazione.",
+    "step2Title": "Tieni d'occhio le scadenze",
+    "step2Desc": "Ricevi notifiche automatiche 30, 14, 7, 3 e 1 giorno prima della scadenza.",
+    "step3Title": "Backup e sincronizzazione",
+    "step3Desc": "Esporta i tuoi dati come backup JSON. All'importazione, le immagini dei prodotti vengono caricate automaticamente tramite codice a barre.",
+    "features": "Funzionalit\u00e0",
+    "featureOffline": "Offline-first \u2014 funziona completamente senza internet",
+    "featureCamera": "Scanner di codici a barre con rilevamento automatico della fotocamera principale",
+    "featureImages": "Immagini dei prodotti caricate automaticamente da Open Food Facts",
+    "featureNotifications": "Promemoria locali sulle scadenze \u2014 nessun cloud necessario",
+    "featureExport": "Backup JSON ed esportazione CSV dei tuoi dati",
+    "featurePrivacy": "100% privato \u2014 tutti i dati restano sul tuo dispositivo",
+    "startScan": "Scansiona codice a barre",
+    "startManual": "Aggiungi manualmente",
+    "startImport": "Importa backup",
+    "dismiss": "Capito, iniziamo!"
   },
   "common": {
     "yes": "S\u00ec",

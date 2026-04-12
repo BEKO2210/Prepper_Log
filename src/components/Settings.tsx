@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { version as appVersion } from '../../package.json';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, ImportResult } from '../lib/db';
+import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { requestNotificationPermission, getNotificationPermissionStatus } from '../lib/notifications';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { usePWAInstall } from '../hooks/usePWAInstall';
@@ -104,17 +104,30 @@ export function Settings() {
     downloadFile(data, `preptrack-export-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
   }
 
+  async function startImageLoading(productIds: number[]) {
+    if (productIds.length === 0) return;
+    setImageLoadProgress({ loaded: 0, total: productIds.length });
+    await loadImportedImages(productIds, (loaded, total) => {
+      setImageLoadProgress({ loaded, total });
+    });
+    setImageLoadProgress(null);
+  }
+
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       const text = await file.text();
-      const count = await importData(text);
-      setImportStatus({ message: t('import.success', { count }), type: 'success' });
+      const result = await importData(text);
+      setImportStatus({ message: t('import.success', { count: result.imported }), type: 'success' });
+      // Bilder im Hintergrund nachladen
+      startImageLoading(result.productsNeedingImages);
     } catch (err) {
       if (err instanceof ImportResult) {
         setImportStatus({ message: err.message, type: 'warning' });
+        // Auch bei teilweisem Import Bilder nachladen
+        startImageLoading(err.productsNeedingImages);
       } else {
         setImportStatus({ message: t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), type: 'error' });
       }
@@ -222,6 +235,39 @@ export function Settings() {
       <div>
         <h2 className="text-2xl font-bold text-gray-100">{t('settings.title')}</h2>
       </div>
+
+      {/* Über PrepTrack / Info */}
+      <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
+        <button
+          onClick={() => setShowInfo(!showInfo)}
+          className="flex w-full items-center justify-between"
+        >
+          <h3 className="flex items-center gap-2 font-semibold text-gray-200">
+            <Info size={18} className="text-green-400" />
+            {t('onboarding.features')}
+          </h3>
+          {showInfo ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+        </button>
+        {showInfo && (
+          <div className="mt-4 space-y-3">
+            <div className="space-y-2.5">
+              {[
+                { icon: <WifiOff size={16} className="text-blue-400" />, text: t('onboarding.featureOffline') },
+                { icon: <Camera size={16} className="text-green-400" />, text: t('onboarding.featureCamera') },
+                { icon: <Image size={16} className="text-purple-400" />, text: t('onboarding.featureImages') },
+                { icon: <BellRing size={16} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
+                { icon: <HardDrive size={16} className="text-orange-400" />, text: t('onboarding.featureExport') },
+                { icon: <Lock size={16} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-lg bg-primary-700/30 px-3 py-2.5">
+                  <span className="mt-0.5 shrink-0">{item.icon}</span>
+                  <span className="text-sm text-gray-300">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Language */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
@@ -478,6 +524,27 @@ export function Settings() {
             >
               {importStatus.message}
             </p>
+          )}
+
+          {imageLoadProgress && (
+            <div className="space-y-2 rounded-lg bg-blue-500/10 px-3 py-2">
+              <div className="flex items-center gap-2 text-sm text-blue-400">
+                <Loader2 size={16} className="animate-spin" />
+                <span>
+                  {t('import.loadingImages', {
+                    loaded: imageLoadProgress.loaded,
+                    total: imageLoadProgress.total,
+                    defaultValue: 'Lade Produktbilder… {{loaded}} / {{total}}',
+                  })}
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary-700">
+                <div
+                  className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                  style={{ width: `${(imageLoadProgress.loaded / imageLoadProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
       </section>

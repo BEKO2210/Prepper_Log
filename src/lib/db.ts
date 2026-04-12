@@ -713,7 +713,14 @@ export async function exportCSV(): Promise<string> {
   return BOM + [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\r\n');
 }
 
-export async function importData(jsonString: string): Promise<number> {
+export interface ImportDataResult {
+  imported: number;
+  skipped: number;
+  /** IDs von importierten Produkten die einen Barcode aber kein Foto haben */
+  productsNeedingImages: number[];
+}
+
+export async function importData(jsonString: string): Promise<ImportDataResult> {
   const t = i18n.t.bind(i18n);
   let data: Record<string, unknown>;
   try {
@@ -735,6 +742,7 @@ export async function importData(jsonString: string): Promise<number> {
 
   let imported = 0;
   let skipped = 0;
+  const productsNeedingImages: number[] = [];
 
   await db.transaction(
     'rw',
@@ -913,23 +921,65 @@ export async function importData(jsonString: string): Promise<number> {
   }
 
   if (skipped > 0) {
-    throw new ImportResult(imported, skipped);
+    throw new ImportResult(imported, skipped, productsNeedingImages);
   }
 
-  return imported;
+  return { imported, skipped, productsNeedingImages };
+}
+
+/**
+ * Lädt Produktbilder im Hintergrund per Barcode von Open Food Facts.
+ * Ruft für jedes Produkt lookupBarcode auf, holt das Bild und speichert es.
+ * @param productIds - IDs der Produkte die ein Bild brauchen
+ * @param onProgress - Callback für Fortschritt (geladen, gesamt)
+ */
+export async function loadImportedImages(
+  productIds: number[],
+  onProgress?: (loaded: number, total: number) => void
+): Promise<number> {
+  let loaded = 0;
+  const total = productIds.length;
+
+  for (const id of productIds) {
+    try {
+      const product = await db.products.get(id);
+      if (!product?.barcode || product.photo) {
+        onProgress?.(++loaded, total);
+        continue;
+      }
+
+      const result = await lookupBarcode(product.barcode);
+      if (result?.imageUrl) {
+        const photo = await fetchAndCompressImage(result.imageUrl);
+        if (photo) {
+          await db.products.update(id, {
+            photo,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+      }
+    } catch {
+      // Einzelnes Bild fehlgeschlagen — weiter mit dem nächsten
+    }
+    onProgress?.(++loaded, total);
+  }
+
+  return loaded;
 }
 
 // Custom class to pass both imported and skipped counts
 export class ImportResult extends Error {
   imported: number;
   skipped: number;
+  productsNeedingImages: number[];
 
-  constructor(imported: number, skipped: number) {
+  constructor(imported: number, skipped: number, productsNeedingImages: number[] = []) {
     const t = i18n.t.bind(i18n);
     const msg = t('dbErrors.importResult', { imported, skipped });
     super(msg);
     this.name = 'ImportResult';
     this.imported = imported;
     this.skipped = skipped;
+    this.productsNeedingImages = productsNeedingImages;
   }
 }

@@ -284,7 +284,8 @@
   "import": {
     "success": "{{count}} Produkte erfolgreich importiert.",
     "error": "Fehler: {{message}}",
-    "importFailed": "Import fehlgeschlagen"
+    "importFailed": "Import fehlgeschlagen",
+    "loadingImages": "Lade Produktbilder… {{loaded}} / {{total}}"
   },
   "notifications": {
     "expiredTitle": "{{name}} ist abgelaufen!",
@@ -303,6 +304,28 @@
     "invalidFormat": "Ungültiges Importformat: Keine Produkte gefunden.",
     "importResult": "{{imported}} Produkte importiert, {{skipped}} übersprungen (Duplikate oder ungültig).",
     "unknownProduct": "Unbekanntes Produkt"
+  },
+  "onboarding": {
+    "title": "Willkommen bei PrepTrack",
+    "subtitle": "Dein digitaler Vorratsmanager",
+    "getStarted": "So startest du",
+    "step1Title": "Produkte erfassen",
+    "step1Desc": "Scanne Barcodes oder erfasse Produkte manuell mit MHD, Kategorie und Lagerort.",
+    "step2Title": "MHD im Blick",
+    "step2Desc": "Erhalte automatische Benachrichtigungen 30, 14, 7, 3 und 1 Tag vor Ablauf.",
+    "step3Title": "Backup & Sync",
+    "step3Desc": "Exportiere deine Daten als JSON-Backup. Beim Import werden Produktbilder automatisch per Barcode geladen.",
+    "features": "Funktionen",
+    "featureOffline": "Offline-first — funktioniert komplett ohne Internet",
+    "featureCamera": "Barcode-Scanner mit automatischer Hauptkamera-Erkennung",
+    "featureImages": "Produktbilder werden automatisch von Open Food Facts geladen",
+    "featureNotifications": "Lokale MHD-Erinnerungen — keine Cloud nötig",
+    "featureExport": "JSON-Backup & CSV-Export für deine Daten",
+    "featurePrivacy": "100% privat — alle Daten bleiben auf deinem Gerät",
+    "startScan": "Barcode scannen",
+    "startManual": "Manuell erfassen",
+    "startImport": "Backup importieren",
+    "dismiss": "Verstanden, los geht's!"
   },
   "common": {
     "yes": "Ja",
