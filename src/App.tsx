@@ -12,10 +12,6 @@ import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
 import { Loader2 } from 'lucide-react';
 
-const BarcodeScanner = lazy(() =>
-  import('./components/BarcodeScanner').then((m) => ({ default: m.BarcodeScanner }))
-);
-
 const Settings = lazy(() =>
   import('./components/Settings').then((m) => ({ default: m.Settings }))
 );
@@ -42,12 +38,6 @@ function PageContent() {
       return <ProductList />;
     case 'add':
       return <ProductForm />;
-    case 'scanner':
-      return (
-        <Suspense fallback={<LazyFallback />}>
-          <BarcodeScanner />
-        </Suspense>
-      );
     case 'settings':
       return (
         <Suspense fallback={<LazyFallback />}>
