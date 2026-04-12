@@ -162,9 +162,11 @@
     "csvExportDesc": "Pour Google Sheets ou traitement de texte",
     "jsonImport": "Importer une sauvegarde JSON",
     "jsonImportDesc": "Restaurer les donn\u00e9es depuis une sauvegarde",
-    "support": "Soutien",
-    "supportDesc": "PrepTrack est gratuit et sans publicit\u00e9. Si vous aimez l'application, vous pouvez soutenir le d\u00e9veloppement avec un petit don. Merci !",
-    "donatePayPal": "Faire un don avec PayPal",
+    "support": "Soutien volontaire",
+    "supportDesc": "PrepTrack est gratuit et sans publicit\u00e9. Si l'application vous pla\u00eet, vous pouvez soutenir volontairement son d\u00e9veloppement. Merci !",
+    "supportLegal": "Remarque : il s'agit d'une contribution volontaire \u00e0 un particulier — pas d'un don d\u00e9ductible des imp\u00f4ts. Aucun re\u00e7u fiscal ne sera \u00e9mis et aucune contrepartie ou prestation particuli\u00e8re n'est due.",
+    "donatePayPal": "Soutenir via PayPal",
+    "versionStatus": "Stable",
     "impressum": "Mentions l\u00e9gales",
     "impressumTMG": "Informations conform\u00e9ment au \u00a7 5 TMG :",
     "impressumContact": "Contact :",
@@ -195,8 +197,8 @@
     "termsLiabilityText": "L'utilisation est \u00e0 vos propres risques. Le fournisseur n'est pas responsable des dommages r\u00e9sultant de l'utilisation de l'application, en particulier de la perte de donn\u00e9es. Des sauvegardes r\u00e9guli\u00e8res sont recommand\u00e9es.",
     "termsIP": "5. Propri\u00e9t\u00e9 intellectuelle",
     "termsIPText": "Tous les droits sur l'application appartiennent au fournisseur. L'application peut \u00eatre utilis\u00e9e librement pour un usage personnel.",
-    "termsDonations": "6. Dons",
-    "termsDonationsText": "Les dons sont volontaires et n'\u00e9tablissent pas de relation contractuelle. Il n'existe aucun droit \u00e0 des services sp\u00e9ciaux.",
+    "termsDonations": "6. Soutien volontaire",
+    "termsDonationsText": "Les contributions volontaires sont des dons personnels au fournisseur — elles ne constituent pas des dons d\u00e9ductibles des imp\u00f4ts au sens du § 10b EStG (droit allemand). Elles sont versées volontairement, n'\u00e9tablissent aucune relation contractuelle et n'ouvrent droit ni à un re\u00e7u fiscal ni à des prestations particulières.",
     "appSlogan": "Vos provisions. Toujours en vue.",
     "language": "Langue",
     "installError": "L'installation n'a pas pu \u00eatre lanc\u00e9e automatiquement.\n\nPour installer PrepTrack manuellement :\n1. Chrome/Edge : Cliquez sur l'ic\u00f4ne d'installation dans la barre d'adresse (ou Menu > Installer l'application)\n2. Safari (iOS) : Appuyez sur Partager > Ajouter \u00e0 l'\u00e9cran d'accueil\n3. Firefox : Menu > Installer le site"
@@ -216,6 +218,21 @@
     "byCategory": "Par cat\u00e9gorie",
     "byLocation": "Par emplacement",
     "mostConsumed": "Les plus consomm\u00e9s"
+  },
+  "whatsNew": {
+    "title": "Nouveaut\u00e9s",
+    "subtitle": "Changements de la version {{version}}",
+    "close": "Compris",
+    "items": [
+      "Nouveau logo et ic\u00f4nes mises \u00e0 jour (toutes les tailles)",
+      "Barre de navigation stable — le menu ne bouge plus lors du changement de langue",
+      "\u00c9cran d'accueil vide avec guide et nouvelle section d'info dans les r\u00e9glages",
+      "Images produits recharg\u00e9es automatiquement \u00e0 l'import",
+      "Synchronisation LAN optionnelle pour plusieurs appareils sur votre r\u00e9seau",
+      "Scanner de code-barres int\u00e9gr\u00e9 directement dans le formulaire produit",
+      "Section soutien reformul\u00e9e comme contribution volontaire pour la conformit\u00e9 l\u00e9gale",
+      "Nouveau versionnage (2.0.0 · Stable) avec popup de mise \u00e0 jour"
+    ]
   },
   "status": {
     "expired": "Expir\u00e9",

@@ -1,7 +1,7 @@
 {
   "name": "preptrack",
   "private": true,
-  "version": "1.88_Build_9426",
+  "version": "2.0.0",
   "description": "Dein Vorrat. Immer im Blick. — Offline-first PWA für Prepper und Vorratshaltung",
   "license": "Apache-2.0",
   "type": "module",

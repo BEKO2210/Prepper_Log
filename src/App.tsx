@@ -6,6 +6,7 @@ import { startSyncEngine } from './lib/sync';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { WhatsNewModal } from './components/WhatsNewModal';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ProductList } from './components/ProductList';
@@ -87,6 +88,7 @@ export default function App() {
 
         <Navigation />
         <PWAInstallPrompt />
+        <WhatsNewModal />
       </div>
     </ErrorBoundary>
   );

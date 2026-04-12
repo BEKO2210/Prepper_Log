@@ -162,9 +162,11 @@
     "csvExportDesc": "Per Google Sheets o elaborazione testi",
     "jsonImport": "Importa backup JSON",
     "jsonImportDesc": "Ripristina dati da un backup",
-    "support": "Supporto",
-    "supportDesc": "PrepTrack \u00e8 gratuito e senza pubblicit\u00e0. Se ti piace l'app, puoi supportare lo sviluppo con una piccola donazione. Grazie!",
-    "donatePayPal": "Dona con PayPal",
+    "support": "Contributo volontario",
+    "supportDesc": "PrepTrack \u00e8 gratuito e senza pubblicit\u00e0. Se ti piace l'app, puoi sostenere volontariamente lo sviluppo. Grazie!",
+    "supportLegal": "Nota: si tratta di un contributo volontario a una persona privata — non di una donazione fiscalmente deducibile. Non verr\u00e0 emessa alcuna ricevuta di donazione e non sussiste diritto ad alcuna prestazione particolare.",
+    "donatePayPal": "Sostieni con PayPal",
+    "versionStatus": "Stabile",
     "impressum": "Note legali",
     "impressumTMG": "Informazioni ai sensi del \u00a7 5 TMG:",
     "impressumContact": "Contatto:",
@@ -195,8 +197,8 @@
     "termsLiabilityText": "L'uso \u00e8 a proprio rischio. Il fornitore non \u00e8 responsabile per danni derivanti dall'uso dell'app, in particolare per la perdita di dati. Si raccomandano backup regolari.",
     "termsIP": "5. Propriet\u00e0 intellettuale",
     "termsIPText": "Tutti i diritti sull'app appartengono al fornitore. L'app pu\u00f2 essere utilizzata liberamente per uso personale.",
-    "termsDonations": "6. Donazioni",
-    "termsDonationsText": "Le donazioni sono volontarie e non stabiliscono un rapporto contrattuale. Non esiste alcun diritto a servizi speciali.",
+    "termsDonations": "6. Contributo volontario",
+    "termsDonationsText": "I contributi volontari sono donazioni personali al fornitore — non costituiscono donazioni fiscalmente deducibili ai sensi del § 10b EStG (diritto tedesco). Sono versati volontariamente, non stabiliscono alcun rapporto contrattuale e non danno diritto n\u00e9 a una ricevuta di donazione n\u00e9 a prestazioni particolari.",
     "appSlogan": "Le tue scorte. Sempre sotto controllo.",
     "language": "Lingua",
     "installError": "L'installazione non pu\u00f2 essere avviata automaticamente.\n\nPer installare PrepTrack manualmente:\n1. Chrome/Edge: Clicca sull'icona di installazione nella barra degli indirizzi (o Menu > Installa app)\n2. Safari (iOS): Tocca Condividi > Aggiungi alla schermata Home\n3. Firefox: Menu > Installa sito"
@@ -216,6 +218,21 @@
     "byCategory": "Per categoria",
     "byLocation": "Per posizione",
     "mostConsumed": "Pi\u00f9 consumati"
+  },
+  "whatsNew": {
+    "title": "Novit\u00e0",
+    "subtitle": "Modifiche nella versione {{version}}",
+    "close": "Ho capito",
+    "items": [
+      "Nuovo logo dell'app e icone aggiornate (tutte le dimensioni)",
+      "Navigazione inferiore stabile — il menu non si sposta pi\u00f9 al cambio di lingua",
+      "Schermata iniziale per dashboard vuota e nuova sezione info nelle impostazioni",
+      "Le immagini dei prodotti vengono ricaricate automaticamente all'importazione",
+      "Sincronizzazione LAN opzionale per pi\u00f9 dispositivi sulla rete domestica",
+      "Scanner di codici a barre integrato direttamente nel modulo prodotto",
+      "Sezione sostegno riformulata come contributo volontario per conformit\u00e0 legale",
+      "Nuova numerazione (2.0.0 · Stabile) con popup di aggiornamento"
+    ]
   },
   "status": {
     "expired": "Scaduto",
