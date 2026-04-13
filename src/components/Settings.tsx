@@ -9,6 +9,7 @@ import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
 import { getSyncConfig, saveSyncConfig, clearSyncPairing } from '../lib/syncConfig';
+import { SyncHomeServerGuide } from './SyncHomeServerGuide';
 import {
   getSyncRuntimeState,
   pairSyncDevice,
@@ -82,6 +83,7 @@ export function Settings() {
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [showSyncGuide, setShowSyncGuide] = useState(false);
   const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
   const { t, i18n } = useTranslation();
 
@@ -238,6 +240,10 @@ export function Settings() {
     syncConfigState.householdId.length > 0 &&
     syncConfigState.deviceId.length > 0 &&
     syncConfigState.deviceToken.length > 0;
+
+  if (showSyncGuide) {
+    return <SyncHomeServerGuide onBack={() => setShowSyncGuide(false)} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -632,6 +638,13 @@ export function Settings() {
               </button>
             )}
           </div>
+
+          <button
+            onClick={() => setShowSyncGuide(true)}
+            className="w-full rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-sm font-medium text-sky-200 hover:bg-sky-500/20"
+          >
+            Home-Server Anleitung öffnen
+          </button>
 
           {syncIsPaired && !showRepair && (
             <button
