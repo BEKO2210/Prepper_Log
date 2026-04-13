@@ -9,6 +9,7 @@ import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
 import { getSyncConfig, saveSyncConfig, clearSyncPairing } from '../lib/syncConfig';
+import { SyncHomeServerGuide } from './SyncHomeServerGuide';
 import {
   getSyncRuntimeState,
   pairSyncDevice,
@@ -82,6 +83,7 @@ export function Settings() {
   const [showDatenschutz, setShowDatenschutz] = useState(false);
   const [showAGB, setShowAGB] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [showSyncGuide, setShowSyncGuide] = useState(false);
   const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
   const { t, i18n } = useTranslation();
 
@@ -233,11 +235,20 @@ export function Settings() {
     }
   }
 
+  function handleOpenSyncGuide() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setShowSyncGuide(true);
+  }
+
   const notifStatus = getNotificationPermissionStatus();
   const syncIsPaired =
     syncConfigState.householdId.length > 0 &&
     syncConfigState.deviceId.length > 0 &&
     syncConfigState.deviceToken.length > 0;
+
+  if (showSyncGuide) {
+    return <SyncHomeServerGuide onBack={() => setShowSyncGuide(false)} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -632,6 +643,13 @@ export function Settings() {
               </button>
             )}
           </div>
+
+          <button
+            onClick={handleOpenSyncGuide}
+            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
+          >
+            Home-Server Anleitung öffnen
+          </button>
 
           {syncIsPaired && !showRepair && (
             <button
