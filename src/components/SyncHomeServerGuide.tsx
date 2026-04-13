@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { ArrowLeft, CheckCircle2, Copy, Home, ShieldAlert, Wrench } from 'lucide-react';
 
 interface SyncHomeServerGuideProps {
@@ -36,6 +37,10 @@ function CodeLine({ value }: { value: string }) {
 }
 
 export function SyncHomeServerGuide({ onBack }: SyncHomeServerGuideProps) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="space-y-4">
       <section className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4">

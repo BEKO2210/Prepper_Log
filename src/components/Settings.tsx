@@ -235,6 +235,11 @@ export function Settings() {
     }
   }
 
+  function handleOpenSyncGuide() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setShowSyncGuide(true);
+  }
+
   const notifStatus = getNotificationPermissionStatus();
   const syncIsPaired =
     syncConfigState.householdId.length > 0 &&
@@ -640,8 +645,8 @@ export function Settings() {
           </div>
 
           <button
-            onClick={() => setShowSyncGuide(true)}
-            className="w-full rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-sm font-medium text-sky-200 hover:bg-sky-500/20"
+            onClick={handleOpenSyncGuide}
+            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
           >
             Home-Server Anleitung öffnen
           </button>
