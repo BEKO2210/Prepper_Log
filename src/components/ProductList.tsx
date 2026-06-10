@@ -143,7 +143,9 @@ export function ProductList() {
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-1 rounded-lg border px-3 py-2 ${hasActiveFilters ? 'border-green-500 text-green-400' : 'border-primary-600 text-gray-400'}`}
+          aria-label={t('products.filter')}
+          aria-expanded={showFilters}
+          className={`flex items-center gap-1 rounded-lg border px-3 py-2 transition-colors ${hasActiveFilters ? 'border-green-500 text-green-400' : 'border-primary-600 text-gray-400 hover:text-gray-300'}`}
         >
           <Filter size={18} />
           <ChevronDown size={14} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
@@ -161,17 +163,17 @@ export function ProductList() {
             )}
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <select value={filters.category} onChange={(e) => setFilter('category', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300">
+            <select value={filters.category} onChange={(e) => setFilter('category', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
               <option value="">{t('products.allCategories')}</option>
               {(['konserven', 'wasser', 'medizin', 'werkzeug', 'hygiene', 'lebensmittel', 'getranke', 'elektronik', 'kleidung', 'sonstiges'] as ProductCategory[]).map((key) => (
                 <option key={key} value={key}>{t(`categories.${key}`)}</option>
               ))}
             </select>
-            <select value={filters.location} onChange={(e) => setFilter('location', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300">
+            <select value={filters.location} onChange={(e) => setFilter('location', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
               <option value="">{t('products.allLocations')}</option>
               {locations.map((loc) => (<option key={loc.id} value={loc.name}>{loc.name}</option>))}
             </select>
-            <select value={filters.status} onChange={(e) => setFilter('status', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300">
+            <select value={filters.status} onChange={(e) => setFilter('status', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
               <option value="">{t('products.allStatus')}</option>
               <option value="expired">{t('products.statusExpired')}</option>
               <option value="critical">{t('products.statusCritical')}</option>
@@ -224,20 +226,20 @@ export function ProductList() {
                   </div>
                   {!showArchived && (
                     <div className="mt-2 flex gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200" title={t('products.edit')}>
+                      <button onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-gray-200" title={t('products.edit')} aria-label={t('products.edit')}>
                         <Edit3 size={16} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-green-400" title={t('products.consumed')}>
+                      <button onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-green-400" title={t('products.consumed')} aria-label={t('products.consumed')}>
                         <ShoppingCart size={16} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-red-400" title={t('products.delete')}>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-red-400" title={t('products.delete')} aria-label={t('products.delete')}>
                         <Trash2 size={16} />
                       </button>
                     </div>
                   )}
                   {showArchived && (
                     <div className="mt-2 flex gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-1.5 text-gray-400 hover:bg-primary-700 hover:text-red-400" title={t('products.delete')}>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-red-400" title={t('products.delete')} aria-label={t('products.delete')}>
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -299,6 +301,12 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
   const [amount, setAmount] = useState(() => Math.min(step, max));
   const isAll = amount >= max;
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   if (!product) return null;
 
   function adjustAmount(delta: number) {
@@ -311,9 +319,9 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div onClick={(e) => e.stopPropagation()} className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop" />
+      <div onClick={(e) => e.stopPropagation()} className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl animate-scale-in">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-100">{t('consume.title')}</h2>
           <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"><X size={20} /></button>
@@ -361,6 +369,12 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   if (!product) return null;
 
   const locale = getLocale();
@@ -400,9 +414,9 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
   const progressColor = status === 'expired' || status === 'critical' ? 'bg-red-500' : status === 'warning' ? 'bg-orange-400' : status === 'soon' ? 'bg-yellow-400' : 'bg-green-500';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div onClick={(e) => e.stopPropagation()} className="relative mx-4 mb-4 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-primary-600 bg-primary-900 shadow-2xl sm:mb-0">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop" />
+      <div onClick={(e) => e.stopPropagation()} className="relative mx-4 mb-4 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-primary-600 bg-primary-900 shadow-2xl sm:mb-0 animate-fade-in">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-primary-700 bg-primary-900/95 px-5 py-4 backdrop-blur">
           <div className="flex items-center gap-3 min-w-0">
             <Info size={20} className="shrink-0 text-green-400" />

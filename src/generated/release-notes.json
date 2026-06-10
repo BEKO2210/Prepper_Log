@@ -1,8 +1,20 @@
 {
   "version": "2.0.0",
-  "generatedAt": "2026-04-12T12:18:58.629Z",
-  "sinceTag": "v1.1.0",
+  "generatedAt": "2026-06-10T13:44:28.168Z",
+  "sinceTag": null,
   "items": [
+    {
+      "message": "Fix LAN guide button contrast and auto-scroll behavior",
+      "sha": "bc789f7"
+    },
+    {
+      "message": "Add guided LAN home-server setup page in Settings",
+      "sha": "aa84d42"
+    },
+    {
+      "message": "fix: Theme (hell/dunkel) bleibt bei Seitenwechsel erhalten",
+      "sha": "a9217f8"
+    },
     {
       "message": "feat: Was-ist-neu Popup liest automatisch Git-Commit-Messages",
       "sha": "7c62595"
@@ -110,18 +122,6 @@
     {
       "message": "Fix 15+ bugs found during comprehensive code review",
       "sha": "b2f000f"
-    },
-    {
-      "message": "Add Arabic (AR) language support and fix language switcher layout",
-      "sha": "55994b4"
-    },
-    {
-      "message": "Fix Portuguese flag: use Portugal 🇵🇹 instead of Brazil 🇧🇷",
-      "sha": "d8fb9d8"
-    },
-    {
-      "message": "Add Portuguese (PT) language support",
-      "sha": "1f41fc8"
     }
   ]
 }

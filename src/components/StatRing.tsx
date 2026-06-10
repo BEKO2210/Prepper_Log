@@ -31,6 +31,7 @@ export function StatRing({
         aria-label={`${value} / ${max} ${label}`}
       >
         <circle
+          className="stat-ring-track"
           cx={center}
           cy={center}
           r={radius}
