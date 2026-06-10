@@ -55,6 +55,12 @@ function PageContent() {
 }
 
 export default function App() {
+  const currentPage = useAppStore((s) => s.currentPage);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
+
   useEffect(() => {
     seedDefaults().catch((err) =>
       console.error('[PrepTrack] seedDefaults fehlgeschlagen:', err)

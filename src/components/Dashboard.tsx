@@ -18,6 +18,8 @@ import {
   Lock,
   HardDrive,
   Loader2,
+  ScanBarcode,
+  Upload,
 } from 'lucide-react';
 
 const URGENT_STATUS_COLORS: Record<string, string> = {
@@ -116,20 +118,26 @@ export function Dashboard() {
           <h2 className="mt-4 text-2xl font-bold text-gray-100">{t('onboarding.title')}</h2>
           <p className="mt-1 text-sm text-gray-400">{t('onboarding.subtitle')}</p>
         </div>
-        <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
-        <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
-        <div className="mt-6 flex gap-3">
-          <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform">
-            <PlusCircle size={18} />
-            {t('nav.add')}
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className="hidden"
-          />
+        <div className="flex flex-col items-center text-center">
+          <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
+          <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform">
+              <PlusCircle size={18} />
+              {t('nav.add')}
+            </button>
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-primary-600 bg-primary-800 px-5 py-3 font-medium text-gray-300 hover:border-green-500 hover:text-gray-200 active:scale-[0.98] transition-transform">
+              <Upload size={18} />
+              {t('onboarding.startImport')}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
+          </div>
         </div>
 
         {/* Import Status */}
@@ -194,21 +202,21 @@ export function Dashboard() {
 
       <div className="grid grid-cols-2 gap-3">
         <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-600/20">
-            <PlusCircle size={20} className="text-green-400" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-600/20">
+            <ScanBarcode size={20} className="text-green-400" />
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-200">{t('nav.add')}</p>
-            <p className="text-[0.65rem] text-gray-400">{t('dashboard.scanBarcode')}</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-gray-200">{t('dashboard.scan')}</p>
+            <p className="truncate text-[0.65rem] text-gray-400">{t('dashboard.scanBarcode')}</p>
           </div>
         </button>
-        <button onClick={() => setPage('add')} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600/20">
+        <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
             <PlusCircle size={20} className="text-blue-400" />
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-200">{t('dashboard.addProduct')}</p>
-            <p className="text-[0.65rem] text-gray-400">{t('dashboard.addManual')}</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-gray-200">{t('dashboard.addProduct')}</p>
+            <p className="truncate text-[0.65rem] text-gray-400">{t('dashboard.addManual')}</p>
           </div>
         </button>
       </div>
@@ -241,7 +249,7 @@ export function Dashboard() {
           </div>
           <div className="space-y-2">
             {urgentProducts.map((product) => (
-              <div key={product.id} className="flex overflow-hidden rounded-lg bg-primary-900/40">
+              <button key={product.id} onClick={() => setEditingProductId(product.id!)} className="flex w-full overflow-hidden rounded-lg bg-primary-900/40 text-start transition-colors hover:bg-primary-900/70">
                 <div className={`w-1 shrink-0 ${URGENT_STATUS_COLORS[product.status]}`} />
                 <div className="flex flex-1 items-center justify-between p-3">
                   <div className="min-w-0 flex-1">
@@ -250,7 +258,7 @@ export function Dashboard() {
                   </div>
                   <span className={`shrink-0 text-xs font-bold ${URGENT_TEXT_COLORS[product.status]}`}>{formatDaysUntil(product.daysLeft)}</span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

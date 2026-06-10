@@ -131,12 +131,20 @@ html:not(.dark) .bg-primary-900\/95 {
   background-color: rgb(249 250 251 / 0.95);
 }
 
+html:not(.dark) .hover\:bg-primary-900\/70:hover {
+  background-color: rgb(229 231 235 / 0.8);
+}
+
 html:not(.dark) .bg-primary-800\/40 {
   background-color: rgb(255 255 255 / 0.6);
 }
 
 html:not(.dark) .bg-primary-800\/50 {
   background-color: rgb(255 255 255 / 0.5);
+}
+
+html:not(.dark) .stat-ring-track {
+  stroke: rgba(0, 0, 0, 0.08);
 }
 
 html:not(.dark) input:-webkit-autofill,
@@ -230,6 +238,25 @@ html:not(.dark) select:-webkit-autofill {
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Modal entrance ===== */
+.animate-scale-in {
+  animation: scaleIn 200ms ease-out both;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-backdrop {
+  animation: backdropFade 200ms ease-out both;
+}
+
+@keyframes backdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ===== Stat number reveal ===== */
