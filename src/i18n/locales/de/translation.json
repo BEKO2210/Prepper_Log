@@ -217,7 +217,9 @@
     "ok": "OK (>30d)",
     "byCategory": "Nach Kategorie",
     "byLocation": "Nach Lagerort",
-    "mostConsumed": "Meistverbraucht"
+    "mostConsumed": "Meistverbraucht",
+    "noData": "Noch keine Daten",
+    "noDataDesc": "Erfasse Produkte, um hier Auswertungen zu deinem Vorrat zu sehen."
   },
   "whatsNew": {
     "title": "Was ist neu",

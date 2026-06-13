@@ -217,7 +217,9 @@
     "ok": "OK (>30d)",
     "byCategory": "By Category",
     "byLocation": "By Location",
-    "mostConsumed": "Most Consumed"
+    "mostConsumed": "Most Consumed",
+    "noData": "No data yet",
+    "noDataDesc": "Add products to see insights about your supplies here."
   },
   "whatsNew": {
     "title": "What's New",

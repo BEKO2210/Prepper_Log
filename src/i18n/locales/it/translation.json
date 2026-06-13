@@ -217,7 +217,9 @@
     "ok": "OK (>30g)",
     "byCategory": "Per categoria",
     "byLocation": "Per posizione",
-    "mostConsumed": "Più consumati"
+    "mostConsumed": "Più consumati",
+    "noData": "Ancora nessun dato",
+    "noDataDesc": "Aggiungi prodotti per vedere qui le analisi delle tue scorte."
   },
   "whatsNew": {
     "title": "Novità",

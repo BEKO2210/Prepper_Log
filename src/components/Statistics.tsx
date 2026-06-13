@@ -4,14 +4,16 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { getExpiryStatus, computeStats } from '../lib/utils';
 import type { ExpiryStatus, ProductCategory } from '../types';
-import { BarChart3, TrendingUp, Package, Calendar } from 'lucide-react';
+import { BarChart3, TrendingUp, Package, Calendar, MapPin } from 'lucide-react';
+
+const RANK_STYLES = ['bg-yellow-400/20 text-yellow-300', 'bg-gray-400/20 text-gray-200', 'bg-orange-500/20 text-orange-300'];
 
 export function Statistics() {
   const products = useLiveQuery(() => db.products.toArray()) ?? [];
   const consumptionLogs = useLiveQuery(() => db.consumptionLogs.toArray()) ?? [];
   const { t } = useTranslation();
 
-  const { stats, expiryDist, totalForDist, categoryBreakdown, locationBreakdown, topConsumed, expiryRate } = useMemo(() => {
+  const { stats, expiryDist, totalForDist, categoryBreakdown, categoryMax, locationBreakdown, locationMax, topConsumed, topConsumedMax, expiryRate } = useMemo(() => {
     const s = computeStats(products);
     const activeProducts = products.filter((p) => !p.archived);
 
@@ -53,11 +55,34 @@ export function Statistics() {
       expiryDist: dist,
       totalForDist: Math.max(activeProducts.length, 1),
       categoryBreakdown: catBreakdown,
+      categoryMax: Math.max(...catBreakdown.map((c) => c.count), 1),
       locationBreakdown: locBreakdown,
+      locationMax: Math.max(...locBreakdown.map(([, c]) => c), 1),
       topConsumed: topConsumedList,
+      topConsumedMax: Math.max(...topConsumedList.map(([, c]) => c), 1),
       expiryRate: rate,
     };
   }, [products, consumptionLogs, t]);
+
+  const hasData = stats.totalProducts > 0 || consumptionLogs.length > 0;
+
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-100">{t('stats.title')}</h2>
+          <p className="text-sm text-gray-400">{t('stats.subtitle')}</p>
+        </div>
+        <div className="flex flex-col items-center rounded-xl border border-primary-700 bg-primary-800/60 px-6 py-14 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-green-500/30 bg-green-500/10">
+            <BarChart3 size={32} className="text-green-400" />
+          </div>
+          <p className="mt-4 text-lg font-semibold text-gray-200">{t('stats.noData')}</p>
+          <p className="mt-1 max-w-xs text-sm text-gray-400">{t('stats.noDataDesc')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -100,20 +125,23 @@ export function Statistics() {
             { label: t('stats.warning'), count: expiryDist.warning, color: 'bg-orange-400' },
             { label: t('stats.soon'), count: expiryDist.soon, color: 'bg-yellow-400' },
             { label: t('stats.ok'), count: expiryDist.good, color: 'bg-green-500' },
-          ].map(({ label, count, color }) => (
-            <div key={label}>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">{label}</span>
-                <span className="text-gray-300">{count}</span>
+          ].map(({ label, count, color }) => {
+            const pct = Math.round((count / totalForDist) * 100);
+            return (
+              <div key={label}>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">{label}</span>
+                  <span className="text-gray-300">{count} <span className="text-gray-500">· {pct}%</span></span>
+                </div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-primary-700">
+                  <div
+                    className={`h-full rounded-full ${color} transition-all`}
+                    style={{ width: count > 0 ? `${Math.max(pct, 4)}%` : '0%' }}
+                  />
+                </div>
               </div>
-              <div className="mt-1 h-2 overflow-hidden rounded-full bg-primary-700">
-                <div
-                  className={`h-full rounded-full ${color} transition-all`}
-                  style={{ width: `${(count / totalForDist) * 100}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -124,14 +152,16 @@ export function Statistics() {
             <Package size={18} className="text-purple-400" />
             {t('stats.byCategory')}
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {categoryBreakdown.map(({ key, label, count }) => (
-              <div
-                key={key}
-                className="flex items-center justify-between rounded-lg bg-primary-700/50 px-3 py-2"
-              >
-                <span className="text-sm text-gray-300">{label}</span>
-                <span className="font-semibold text-gray-200">{count}</span>
+              <div key={key}>
+                <div className="mb-1 flex items-center justify-between text-sm">
+                  <span className="text-gray-300">{label}</span>
+                  <span className="font-semibold text-gray-200">{count}</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-primary-700">
+                  <div className="h-full rounded-full bg-purple-400/70 transition-all" style={{ width: `${Math.max((count / categoryMax) * 100, 4)}%` }} />
+                </div>
               </div>
             ))}
           </div>
@@ -142,17 +172,19 @@ export function Statistics() {
       {locationBreakdown.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
           <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-            <TrendingUp size={18} className="text-cyan-400" />
+            <MapPin size={18} className="text-cyan-400" />
             {t('stats.byLocation')}
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {locationBreakdown.map(([name, count]) => (
-              <div
-                key={name}
-                className="flex items-center justify-between rounded-lg bg-primary-700/50 px-3 py-2"
-              >
-                <span className="text-sm text-gray-300">{name}</span>
-                <span className="font-semibold text-gray-200">{count}</span>
+              <div key={name}>
+                <div className="mb-1 flex items-center justify-between text-sm">
+                  <span className="text-gray-300">{name}</span>
+                  <span className="font-semibold text-gray-200">{count}</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-primary-700">
+                  <div className="h-full rounded-full bg-cyan-400/70 transition-all" style={{ width: `${Math.max((count / locationMax) * 100, 4)}%` }} />
+                </div>
               </div>
             ))}
           </div>
@@ -170,14 +202,20 @@ export function Statistics() {
             {topConsumed.map(([name, count], i) => (
               <div
                 key={name}
-                className="flex items-center justify-between rounded-lg bg-primary-700/50 px-3 py-2"
+                className="flex items-center gap-3 rounded-lg bg-primary-700/50 px-3 py-2"
               >
-                <span className="text-sm text-gray-300">
-                  {i + 1}. {name}
+                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${RANK_STYLES[i] ?? 'bg-primary-600 text-gray-300'}`}>
+                  {i + 1}
                 </span>
-                <span className="font-semibold text-gray-200">
-                  {count}x
-                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm text-gray-300">{name}</span>
+                    <span className="shrink-0 font-semibold text-gray-200">{count}x</span>
+                  </div>
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-primary-800">
+                    <div className="h-full rounded-full bg-green-400/70 transition-all" style={{ width: `${Math.max((count / topConsumedMax) * 100, 4)}%` }} />
+                  </div>
+                </div>
               </div>
             ))}
           </div>

@@ -217,7 +217,9 @@
     "ok": "OK (>30d)",
     "byCategory": "Por Categoria",
     "byLocation": "Por Local",
-    "mostConsumed": "Mais Consumidos"
+    "mostConsumed": "Mais Consumidos",
+    "noData": "Ainda sem dados",
+    "noDataDesc": "Adiciona produtos para ver análises do teu stock aqui."
   },
   "whatsNew": {
     "title": "O que há de novo",
