@@ -149,8 +149,18 @@ export function ProductList() {
             placeholder={t('products.searchPlaceholder')}
             value={filters.search}
             onChange={(e) => setFilter('search', e.target.value)}
-            className="w-full rounded-lg border border-primary-600 bg-primary-800 py-2 ps-10 pe-4 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+            className={`w-full rounded-lg border border-primary-600 bg-primary-800 py-2 ps-10 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none ${filters.search ? 'pe-10' : 'pe-4'}`}
           />
+          {filters.search && (
+            <button
+              type="button"
+              onClick={() => setFilter('search', '')}
+              aria-label={t('products.reset')}
+              className="absolute end-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 hover:bg-primary-700 hover:text-gray-200"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
@@ -192,6 +202,20 @@ export function ProductList() {
               <option value="good">{t('products.statusGood')}</option>
             </select>
           </div>
+        </div>
+      )}
+
+      {(filters.category || filters.location || filters.status) && (
+        <div className="flex flex-wrap gap-2">
+          {filters.category && (
+            <FilterChip label={t(`categories.${filters.category}`)} onRemove={() => setFilter('category', '')} />
+          )}
+          {filters.location && (
+            <FilterChip label={filters.location} onRemove={() => setFilter('location', '')} />
+          )}
+          {filters.status && (
+            <FilterChip label={t(`status.${filters.status}`)} onRemove={() => setFilter('status', '')} />
+          )}
         </div>
       )}
 
@@ -463,6 +487,22 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
         </div>
       </div>
     </div>
+  );
+}
+
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-500/10 py-1 ps-3 pe-1.5 text-xs font-medium text-green-300">
+      {label}
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={`${label} ✕`}
+        className="rounded-full p-0.5 text-green-400/80 hover:bg-green-500/20 hover:text-green-200"
+      >
+        <X size={12} />
+      </button>
+    </span>
   );
 }
 
