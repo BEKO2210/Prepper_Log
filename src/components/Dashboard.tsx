@@ -6,6 +6,7 @@ import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDa
 import { useAppStore } from '../store/useAppStore';
 import type { ProductCategory } from '../types';
 import { StatRing } from './StatRing';
+import { CountUp } from './CountUp';
 import {
   Package,
   PlusCircle,
@@ -294,11 +295,11 @@ export function Dashboard() {
               <TrendingDown size={14} className="text-yellow-400" />
               <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.lowStock')}</span>
             </div>
-            <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}>{stats.lowStockCount}</p>
+            <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}><CountUp value={stats.lowStockCount} /></p>
           </div>
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
             <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.storageLocations')}</span>
-            <p className="stat-number mt-1 text-2xl font-bold text-gray-300">{stats.totalLocations}</p>
+            <p className="stat-number mt-1 text-2xl font-bold text-gray-300"><CountUp value={stats.totalLocations} /></p>
           </div>
         </div>
       </div>
