@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { version as appVersion } from '../../package.json';
 import releaseNotes from '../generated/release-notes.json';
+import { useModal } from '../hooks/useModal';
 import { Sparkles, X } from 'lucide-react';
 
 const STORAGE_KEY = 'preptrack-last-seen-version';
@@ -32,12 +33,7 @@ export function WhatsNewModal() {
     setOpen(false);
   }
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
+  const modalRef = useModal(open, dismiss);
 
   const items = useMemo<ReleaseItem[]>(
     () => (Array.isArray(releaseNotes.items) ? (releaseNotes.items as ReleaseItem[]) : []),
@@ -55,6 +51,7 @@ export function WhatsNewModal() {
       onClick={dismiss}
     >
       <div
+        ref={modalRef}
         className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-primary-700 bg-primary-800 p-5 shadow-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >

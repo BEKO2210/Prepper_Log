@@ -4,13 +4,15 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../lib/db';
 import { getExpiryStatus, computeStats } from '../lib/utils';
 import type { ExpiryStatus, ProductCategory } from '../types';
-import { BarChart3, TrendingUp, Package, Calendar, MapPin } from 'lucide-react';
+import { BarChart3, TrendingUp, Package, Calendar, MapPin, Loader2 } from 'lucide-react';
 
 const RANK_STYLES = ['bg-yellow-400/20 text-yellow-300', 'bg-gray-400/20 text-gray-200', 'bg-orange-500/20 text-orange-300'];
 
 export function Statistics() {
-  const products = useLiveQuery(() => db.products.toArray()) ?? [];
-  const consumptionLogs = useLiveQuery(() => db.consumptionLogs.toArray()) ?? [];
+  const productsQuery = useLiveQuery(() => db.products.toArray());
+  const logsQuery = useLiveQuery(() => db.consumptionLogs.toArray());
+  const products = useMemo(() => productsQuery ?? [], [productsQuery]);
+  const consumptionLogs = useMemo(() => logsQuery ?? [], [logsQuery]);
   const { t } = useTranslation();
 
   const { stats, expiryDist, totalForDist, categoryBreakdown, categoryMax, locationBreakdown, locationMax, topConsumed, topConsumedMax, expiryRate } = useMemo(() => {
@@ -63,6 +65,14 @@ export function Statistics() {
       expiryRate: rate,
     };
   }, [products, consumptionLogs, t]);
+
+  if (productsQuery === undefined || logsQuery === undefined) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 size={28} className="animate-spin text-green-400" />
+      </div>
+    );
+  }
 
   const hasData = stats.totalProducts > 0 || consumptionLogs.length > 0;
 
