@@ -5,6 +5,7 @@ import { db } from '../lib/db';
 import { getExpiryStatus, computeStats } from '../lib/utils';
 import type { ExpiryStatus, ProductCategory } from '../types';
 import { BarChart3, TrendingUp, Package, Calendar, MapPin, Loader2 } from 'lucide-react';
+import { CountUp } from './CountUp';
 
 const RANK_STYLES = ['bg-yellow-400/20 text-yellow-300', 'bg-gray-400/20 text-gray-200', 'bg-orange-500/20 text-orange-300'];
 
@@ -109,7 +110,7 @@ export function Statistics() {
             <span className="text-sm">{t('stats.activeProducts')}</span>
           </div>
           <p className="mt-1 text-3xl font-bold text-gray-100">
-            {stats.totalProducts}
+            <CountUp value={stats.totalProducts} />
           </p>
         </div>
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
@@ -117,7 +118,7 @@ export function Statistics() {
             <Calendar size={18} />
             <span className="text-sm">{t('stats.expiryRate')}</span>
           </div>
-          <p className="mt-1 text-3xl font-bold text-gray-100">{expiryRate}%</p>
+          <p className="mt-1 text-3xl font-bold text-gray-100"><CountUp value={expiryRate} suffix="%" /></p>
           <p className="text-xs text-gray-400">{t('stats.ofArchived')}</p>
         </div>
       </div>

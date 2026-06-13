@@ -1,3 +1,5 @@
+import { useCountUp } from './CountUp';
+
 interface StatRingProps {
   value: number;
   max: number;
@@ -20,6 +22,7 @@ export function StatRing({
   const progress = max > 0 ? Math.min(value / max, 1) : 0;
   const offset = circumference * (1 - progress);
   const center = size / 2;
+  const animatedValue = Math.round(useCountUp(value));
 
   return (
     <div className="flex flex-col items-center gap-1.5">
@@ -66,7 +69,7 @@ export function StatRing({
             fontWeight: 700,
           }}
         >
-          {value}
+          {animatedValue}
         </text>
       </svg>
       <span className="text-[0.6rem] uppercase tracking-widest text-gray-400">
