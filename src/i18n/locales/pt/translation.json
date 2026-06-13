@@ -201,7 +201,8 @@
     "termsDonationsText": "Contribuições voluntárias são doações pessoais ao fornecedor — não constituem doações dedutíveis de impostos nos termos do § 10b EStG (direito alemão). São feitas voluntariamente, não estabelecem relação contratual e não conferem direito a recibo de doação nem a prestações especiais.",
     "appSlogan": "Seu estoque. Sempre à vista.",
     "language": "Idioma",
-    "installError": "A instalação não pôde ser iniciada automaticamente.\n\nPara instalar o PrepTrack manualmente:\n1. Chrome/Edge: Clique no ícone de instalação na barra de endereço (ou Menu > Instalar app)\n2. Safari (iOS): Toque em Compartilhar > Adicionar à Tela Inicial\n3. Firefox: Menu > Instalar site"
+    "installError": "A instalação não pôde ser iniciada automaticamente.\n\nPara instalar o PrepTrack manualmente:\n1. Chrome/Edge: Clique no ícone de instalação na barra de endereço (ou Menu > Instalar app)\n2. Safari (iOS): Toque em Compartilhar > Adicionar à Tela Inicial\n3. Firefox: Menu > Instalar site",
+    "deleteLocation": "Eliminar {{name}}"
   },
   "stats": {
     "title": "Estatísticas",

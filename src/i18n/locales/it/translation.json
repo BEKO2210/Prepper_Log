@@ -201,7 +201,8 @@
     "termsDonationsText": "I contributi volontari sono donazioni personali al fornitore — non costituiscono donazioni fiscalmente deducibili ai sensi del § 10b EStG (diritto tedesco). Sono versati volontariamente, non stabiliscono alcun rapporto contrattuale e non danno diritto né a una ricevuta di donazione né a prestazioni particolari.",
     "appSlogan": "Le tue scorte. Sempre sotto controllo.",
     "language": "Lingua",
-    "installError": "L'installazione non può essere avviata automaticamente.\n\nPer installare PrepTrack manualmente:\n1. Chrome/Edge: Clicca sull'icona di installazione nella barra degli indirizzi (o Menu > Installa app)\n2. Safari (iOS): Tocca Condividi > Aggiungi alla schermata Home\n3. Firefox: Menu > Installa sito"
+    "installError": "L'installazione non può essere avviata automaticamente.\n\nPer installare PrepTrack manualmente:\n1. Chrome/Edge: Clicca sull'icona di installazione nella barra degli indirizzi (o Menu > Installa app)\n2. Safari (iOS): Tocca Condividi > Aggiungi alla schermata Home\n3. Firefox: Menu > Installa sito",
+    "deleteLocation": "Elimina {{name}}"
   },
   "stats": {
     "title": "Statistiche",

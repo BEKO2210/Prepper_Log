@@ -1,8 +1,12 @@
 {
   "version": "2.0.0",
-  "generatedAt": "2026-06-13T17:58:50.115Z",
+  "generatedAt": "2026-06-13T18:06:32.870Z",
   "sinceTag": null,
   "items": [
+    {
+      "message": "Verbessere Statistik-Seite und Button-Konsistenz",
+      "sha": "fd43351"
+    },
     {
       "message": "Verbessere UI: Dashboard-Empty-State, Quick-Actions, Modals und Light Mode",
       "sha": "a935898"
@@ -118,10 +122,6 @@
     {
       "message": "Add Italian (it) and French (fr) language support",
       "sha": "93ca182"
-    },
-    {
-      "message": "Update language switcher summary in README",
-      "sha": "4d05c75"
     }
   ]
 }

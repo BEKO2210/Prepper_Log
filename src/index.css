@@ -45,6 +45,19 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Visible keyboard focus for interactive elements
+     (mouse/touch use :focus, not :focus-visible, so this stays clean) */
+  a:focus-visible,
+  button:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  input:focus-visible,
+  [role='switch']:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #4ade80;
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {
