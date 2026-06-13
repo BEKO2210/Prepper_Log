@@ -1,8 +1,12 @@
 {
   "version": "2.0.0",
-  "generatedAt": "2026-06-10T13:44:28.168Z",
+  "generatedAt": "2026-06-13T17:58:50.115Z",
   "sinceTag": null,
   "items": [
+    {
+      "message": "Verbessere UI: Dashboard-Empty-State, Quick-Actions, Modals und Light Mode",
+      "sha": "a935898"
+    },
     {
       "message": "Fix LAN guide button contrast and auto-scroll behavior",
       "sha": "bc789f7"
@@ -118,10 +122,6 @@
     {
       "message": "Update language switcher summary in README",
       "sha": "4d05c75"
-    },
-    {
-      "message": "Fix 15+ bugs found during comprehensive code review",
-      "sha": "b2f000f"
     }
   ]
 }

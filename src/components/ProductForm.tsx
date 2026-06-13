@@ -614,7 +614,7 @@ export function ProductForm() {
           <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} rows={2} placeholder={t('form.notesPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
         </div>
 
-        <button type="submit" disabled={saving || !form.name.trim() || !form.expiryDate} className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="submit" disabled={saving || !form.name.trim() || !form.expiryDate} className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-transform hover:bg-green-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:scale-100">
           <Save size={20} />
           {saving ? t('form.saving') : editingProductId ? t('form.saveChanges') : t('form.saveProduct')}
         </button>
