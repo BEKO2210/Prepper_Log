@@ -6,7 +6,9 @@
 
     <title>PrepTrack — Vorratsverwaltung für Prepper | MHD-Tracker &amp; Barcode-Scanner PWA</title>
     <meta name="description" content="PrepTrack ist die kostenlose Offline-PWA zur Vorratsverwaltung. Barcode scannen, Mindesthaltbarkeitsdaten tracken, Lagerorte verwalten und Benachrichtigungen vor Ablauf erhalten. Für Prepper, Krisenvorsorge und Haushalt." />
+    <meta name="keywords" content="Vorratsverwaltung, Prepper, MHD-Tracker, Mindesthaltbarkeitsdatum, Barcode-Scanner, Krisenvorsorge, Vorratshaltung, Lagerverwaltung, PWA, offline, Notvorrat, Haushalt" />
     <meta name="author" content="Belkis Aslani" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="canonical" href="https://beko2210.github.io/Prepper_Log/" />
 
     <!-- PWA: manifest injected by vite-plugin-pwa -->
@@ -22,16 +24,26 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192x192.png" />
 
-    <!-- Open Graph -->
+    <!-- Open Graph (absolute URLs — social crawlers don't resolve relative paths) -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PrepTrack" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:url" content="https://beko2210.github.io/Prepper_Log/" />
     <meta property="og:title" content="PrepTrack — Dein Vorrat. Immer im Blick." />
-    <meta property="og:description" content="Offline-first PWA für Prepper und Vorratshaltung." />
-    <meta property="og:image" content="./screenshots/screenshot-desktop.png" />
+    <meta property="og:description" content="Kostenlose Offline-PWA zur Vorratsverwaltung: Barcode scannen, MHD tracken, vor Ablauf erinnern lassen. Ohne Konto, 100 % offline." />
+    <meta property="og:image" content="https://beko2210.github.io/Prepper_Log/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="PrepTrack — Offline-PWA zur Vorratsverwaltung mit Barcode-Scanner und MHD-Tracker" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="PrepTrack — Dein Vorrat. Immer im Blick." />
-    <meta name="twitter:description" content="Offline-first PWA für Prepper und Vorratshaltung." />
+    <meta name="twitter:description" content="Kostenlose Offline-PWA zur Vorratsverwaltung: Barcode scannen, MHD tracken, vor Ablauf erinnern lassen. Ohne Konto, 100 % offline." />
+    <meta name="twitter:image" content="https://beko2210.github.io/Prepper_Log/og-image.png" />
+    <meta name="twitter:image:alt" content="PrepTrack — Offline-PWA zur Vorratsverwaltung mit Barcode-Scanner und MHD-Tracker" />
 
     <!-- CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.bunny.net; font-src 'self' https://fonts.bunny.net; img-src 'self' data: blob: https://images.openfoodfacts.org; connect-src 'self' https://world.openfoodfacts.org; media-src 'self' blob:; worker-src 'self'; manifest-src 'self';" />
@@ -39,6 +51,24 @@
     <!-- Preload -->
     <link rel="preconnect" href="https://fonts.bunny.net" />
     <link rel="preconnect" href="https://world.openfoodfacts.org" />
+
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "PrepTrack",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Web, iOS, Android",
+        "url": "https://beko2210.github.io/Prepper_Log/",
+        "image": "https://beko2210.github.io/Prepper_Log/og-image.png",
+        "description": "Kostenlose Offline-PWA zur Vorratsverwaltung: Barcode scannen, Mindesthaltbarkeitsdaten tracken, Lagerorte verwalten und vor Ablauf erinnern lassen. Für Prepper, Krisenvorsorge und Haushalt.",
+        "inLanguage": ["de", "en", "pt", "ar", "it", "fr"],
+        "isAccessibleForFree": true,
+        "author": { "@type": "Person", "name": "Belkis Aslani" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      }
+    </script>
   </head>
   <body class="bg-primary-900 text-gray-100 antialiased">
     <script>
