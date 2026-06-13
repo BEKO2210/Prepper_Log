@@ -32,18 +32,19 @@ i18n
     },
   });
 
-// Set dir attribute for RTL languages (Arabic)
-function updateDirection(lng: string) {
-  if (typeof document !== 'undefined') {
-    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
-  }
+// Keep <html lang> and text direction (RTL for Arabic) in sync with the language
+function updateHtmlAttributes(lng: string) {
+  if (typeof document === 'undefined') return;
+  const base = (lng || 'de').split('-')[0];
+  document.documentElement.lang = base;
+  document.documentElement.dir = base === 'ar' ? 'rtl' : 'ltr';
 }
 
-i18n.on('languageChanged', updateDirection);
+i18n.on('languageChanged', updateHtmlAttributes);
 
-// Set initial direction
+// Set initial language + direction
 if (i18n.language) {
-  updateDirection(i18n.language);
+  updateHtmlAttributes(i18n.language);
 }
 
 export default i18n;
