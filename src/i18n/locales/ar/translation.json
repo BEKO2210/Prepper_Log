@@ -56,7 +56,9 @@
     "archiveEmpty": "الأرشيف فارغ.",
     "noProducts": "لم يتم تسجيل أي منتجات بعد.",
     "lowStockWarning": "مخزون منخفض (الحد الأدنى: {{min}})",
-    "mhd": "الصلاحية"
+    "mhd": "الصلاحية",
+    "deletedToast": "تم حذف {{name}}",
+    "deleteError": "فشل الحذف. يُرجى المحاولة مرة أخرى."
   },
   "consume": {
     "title": "سحب كمية",

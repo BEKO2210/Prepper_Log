@@ -118,8 +118,16 @@ export function ProductList() {
   }
 
   async function handleDelete(id: number) {
-    await deleteProduct(id);
-    setConfirmDelete(null);
+    const name = products.find((p) => p.id === id)?.name;
+    try {
+      await deleteProduct(id);
+      setConfirmDelete(null);
+      setSelectedProduct((cur) => (cur === id ? null : cur));
+      if (name) showToast(t('products.deletedToast', { name }));
+    } catch (err) {
+      console.error('[PrepTrack] Löschen fehlgeschlagen:', err);
+      showToast(t('products.deleteError'));
+    }
   }
 
   if (productsQuery === undefined) {
@@ -312,7 +320,7 @@ export function ProductList() {
       )}
 
       {consumeProduct && <ConsumeModal productId={consumeProduct} products={products} onConfirm={handleConsumeConfirm} onClose={() => setConsumeProduct(null)} />}
-      {selectedProduct && <ProductDetailModal productId={selectedProduct} products={products} onClose={() => setSelectedProduct(null)} />}
+      {selectedProduct && <ProductDetailModal productId={selectedProduct} products={products} onClose={() => setSelectedProduct(null)} onDelete={handleDelete} />}
     </div>
   );
 }
@@ -389,9 +397,10 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
   );
 }
 
-function ProductDetailModal({ productId, products, onClose }: { productId: number; products: Product[]; onClose: () => void }) {
+function ProductDetailModal({ productId, products, onClose, onDelete }: { productId: number; products: Product[]; onClose: () => void; onDelete: (id: number) => void }) {
   const product = products.find((p) => p.id === productId);
   const [now, setNow] = useState(Date.now());
+  const [confirming, setConfirming] = useState(false);
   const { t } = useTranslation();
 
   const modalRef = useModal(true, onClose);
@@ -484,6 +493,23 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-400">{product.notes}</p>
             </div>
           )}
+
+          <div className="border-t border-primary-700 pt-4">
+            {confirming ? (
+              <div className="flex items-center justify-between gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+                <span className="text-sm text-red-400">{t('products.confirmDelete')}</span>
+                <div className="flex shrink-0 gap-2">
+                  <button onClick={() => onDelete(product.id!)} className="rounded bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500">{t('products.deleteBtn')}</button>
+                  <button onClick={() => setConfirming(false)} className="rounded bg-primary-700 px-3 py-1.5 text-xs text-gray-300 hover:bg-primary-600">{t('products.cancel')}</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setConfirming(true)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10">
+                <Trash2 size={16} />
+                {t('products.delete')}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

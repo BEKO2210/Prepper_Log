@@ -56,7 +56,9 @@
     "archiveEmpty": "Arquivo vazio.",
     "noProducts": "Nenhum produto cadastrado.",
     "lowStockWarning": "Estoque baixo (Mín: {{min}})",
-    "mhd": "Validade"
+    "mhd": "Validade",
+    "deletedToast": "{{name}} eliminado",
+    "deleteError": "Falha ao eliminar. Tenta novamente."
   },
   "consume": {
     "title": "Retirar quantidade",

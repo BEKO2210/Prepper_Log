@@ -56,7 +56,9 @@
     "archiveEmpty": "Les archives sont vides.",
     "noProducts": "Aucun produit ajouté encore.",
     "lowStockWarning": "Stock faible (Min : {{min}})",
-    "mhd": "DLUO"
+    "mhd": "DLUO",
+    "deletedToast": "{{name}} supprimé",
+    "deleteError": "Échec de la suppression. Réessaie."
   },
   "consume": {
     "title": "Retirer une quantité",

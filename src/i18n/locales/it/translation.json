@@ -56,7 +56,9 @@
     "archiveEmpty": "L'archivio è vuoto.",
     "noProducts": "Nessun prodotto aggiunto ancora.",
     "lowStockWarning": "Scorte basse (Min: {{min}})",
-    "mhd": "TMC"
+    "mhd": "TMC",
+    "deletedToast": "{{name}} eliminato",
+    "deleteError": "Eliminazione non riuscita. Riprova."
   },
   "consume": {
     "title": "Rimuovi quantità",

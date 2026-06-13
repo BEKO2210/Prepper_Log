@@ -56,7 +56,9 @@
     "archiveEmpty": "Archiv ist leer.",
     "noProducts": "Noch keine Produkte erfasst.",
     "lowStockWarning": "Unterbestand (Min: {{min}})",
-    "mhd": "MHD"
+    "mhd": "MHD",
+    "deletedToast": "{{name}} gelöscht",
+    "deleteError": "Löschen fehlgeschlagen. Bitte erneut versuchen."
   },
   "consume": {
     "title": "Menge entnehmen",

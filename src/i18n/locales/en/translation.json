@@ -56,7 +56,9 @@
     "archiveEmpty": "Archive is empty.",
     "noProducts": "No products added yet.",
     "lowStockWarning": "Low stock (Min: {{min}})",
-    "mhd": "BBD"
+    "mhd": "BBD",
+    "deletedToast": "{{name}} deleted",
+    "deleteError": "Deletion failed. Please try again."
   },
   "consume": {
     "title": "Remove quantity",
