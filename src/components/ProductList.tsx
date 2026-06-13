@@ -31,9 +31,11 @@ import {
   Info,
   Minus,
   Plus,
+  Loader2,
 } from 'lucide-react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { archiveProduct, deleteProduct, logConsumption, updateProduct } from '../lib/db';
+import { useModal } from '../hooks/useModal';
 
 const STATUS_COLORS: Record<string, string> = {
   expired: 'bg-red-500',
@@ -53,7 +55,8 @@ export function ProductList() {
   const [consumeProduct, setConsumeProduct] = useState<number | null>(null);
   const { t } = useTranslation();
 
-  const products = useLiveQuery(() => db.products.toArray()) ?? [];
+  const productsQuery = useLiveQuery(() => db.products.toArray());
+  const products = useMemo(() => productsQuery ?? [], [productsQuery]);
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
 
   const filtered = useMemo(() => products
@@ -117,6 +120,14 @@ export function ProductList() {
   async function handleDelete(id: number) {
     await deleteProduct(id);
     setConfirmDelete(null);
+  }
+
+  if (productsQuery === undefined) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 size={28} className="animate-spin text-green-400" />
+      </div>
+    );
   }
 
   return (
@@ -300,12 +311,7 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
   const max = product?.quantity ?? 1;
   const [amount, setAmount] = useState(() => Math.min(step, max));
   const isAll = amount >= max;
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  const modalRef = useModal(true, onClose);
 
   if (!product) return null;
 
@@ -321,7 +327,7 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop" />
-      <div onClick={(e) => e.stopPropagation()} className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl animate-scale-in">
+      <div ref={modalRef} onClick={(e) => e.stopPropagation()} className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl animate-scale-in">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-100">{t('consume.title')}</h2>
           <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"><X size={20} /></button>
@@ -364,16 +370,12 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
   const [now, setNow] = useState(Date.now());
   const { t } = useTranslation();
 
+  const modalRef = useModal(true, onClose);
+
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
 
   if (!product) return null;
 
@@ -416,7 +418,7 @@ function ProductDetailModal({ productId, products, onClose }: { productId: numbe
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop" />
-      <div onClick={(e) => e.stopPropagation()} className="relative mx-4 mb-4 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-primary-600 bg-primary-900 shadow-2xl sm:mb-0 animate-fade-in">
+      <div ref={modalRef} onClick={(e) => e.stopPropagation()} className="relative mx-4 mb-4 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-primary-600 bg-primary-900 shadow-2xl sm:mb-0 animate-fade-in">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-primary-700 bg-primary-900/95 px-5 py-4 backdrop-blur">
           <div className="flex items-center gap-3 min-w-0">
             <Info size={20} className="shrink-0 text-green-400" />

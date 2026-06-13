@@ -71,6 +71,8 @@ export function Settings() {
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
+  const [installError, setInstallError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [syncConfigState, setSyncConfigState] = useState(() => getSyncConfig());
   const [syncServerUrl, setSyncServerUrl] = useState(syncConfigState.serverUrl);
   const [syncDeviceName, setSyncDeviceName] = useState(syncConfigState.deviceName || '');
@@ -148,9 +150,10 @@ export function Settings() {
   }
 
   async function handleInstall() {
+    setInstallError(null);
     const success = await install();
     if (!success) {
-      alert(t('settings.installError'));
+      setInstallError(t('settings.installError'));
     }
   }
 
@@ -171,14 +174,14 @@ export function Settings() {
       deviceName: syncDeviceName.trim(),
     });
     setSyncConfigState(next);
-    setSyncNotice({ type: 'success', message: 'Sync-Einstellungen gespeichert.' });
+    setSyncNotice({ type: 'success', message: t('sync.settingsSaved') });
   }
 
   async function handlePairSyncDevice() {
     if (!syncServerUrl.trim() || !syncCode.trim() || !syncDeviceName.trim()) {
       setSyncNotice({
         type: 'error',
-        message: 'Server URL, Sync-Code und Gerätename sind erforderlich.',
+        message: t('sync.fieldsRequired'),
       });
       return;
     }
@@ -195,12 +198,12 @@ export function Settings() {
       setShowRepair(false);
       const next = getSyncConfig();
       setSyncConfigState(next);
-      setSyncNotice({ type: 'success', message: 'Gerät erfolgreich gekoppelt.' });
+      setSyncNotice({ type: 'success', message: t('sync.pairSuccess') });
       await runSyncNow('pairing');
     } catch (err) {
       setSyncNotice({
         type: 'error',
-        message: err instanceof Error ? err.message : 'Koppeln fehlgeschlagen.',
+        message: err instanceof Error ? err.message : t('sync.pairFailed'),
       });
     } finally {
       setSyncBusy(false);
@@ -224,11 +227,11 @@ export function Settings() {
     setSyncNotice(null);
     try {
       await runSyncNow('manual');
-      setSyncNotice({ type: 'success', message: 'Sync abgeschlossen.' });
+      setSyncNotice({ type: 'success', message: t('sync.syncComplete') });
     } catch (err) {
       setSyncNotice({
         type: 'error',
-        message: err instanceof Error ? err.message : 'Sync fehlgeschlagen.',
+        message: err instanceof Error ? err.message : t('sync.syncFailed'),
       });
     } finally {
       setSyncBusy(false);
@@ -342,6 +345,11 @@ export function Settings() {
                 <Download size={18} />
                 {isInstallable ? t('settings.installNow') : t('settings.installApp2')}
               </button>
+              {installError && (
+                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400" role="alert">
+                  {installError}
+                </p>
+              )}
               {!isInstallable && (
                 <p className="text-xs text-gray-400">
                   {t('settings.installTip')}
@@ -482,12 +490,13 @@ export function Settings() {
                 onClick={() => {
                   const used = allProducts.filter((p) => !p.archived && p.storageLocation === loc.name).length;
                   if (used > 0) {
-                    alert(t('settings.locationInUse', { name: loc.name, count: used }));
+                    setLocationError(t('settings.locationInUse', { name: loc.name, count: used }));
                     return;
                   }
+                  setLocationError(null);
                   deleteStorageLocation(loc.id!);
                 }}
-                aria-label={t('settings.deleteLocation', { defaultValue: '{{name}} löschen', name: loc.name })}
+                aria-label={t('settings.deleteLocation', { name: loc.name })}
                 className="rounded p-1.5 text-gray-400 transition-colors hover:bg-primary-600 hover:text-red-400"
               >
                 <Trash2 size={14} />
@@ -495,6 +504,11 @@ export function Settings() {
             </div>
           ))}
         </div>
+        {locationError && (
+          <p className="mt-2 rounded-lg bg-orange-500/10 px-3 py-2 text-xs text-orange-400" role="alert">
+            {locationError}
+          </p>
+        )}
       </section>
 
       {/* Data Management */}
@@ -580,16 +594,16 @@ export function Settings() {
       <section className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
           <Cloud size={18} className="text-sky-400" />
-          LAN Sync (optional)
+          {t('sync.title')}
         </h3>
 
         <p className="mb-3 text-xs text-gray-400">
-          Daten bleiben lokal nutzbar. Sync ist optional und wird nur mit deinem eigenen Backend verwendet.
+          {t('sync.subtitle')}
         </p>
 
         <div className="space-y-2">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-400">Server URL</label>
+            <label className="mb-1 block text-xs font-medium text-gray-400">{t('sync.serverUrl')}</label>
             <input
               type="url"
               value={syncServerUrl}
@@ -600,24 +614,24 @@ export function Settings() {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-400">Gerätename</label>
+            <label className="mb-1 block text-xs font-medium text-gray-400">{t('sync.deviceName')}</label>
             <input
               type="text"
               value={syncDeviceName}
               onChange={(e) => setSyncDeviceName(e.target.value)}
-              placeholder="z. B. iPhone Küche"
+              placeholder={t('sync.deviceNamePlaceholder')}
               className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
             />
           </div>
 
           {(!syncIsPaired || showRepair) && (
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-400">Sync-Code</label>
+              <label className="mb-1 block text-xs font-medium text-gray-400">{t('sync.syncCode')}</label>
               <input
                 type="password"
                 value={syncCode}
                 onChange={(e) => setSyncCode(e.target.value)}
-                placeholder="gemeinsamer Haushalt-Code"
+                placeholder={t('sync.syncCodePlaceholder')}
                 className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
               />
             </div>
@@ -628,7 +642,7 @@ export function Settings() {
               onClick={handleSaveSyncSettings}
               className="rounded-lg bg-primary-700 px-3 py-2 text-sm text-gray-200 hover:bg-primary-600"
             >
-              Einstellungen speichern
+              {t('sync.saveSettings')}
             </button>
 
             {!syncIsPaired || showRepair ? (
@@ -637,7 +651,7 @@ export function Settings() {
                 disabled={syncBusy}
                 className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {showRepair ? 'Neu koppeln' : 'Gerät koppeln'}
+                {showRepair ? t('sync.repairDevice') : t('sync.pairDevice')}
               </button>
             ) : (
               <button
@@ -646,7 +660,7 @@ export function Settings() {
                 className="flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RefreshCw size={15} className={syncBusy ? 'animate-spin' : ''} />
-                Jetzt synchronisieren
+                {t('sync.syncNow')}
               </button>
             )}
           </div>
@@ -655,7 +669,7 @@ export function Settings() {
             onClick={handleOpenSyncGuide}
             className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
           >
-            Home-Server Anleitung öffnen
+            {t('sync.openGuide')}
           </button>
 
           {syncIsPaired && !showRepair && (
@@ -669,7 +683,7 @@ export function Settings() {
               }}
               className="w-full text-xs text-gray-500 hover:text-gray-300"
             >
-              Neu koppeln (anderen Server oder Code verwenden)
+              {t('sync.repairLink')}
             </button>
           )}
           {showRepair && (
@@ -677,7 +691,7 @@ export function Settings() {
               onClick={() => { setSyncCode(''); setShowRepair(false); }}
               className="w-full text-xs text-gray-500 hover:text-gray-300"
             >
-              Abbrechen
+              {t('sync.cancel')}
             </button>
           )}
 
@@ -686,7 +700,7 @@ export function Settings() {
               onClick={() => handleToggleSyncEnabled(!syncConfigState.enabled)}
               className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3"
             >
-              <span className="text-sm text-gray-200">Hintergrund-Sync</span>
+              <span className="text-sm text-gray-200">{t('sync.backgroundSync')}</span>
               <div
                 className={`relative h-6 w-11 rounded-full transition-colors ${
                   syncConfigState.enabled ? 'bg-sky-600' : 'bg-gray-500'
@@ -702,15 +716,15 @@ export function Settings() {
           )}
 
           <div className="rounded-lg border border-primary-700 bg-primary-800/60 px-3 py-2 text-xs text-gray-400">
-            <p>Status: <span className="text-gray-300">{syncRuntime.status}</span></p>
-            <p>Ausstehende Änderungen: <span className="text-gray-300">{syncRuntime.pendingChanges}</span></p>
-            <p>Letzter Erfolg: <span className="text-gray-300">{formatSyncTime(syncRuntime.lastSuccessAt)}</span></p>
+            <p>{t('sync.statusLabel')}: <span className="text-gray-300">{syncRuntime.status}</span></p>
+            <p>{t('sync.pendingChanges')}: <span className="text-gray-300">{syncRuntime.pendingChanges}</span></p>
+            <p>{t('sync.lastSuccess')}: <span className="text-gray-300">{formatSyncTime(syncRuntime.lastSuccessAt)}</span></p>
             {syncRuntime.lastError && (
-              <p className="text-red-400">Fehler: {syncRuntime.lastError}</p>
+              <p className="text-red-400">{t('sync.errorLabel')}: {syncRuntime.lastError}</p>
             )}
             {syncIsPaired && (
               <p className="mt-1 break-all text-[11px] text-gray-500">
-                Haushalt: {syncConfigState.householdId}
+                {t('sync.household')}: {syncConfigState.householdId}
               </p>
             )}
           </div>

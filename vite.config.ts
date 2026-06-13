@@ -121,4 +121,19 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // @zxing is dynamically imported by the scanner — keep it in its
+            // own lazy chunk instead of bundling it into the eager vendor chunk.
+            if (id.includes('@zxing')) return undefined;
+            return 'vendor';
+          }
+          return undefined;
+        },
+      },
+    },
+  },
 });

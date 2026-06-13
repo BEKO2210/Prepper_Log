@@ -95,13 +95,14 @@ type ScanState =
   | { type: 'error'; message: string }
   | { type: 'success'; barcode: string; name?: string };
 
-function InlineScanner({ onScanned }: { onScanned: (data: { barcode: string; name?: string; imageUrl?: string }) => void }) {
+function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { barcode: string; name?: string; imageUrl?: string }) => void; autoStart?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
   const processedRef = useRef(false);
   const [scanState, setScanState] = useState<ScanState>({ type: 'idle' });
   const [cameraActive, setCameraActive] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const autoStartedRef = useRef(false);
   const isOnline = useOnlineStatus();
   const isOnlineRef = useRef(isOnline);
   isOnlineRef.current = isOnline;
@@ -188,6 +189,14 @@ function InlineScanner({ onScanned }: { onScanned: (data: { barcode: string; nam
   useEffect(() => {
     return () => { stopCamera(); };
   }, [stopCamera]);
+
+  useEffect(() => {
+    if (autoStart && !autoStartedRef.current) {
+      autoStartedRef.current = true;
+      setExpanded(true);
+      startCamera();
+    }
+  }, [autoStart, startCamera]);
 
   function reset() {
     processedRef.current = false;
@@ -362,7 +371,8 @@ function InlineScanner({ onScanned }: { onScanned: (data: { barcode: string; nam
 }
 
 export function ProductForm() {
-  const { editingProductId, setPage, setEditingProductId, scannedData, setScannedData } = useAppStore();
+  const { editingProductId, setPage, setEditingProductId, scannedData, setScannedData, scanRequested, clearScanRequest } = useAppStore();
+  const [autoStartScan] = useState(scanRequested);
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
   const existingProduct = useLiveQuery(() => (editingProductId ? db.products.get(editingProductId) : undefined), [editingProductId]);
   const { t } = useTranslation();
@@ -379,6 +389,7 @@ export function ProductForm() {
   });
 
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   function getQuantityStep(unit: string): string {
     switch (unit) {
@@ -391,6 +402,7 @@ export function ProductForm() {
 
   useEffect(() => {
     if (restoredRef.current) { clearFormDraft(); restoredRef.current = false; }
+    if (scanRequested) { clearScanRequest(); }
   }, []);
 
   useEffect(() => {
@@ -473,7 +485,7 @@ export function ProductForm() {
       updateField('photo', compressed);
       clearFormDraft();
     } catch (err) {
-      alert(err instanceof Error ? err.message : t('form.imageError'));
+      setFormError(err instanceof Error ? err.message : t('form.imageError'));
     }
     e.target.value = '';
   }
@@ -481,6 +493,7 @@ export function ProductForm() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || !form.expiryDate) return;
+    setFormError(null);
     setSaving(true);
     try {
       const productData: Omit<Product, 'id'> = {
@@ -506,7 +519,7 @@ export function ProductForm() {
       setPage('products');
     } catch (err) {
       console.error('Speichern fehlgeschlagen:', err);
-      alert(t('form.saveError'));
+      setFormError(t('form.saveError'));
     } finally { setSaving(false); }
   }
 
@@ -525,10 +538,19 @@ export function ProductForm() {
 
       {/* Inline Barcode Scanner — only when adding new products */}
       {!editingProductId && (
-        <InlineScanner onScanned={handleScanned} />
+        <InlineScanner onScanned={handleScanned} autoStart={autoStartScan} />
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {formError && (
+          <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3" role="alert">
+            <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-400" />
+            <p className="flex-1 text-sm text-red-300">{formError}</p>
+            <button type="button" onClick={() => setFormError(null)} className="shrink-0 text-red-400 hover:text-red-300" aria-label={t('consume.cancel')}>
+              <X size={16} />
+            </button>
+          </div>
+        )}
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.photo')}</label>
           <div className="flex items-center gap-3">

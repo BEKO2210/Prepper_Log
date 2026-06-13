@@ -41,7 +41,9 @@ const URGENT_TEXT_COLORS: Record<string, string> = {
 export function Dashboard() {
   const setPage = useAppStore((s) => s.setPage);
   const setEditingProductId = useAppStore((s) => s.setEditingProductId);
-  const products = useLiveQuery(() => db.products.toArray()) ?? [];
+  const requestScan = useAppStore((s) => s.requestScan);
+  const productsQuery = useLiveQuery(() => db.products.toArray());
+  const products = useMemo(() => productsQuery ?? [], [productsQuery]);
   const { t } = useTranslation();
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
   const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
@@ -106,6 +108,14 @@ export function Dashboard() {
       total: Math.max(s.totalProducts, 1),
     };
   }, [products, t]);
+
+  if (productsQuery === undefined) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 size={28} className="animate-spin text-green-400" />
+      </div>
+    );
+  }
 
   if (activeProducts.length === 0) {
     return (
@@ -201,7 +211,7 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+        <button onClick={requestScan} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-600/20">
             <ScanBarcode size={20} className="text-green-400" />
           </div>

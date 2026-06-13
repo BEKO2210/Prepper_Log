@@ -26,6 +26,9 @@ interface AppState {
   scannedData: ScannedData | null;
   setScannedData: (data: ScannedData | null) => void;
   navigateToAddWithScan: (data: ScannedData) => void;
+  scanRequested: boolean;
+  requestScan: () => void;
+  clearScanRequest: () => void;
   notificationsEnabled: boolean;
   setNotificationsEnabled: (enabled: boolean) => void;
 }
@@ -84,6 +87,9 @@ export const useAppStore = create<AppState>((set) => ({
   setScannedData: (data) => set({ scannedData: data }),
   navigateToAddWithScan: (data) =>
     set({ scannedData: data, currentPage: 'add', editingProductId: null }),
+  scanRequested: false,
+  requestScan: () => set({ scanRequested: true, currentPage: 'add', editingProductId: null }),
+  clearScanRequest: () => set({ scanRequested: false }),
   notificationsEnabled: getStoredNotifications(),
   setNotificationsEnabled: (enabled) => {
     try { localStorage.setItem(NOTIF_KEY, String(enabled)); } catch { /* storage unavailable */ }
