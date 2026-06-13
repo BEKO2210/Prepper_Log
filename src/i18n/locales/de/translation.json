@@ -201,7 +201,8 @@
     "termsDonationsText": "Freiwillige Unterstützungen sind persönliche Zuwendungen an den Anbieter — keine steuerlich absetzbaren Spenden im Sinne des § 10b EStG. Sie erfolgen freiwillig, begründen kein Vertragsverhältnis und es besteht weder Anspruch auf eine Spendenbescheinigung noch auf besondere Leistungen.",
     "appSlogan": "Dein Vorrat. Immer im Blick.",
     "language": "Sprache",
-    "installError": "Die Installation konnte nicht automatisch gestartet werden.\n\nSo installierst du PrepTrack manuell:\n1. Chrome/Edge: Klicke auf das Installieren-Symbol in der Adressleiste (oder Menu > App installieren)\n2. Safari (iOS): Tippe auf Teilen > Zum Home-Bildschirm\n3. Firefox: Menu > Seite installieren"
+    "installError": "Die Installation konnte nicht automatisch gestartet werden.\n\nSo installierst du PrepTrack manuell:\n1. Chrome/Edge: Klicke auf das Installieren-Symbol in der Adressleiste (oder Menu > App installieren)\n2. Safari (iOS): Tippe auf Teilen > Zum Home-Bildschirm\n3. Firefox: Menu > Seite installieren",
+    "deleteLocation": "{{name}} löschen"
   },
   "stats": {
     "title": "Statistiken",

@@ -366,7 +366,10 @@ export function Settings() {
         <h3 className="mb-3 font-semibold text-gray-200">{t('settings.appearance')}</h3>
         <button
           onClick={toggleDark}
-          className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3"
+          role="switch"
+          aria-checked={isDark}
+          aria-label={isDark ? t('settings.darkTheme') : t('settings.lightTheme')}
+          className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3 transition-colors hover:bg-primary-700"
         >
           <div className="flex items-center gap-3">
             {isDark ? (
@@ -398,7 +401,10 @@ export function Settings() {
         <button
           onClick={handleToggleNotifications}
           disabled={notifStatus === 'denied' || notifStatus === 'unsupported'}
-          className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3 disabled:opacity-50"
+          role="switch"
+          aria-checked={notificationsEnabled}
+          aria-label={t('settings.expiryReminders')}
+          className="flex w-full items-center justify-between rounded-lg bg-primary-700/50 px-4 py-3 transition-colors hover:bg-primary-700 disabled:opacity-50 disabled:hover:bg-primary-700/50"
         >
           <div className="flex items-center gap-3">
             {notificationsEnabled ? (
@@ -481,7 +487,8 @@ export function Settings() {
                   }
                   deleteStorageLocation(loc.id!);
                 }}
-                className="rounded p-1 text-gray-400 hover:bg-primary-600 hover:text-red-400"
+                aria-label={t('settings.deleteLocation', { defaultValue: '{{name}} löschen', name: loc.name })}
+                className="rounded p-1.5 text-gray-400 transition-colors hover:bg-primary-600 hover:text-red-400"
               >
                 <Trash2 size={14} />
               </button>

@@ -201,7 +201,8 @@
     "termsDonationsText": "Les contributions volontaires sont des dons personnels au fournisseur — elles ne constituent pas des dons déductibles des impôts au sens du § 10b EStG (droit allemand). Elles sont versées volontairement, n'établissent aucune relation contractuelle et n'ouvrent droit ni à un reçu fiscal ni à des prestations particulières.",
     "appSlogan": "Vos provisions. Toujours en vue.",
     "language": "Langue",
-    "installError": "L'installation n'a pas pu être lancée automatiquement.\n\nPour installer PrepTrack manuellement :\n1. Chrome/Edge : Cliquez sur l'icône d'installation dans la barre d'adresse (ou Menu > Installer l'application)\n2. Safari (iOS) : Appuyez sur Partager > Ajouter à l'écran d'accueil\n3. Firefox : Menu > Installer le site"
+    "installError": "L'installation n'a pas pu être lancée automatiquement.\n\nPour installer PrepTrack manuellement :\n1. Chrome/Edge : Cliquez sur l'icône d'installation dans la barre d'adresse (ou Menu > Installer l'application)\n2. Safari (iOS) : Appuyez sur Partager > Ajouter à l'écran d'accueil\n3. Firefox : Menu > Installer le site",
+    "deleteLocation": "Supprimer {{name}}"
   },
   "stats": {
     "title": "Statistiques",

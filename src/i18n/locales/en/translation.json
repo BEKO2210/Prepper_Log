@@ -201,7 +201,8 @@
     "termsDonationsText": "Voluntary contributions are personal gifts to the provider — not tax-deductible charitable donations under German § 10b EStG. They are given voluntarily, do not establish a contractual relationship, and grant no entitlement to a donation receipt or to any special services.",
     "appSlogan": "Your supplies. Always in sight.",
     "language": "Language",
-    "installError": "The installation could not be started automatically.\n\nTo install PrepTrack manually:\n1. Chrome/Edge: Click the install icon in the address bar (or Menu > Install app)\n2. Safari (iOS): Tap Share > Add to Home Screen\n3. Firefox: Menu > Install site"
+    "installError": "The installation could not be started automatically.\n\nTo install PrepTrack manually:\n1. Chrome/Edge: Click the install icon in the address bar (or Menu > Install app)\n2. Safari (iOS): Tap Share > Add to Home Screen\n3. Firefox: Menu > Install site",
+    "deleteLocation": "Delete {{name}}"
   },
   "stats": {
     "title": "Statistics",

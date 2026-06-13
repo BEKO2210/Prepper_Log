@@ -32,6 +32,13 @@ export function WhatsNewModal() {
     setOpen(false);
   }
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
   const items = useMemo<ReleaseItem[]>(
     () => (Array.isArray(releaseNotes.items) ? (releaseNotes.items as ReleaseItem[]) : []),
     []
