@@ -27,15 +27,15 @@ import {
   Clock,
   Tag,
   FileText,
-  CheckCircle,
   Info,
   Minus,
   Plus,
   Loader2,
 } from 'lucide-react';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { archiveProduct, deleteProduct, logConsumption, updateProduct } from '../lib/db';
 import { useModal } from '../hooks/useModal';
+import { useToast } from './Toast';
 
 const STATUS_COLORS: Record<string, string> = {
   expired: 'bg-red-500',
@@ -50,10 +50,10 @@ export function ProductList() {
   const [showFilters, setShowFilters] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
-  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
   const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
   const [consumeProduct, setConsumeProduct] = useState<number | null>(null);
   const { t } = useTranslation();
+  const { showToast } = useToast();
 
   const productsQuery = useLiveQuery(() => db.products.toArray());
   const products = useMemo(() => productsQuery ?? [], [productsQuery]);
@@ -83,16 +83,6 @@ export function ProductList() {
 
   const hasActiveFilters = filters.search || filters.category || filters.location || filters.status;
 
-  const showToast = useCallback((message: string) => {
-    setToast({ message, visible: true });
-  }, []);
-
-  useEffect(() => {
-    if (!toast.visible) return;
-    const timer = setTimeout(() => setToast((prev) => ({ ...prev, visible: false })), 3000);
-    return () => clearTimeout(timer);
-  }, [toast.visible]);
-
   async function handleConsumeConfirm(productId: number, amount: number) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
@@ -109,10 +99,10 @@ export function ProductList() {
     const newQuantity = product.quantity - amount;
     if (newQuantity <= 0) {
       await archiveProduct(productId);
-      showToast(t('consume.toastConsumedAndArchived', { name: product.name, amount, unit: product.unit }));
+      showToast(t('consume.toastConsumedAndArchived', { name: product.name, amount, unit: product.unit }), 'success');
     } else {
       await updateProduct(productId, { quantity: newQuantity });
-      showToast(t('consume.toastConsumed', { name: product.name, amount, unit: product.unit, remaining: newQuantity }));
+      showToast(t('consume.toastConsumed', { name: product.name, amount, unit: product.unit, remaining: newQuantity }), 'success');
     }
     setConsumeProduct(null);
   }
@@ -123,10 +113,10 @@ export function ProductList() {
       await deleteProduct(id);
       setConfirmDelete(null);
       setSelectedProduct((cur) => (cur === id ? null : cur));
-      if (name) showToast(t('products.deletedToast', { name }));
+      if (name) showToast(t('products.deletedToast', { name }), 'success');
     } catch (err) {
       console.error('[PrepTrack] Löschen fehlgeschlagen:', err);
-      showToast(t('products.deleteError'));
+      showToast(t('products.deleteError'), 'error');
     }
   }
 
@@ -309,15 +299,6 @@ export function ProductList() {
           </div>
         )}
       </div>
-
-      {toast.visible && (
-        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 animate-fade-in">
-          <div className="flex items-center gap-2 rounded-xl border border-green-500/30 bg-primary-900/95 px-4 py-3 shadow-lg backdrop-blur">
-            <CheckCircle size={18} className="shrink-0 text-green-400" />
-            <span className="text-sm text-gray-200">{toast.message}</span>
-          </div>
-        </div>
-      )}
 
       {consumeProduct && <ConsumeModal productId={consumeProduct} products={products} onConfirm={handleConsumeConfirm} onClose={() => setConsumeProduct(null)} />}
       {selectedProduct && <ProductDetailModal productId={selectedProduct} products={products} onClose={() => setSelectedProduct(null)} onDelete={handleDelete} />}

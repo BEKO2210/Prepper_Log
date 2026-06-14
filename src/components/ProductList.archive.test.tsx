@@ -20,7 +20,10 @@ vi.mock('../lib/db', () => ({
 }));
 
 import { ProductList } from './ProductList';
+import { ToastProvider } from './Toast';
 import i18n from '../i18n/i18n';
+
+const renderList = () => render(<ToastProvider><ProductList /></ToastProvider>);
 
 function archivedProduct() {
   return {
@@ -42,7 +45,7 @@ describe('archive deletion', () => {
   afterEach(() => cleanup());
 
   it('deletes via the trash button + confirm in the archive list', () => {
-    const { container } = render(<ProductList />);
+    const { container } = renderList();
     fireEvent.click(screen.getByRole('button', { name: /archiv/i }));
     expect(screen.getByText('Altes Reis')).toBeTruthy();
 
@@ -57,7 +60,7 @@ describe('archive deletion', () => {
   });
 
   it('deletes from the product detail modal', () => {
-    render(<ProductList />);
+    renderList();
     fireEvent.click(screen.getByRole('button', { name: /archiv/i }));
 
     // Open detail modal by tapping the row

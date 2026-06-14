@@ -5,6 +5,7 @@ import { db, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDaysUntil } from '../lib/utils';
 import { computePreparedness } from '../lib/preparedness';
 import { useAppStore } from '../store/useAppStore';
+import { useToast } from './Toast';
 import type { ProductCategory } from '../types';
 import { StatRing } from './StatRing';
 import { CountUp } from './CountUp';
@@ -55,7 +56,7 @@ export function Dashboard() {
   const productsQuery = useLiveQuery(() => db.products.toArray());
   const products = useMemo(() => productsQuery ?? [], [productsQuery]);
   const { t } = useTranslation();
-  const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
+  const { showToast } = useToast();
   const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,7 +66,7 @@ export function Dashboard() {
     try {
       const text = await file.text();
       const result = await importData(text);
-      setImportStatus({ message: t('import.success', { count: result.imported }), type: 'success' });
+      showToast(t('import.success', { count: result.imported }), 'success');
       if (result.productsNeedingImages.length > 0) {
         setImageLoadProgress({ loaded: 0, total: result.productsNeedingImages.length });
         await loadImportedImages(result.productsNeedingImages, (loaded, total) => {
@@ -75,7 +76,7 @@ export function Dashboard() {
       }
     } catch (err) {
       if (err instanceof ImportResult) {
-        setImportStatus({ message: err.message, type: 'warning' });
+        showToast(err.message, 'warning');
         if (err.productsNeedingImages.length > 0) {
           setImageLoadProgress({ loaded: 0, total: err.productsNeedingImages.length });
           await loadImportedImages(err.productsNeedingImages, (loaded, total) => {
@@ -84,7 +85,7 @@ export function Dashboard() {
           setImageLoadProgress(null);
         }
       } else {
-        setImportStatus({ message: t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), type: 'error' });
+        showToast(t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), 'error');
       }
     }
     e.target.value = '';
@@ -161,17 +162,6 @@ export function Dashboard() {
             />
           </div>
         </div>
-
-        {/* Import Status */}
-        {importStatus && (
-          <p className={`rounded-lg px-3 py-2 text-sm ${
-            importStatus.type === 'error' ? 'bg-red-500/10 text-red-400'
-              : importStatus.type === 'warning' ? 'bg-orange-500/10 text-orange-400'
-                : 'bg-green-500/10 text-green-400'
-          }`}>
-            {importStatus.message}
-          </p>
-        )}
 
         {imageLoadProgress && (
           <div className="space-y-2 rounded-lg bg-blue-500/10 px-3 py-2">
