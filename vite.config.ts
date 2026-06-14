@@ -1,9 +1,16 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
+import { defaultExclude } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   base: process.env.GITHUB_PAGES ? '/Prepper_Log/' : './',
+  // Vitest runs the unit tests in src/; Playwright E2E specs live in e2e/ and
+  // must not be picked up by Vitest.
+  test: {
+    exclude: [...defaultExclude, 'e2e/**'],
+  },
   plugins: [
     react(),
     VitePWA({
