@@ -260,6 +260,15 @@ Open Settings in the app, enter your backend URL (for example `http://192.168.0.
 
 ---
 
+## 📱 Android App (Google Play)
+
+PrepTrack can be shipped to the Play Store as a **Trusted Web Activity** (a thin native
+shell around the PWA). A ready-to-use Bubblewrap config (`twa-manifest.json`) and an
+asset-links template are included. See the step-by-step guide:
+**[docs/PLAY_STORE.md](docs/PLAY_STORE.md)**.
+
+---
+
 ## 🔒 Privacy
 
 PrepTrack takes your privacy seriously:
@@ -572,6 +581,15 @@ npx tsc --noEmit   # Type-Check ohne Build
 </td>
 </tr>
 </table>
+
+---
+
+## 📱 Android-App (Google Play)
+
+PrepTrack lässt sich als **Trusted Web Activity** (schlanke native Hülle um die PWA)
+in den Play Store bringen. Eine fertige Bubblewrap-Konfiguration (`twa-manifest.json`)
+und eine asset-links-Vorlage sind enthalten. Schritt-für-Schritt-Anleitung:
+**[docs/PLAY_STORE.md](docs/PLAY_STORE.md)**.
 
 ---
 
