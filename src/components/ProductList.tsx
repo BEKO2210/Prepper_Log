@@ -30,12 +30,12 @@ import {
   Info,
   Minus,
   Plus,
-  Loader2,
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { archiveProduct, deleteProduct, logConsumption, updateProduct } from '../lib/db';
 import { useModal } from '../hooks/useModal';
 import { useToast } from './Toast';
+import { ListSkeleton } from './Skeleton';
 
 const STATUS_COLORS: Record<string, string> = {
   expired: 'bg-red-500',
@@ -121,11 +121,7 @@ export function ProductList() {
   }
 
   if (productsQuery === undefined) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <Loader2 size={28} className="animate-spin text-green-400" />
-      </div>
-    );
+    return <ListSkeleton />;
   }
 
   return (

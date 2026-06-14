@@ -7,6 +7,7 @@ import { computePreparedness } from '../lib/preparedness';
 import { useAppStore } from '../store/useAppStore';
 import { useToast } from './Toast';
 import { SectionHeader } from './SectionHeader';
+import { DashboardSkeleton } from './Skeleton';
 import type { ProductCategory } from '../types';
 import { StatRing } from './StatRing';
 import { CountUp } from './CountUp';
@@ -126,11 +127,7 @@ export function Dashboard() {
   }, [products, household, t]);
 
   if (productsQuery === undefined) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <Loader2 size={28} className="animate-spin text-green-400" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (activeProducts.length === 0) {

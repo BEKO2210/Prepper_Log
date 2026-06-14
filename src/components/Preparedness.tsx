@@ -19,8 +19,8 @@ import {
   PackagePlus,
   Copy,
   Check,
-  Loader2,
 } from 'lucide-react';
+import { PageSkeleton } from './Skeleton';
 
 function scoreColor(score: number): string {
   if (score >= 70) return '#22c55e';
@@ -103,11 +103,7 @@ export function Preparedness() {
   }
 
   if (productsQuery === undefined) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <Loader2 size={28} className="animate-spin text-green-400" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   const color = scoreColor(result.score);
