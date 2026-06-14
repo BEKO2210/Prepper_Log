@@ -285,7 +285,7 @@ export function BarcodeScanner() {
       {state.type === 'idle' && (
         <button
           onClick={startCamera}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform"
         >
           <Camera size={20} />
           {t('scanner.startCamera')}
@@ -381,7 +381,7 @@ export function BarcodeScanner() {
                   name: state.apiName || state.existing[0]?.name,
                 });
               }}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform"
             >
               <PlusCircle size={16} />
               {t('scanner.addAnyway')}

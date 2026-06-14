@@ -34,6 +34,7 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+.lighthouseci/
 
 # PWA dev artifacts
 dev-dist/

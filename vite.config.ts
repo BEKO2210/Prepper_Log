@@ -48,16 +48,6 @@ export default defineConfig({
               },
             },
           },
-          {
-            urlPattern: /^https:\/\/fonts\.bunny\.net\//,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'fonts-cache',
-              expiration: {
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-              },
-            },
-          },
         ],
       },
       manifest: {

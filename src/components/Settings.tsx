@@ -340,7 +340,7 @@ export function Settings() {
               </p>
               <button
                 onClick={handleInstall}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform"
               >
                 <Download size={18} />
                 {isInstallable ? t('settings.installNow') : t('settings.installApp2')}
@@ -391,7 +391,7 @@ export function Settings() {
           </div>
           <div
             className={`relative h-6 w-11 rounded-full transition-colors ${
-              isDark ? 'bg-green-600' : 'bg-gray-500'
+              isDark ? 'bg-green-700' : 'bg-gray-500'
             }`}
           >
             <div
@@ -436,7 +436,7 @@ export function Settings() {
           </div>
           <div
             className={`relative h-6 w-11 rounded-full transition-colors ${
-              notificationsEnabled ? 'bg-green-600' : 'bg-gray-500'
+              notificationsEnabled ? 'bg-green-700' : 'bg-gray-500'
             }`}
           >
             <div
@@ -474,7 +474,7 @@ export function Settings() {
           <button
             onClick={handleAddLocation}
             disabled={!newLocation.trim()}
-            className="rounded-lg bg-green-600 px-3 py-2 text-white hover:bg-green-500 disabled:opacity-50"
+            className="rounded-lg bg-green-700 px-3 py-2 text-white hover:bg-green-600 disabled:opacity-50"
           >
             <Plus size={18} />
           </button>
