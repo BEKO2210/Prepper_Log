@@ -43,23 +43,13 @@ function PageContent() {
     case 'add':
       return <ProductForm />;
     case 'settings':
-      return (
-        <Suspense fallback={<LazyFallback />}>
-          <Settings />
-        </Suspense>
-      );
+      return <Settings />;
     case 'stats':
-      return (
-        <Suspense fallback={<LazyFallback />}>
-          <Statistics />
-        </Suspense>
-      );
+      return <Statistics />;
     case 'preparedness':
-      return (
-        <Suspense fallback={<LazyFallback />}>
-          <Preparedness />
-        </Suspense>
-      );
+      return <Preparedness />;
+    default:
+      return <Dashboard />;
   }
 }
 
@@ -100,17 +90,22 @@ export default function App() {
           </header>
 
           <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={currentPage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-              >
-                <PageContent />
-              </motion.div>
-            </AnimatePresence>
+            {/* Single Suspense boundary OUTSIDE AnimatePresence: a lazy page that
+                suspends must not do so inside the keyed motion.div, or mode="wait"
+                deadlocks and leaves the page blank until a manual refresh. */}
+            <Suspense fallback={<LazyFallback />}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={currentPage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                >
+                  <PageContent />
+                </motion.div>
+              </AnimatePresence>
+            </Suspense>
           </main>
 
           <Navigation />
