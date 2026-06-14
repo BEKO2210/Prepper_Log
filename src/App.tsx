@@ -14,7 +14,7 @@ import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ProductList } from './components/ProductList';
 import { ProductForm } from './components/ProductForm';
-import { Loader2 } from 'lucide-react';
+import { PageSkeleton } from './components/Skeleton';
 
 const Settings = lazy(() =>
   import('./components/Settings').then((m) => ({ default: m.Settings }))
@@ -29,11 +29,7 @@ const Preparedness = lazy(() =>
 );
 
 function LazyFallback() {
-  return (
-    <div className="flex items-center justify-center py-20">
-      <Loader2 size={24} className="animate-spin text-green-400" />
-    </div>
-  );
+  return <PageSkeleton />;
 }
 
 function PageContent() {
