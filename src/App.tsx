@@ -90,7 +90,7 @@ export default function App() {
       <div className="min-h-screen bg-primary-900">
         <OfflineBanner />
 
-        <header className="sticky top-0 z-30 border-b border-primary-700 bg-primary-800/95 backdrop-blur-sm">
+        <header className="sticky top-0 z-30 border-b border-primary-700 bg-primary-800">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <img src="./icons/icon-48x48.png" alt="PrepTrack" className="h-8 w-8" />

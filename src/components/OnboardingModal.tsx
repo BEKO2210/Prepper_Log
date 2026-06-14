@@ -89,7 +89,7 @@ export function OnboardingModal() {
 
         <button
           onClick={dismiss}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-colors hover:bg-green-500"
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-colors hover:bg-green-600"
         >
           <Rocket size={18} />
           {t('onboarding.dismiss')}

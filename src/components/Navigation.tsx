@@ -24,7 +24,7 @@ export function Navigation() {
   const isAddActive = currentPage === 'add';
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-primary-700 bg-primary-800/95 backdrop-blur-sm safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-primary-700 bg-primary-800 safe-bottom">
       <div className="mx-auto grid max-w-lg grid-cols-5 items-center">
         {/* Left nav items */}
         {LEFT_ITEMS.map(({ id, labelKey, icon: Icon }) => {
@@ -55,7 +55,7 @@ export function Navigation() {
             className={`-mt-7 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all active:scale-95 ${
               isAddActive
                 ? 'bg-green-500 shadow-green-500/30'
-                : 'bg-green-600 shadow-green-600/20 hover:bg-green-500 hover:shadow-green-500/30'
+                : 'bg-green-700 shadow-green-600/20 hover:bg-green-600 hover:shadow-green-500/30'
             }`}
             aria-label={t('nav.add')}
             aria-current={isAddActive ? 'page' : undefined}

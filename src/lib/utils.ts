@@ -50,7 +50,7 @@ export function getStatusBadgeColor(status: ExpiryStatus): string {
     case 'soon':
       return 'bg-yellow-500 text-black';
     case 'good':
-      return 'bg-green-600 text-white';
+      return 'bg-green-700 text-white';
   }
 }
 

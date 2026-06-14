@@ -42,7 +42,7 @@ export function PWAInstallPrompt() {
                   <div className="mt-3 flex gap-2">
                     <button
                       onClick={install}
-                      className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 active:bg-green-700"
+                      className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 active:bg-green-700"
                     >
                       {t('pwa.install')}
                     </button>

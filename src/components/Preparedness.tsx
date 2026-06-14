@@ -244,7 +244,7 @@ export function Preparedness() {
       {products.filter((p) => !p.archived).length === 0 && (
         <button
           onClick={() => { setEditingProductId(null); setPage('add'); }}
-          className="w-full rounded-xl bg-green-600 px-5 py-3 font-medium text-white transition-transform hover:bg-green-500 active:scale-[0.98]"
+          className="w-full rounded-xl bg-green-700 px-5 py-3 font-medium text-white transition-transform hover:bg-green-600 active:scale-[0.98]"
         >
           {t('nav.add')}
         </button>

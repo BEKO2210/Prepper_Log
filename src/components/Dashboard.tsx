@@ -144,7 +144,7 @@ export function Dashboard() {
           <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
           <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform">
+            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
               <PlusCircle size={18} />
               {t('nav.add')}
             </button>

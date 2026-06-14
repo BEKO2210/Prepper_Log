@@ -100,7 +100,7 @@ export function WhatsNewModal() {
 
         <button
           onClick={dismiss}
-          className="w-full rounded-lg bg-green-600 px-4 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-colors hover:bg-green-500"
+          className="w-full rounded-lg bg-green-700 px-4 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-colors hover:bg-green-600"
         >
           {t('whatsNew.close')}
         </button>

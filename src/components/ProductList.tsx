@@ -386,7 +386,7 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
         </div>
         {isAll && <p className="mb-4 rounded-lg border border-orange-500/30 bg-orange-500/5 px-3 py-2 text-xs text-orange-300">{t('consume.archiveWarning')}</p>}
         <div className="flex gap-2">
-          <button onClick={() => onConfirm(productId, amount)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-500 active:scale-[0.98] transition-transform">
+          <button onClick={() => onConfirm(productId, amount)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
             <ShoppingCart size={16} />
             {t('consume.takeBtn', { amount, unit: product.unit })}
           </button>
