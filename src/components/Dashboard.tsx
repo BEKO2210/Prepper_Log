@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDaysUntil } from '../lib/utils';
+import { computePreparedness } from '../lib/preparedness';
 import { useAppStore } from '../store/useAppStore';
 import type { ProductCategory } from '../types';
 import { StatRing } from './StatRing';
@@ -21,7 +22,14 @@ import {
   Loader2,
   ScanBarcode,
   Upload,
+  ShieldCheck,
 } from 'lucide-react';
+
+function preparednessColor(score: number): string {
+  if (score >= 70) return '#22c55e';
+  if (score >= 40) return '#f97316';
+  return '#ef4444';
+}
 
 const URGENT_STATUS_COLORS: Record<string, string> = {
   expired: 'bg-red-500',
@@ -43,6 +51,7 @@ export function Dashboard() {
   const setPage = useAppStore((s) => s.setPage);
   const setEditingProductId = useAppStore((s) => s.setEditingProductId);
   const requestScan = useAppStore((s) => s.requestScan);
+  const household = useAppStore((s) => s.household);
   const productsQuery = useLiveQuery(() => db.products.toArray());
   const products = useMemo(() => productsQuery ?? [], [productsQuery]);
   const { t } = useTranslation();
@@ -81,9 +90,10 @@ export function Dashboard() {
     e.target.value = '';
   }
 
-  const { stats, activeProducts, urgentProducts, categoryBreakdown, total } = useMemo(() => {
+  const { stats, activeProducts, urgentProducts, categoryBreakdown, total, preparedness } = useMemo(() => {
     const s = computeStats(products);
     const active = products.filter((p) => !p.archived);
+    const prep = computePreparedness(products, household);
 
     const urgent = active
       .map((p) => ({ ...p, daysLeft: getDaysUntilExpiry(p.expiryDate), status: getExpiryStatus(p.expiryDate) }))
@@ -107,8 +117,9 @@ export function Dashboard() {
       urgentProducts: urgent,
       categoryBreakdown: catBreakdown,
       total: Math.max(s.totalProducts, 1),
+      preparedness: prep,
     };
-  }, [products, t]);
+  }, [products, household, t]);
 
   if (productsQuery === undefined) {
     return (
@@ -210,6 +221,22 @@ export function Dashboard() {
           <StatRing value={stats.totalProducts} max={stats.totalProducts} label={t('dashboard.total')} color="#9ca3af" />
         </div>
       </div>
+
+      <button
+        onClick={() => setPage('preparedness')}
+        className="flex w-full items-center gap-4 rounded-2xl border border-primary-700 bg-primary-800/60 p-4 text-start transition-colors hover:bg-primary-700/50 active:scale-[0.99]"
+      >
+        <StatRing value={preparedness.score} max={100} label={t('preparedness.score')} color={preparednessColor(preparedness.score)} size={64} strokeWidth={6} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={16} className="text-green-400" />
+            <span className="text-sm font-semibold text-gray-200">{t('preparedness.cardTitle')}</span>
+          </div>
+          <p className="mt-1 text-xs text-gray-400">{t('preparedness.waterDays', { count: preparedness.waterDays })}</p>
+          <p className="text-[0.65rem] text-gray-500">{t('preparedness.cardHint')}</p>
+        </div>
+        <ChevronRight size={18} className="shrink-0 text-gray-500" />
+      </button>
 
       <div className="grid grid-cols-2 gap-3">
         <button onClick={requestScan} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">

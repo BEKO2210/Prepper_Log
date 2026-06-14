@@ -21,6 +21,10 @@ const Statistics = lazy(() =>
   import('./components/Statistics').then((m) => ({ default: m.Statistics }))
 );
 
+const Preparedness = lazy(() =>
+  import('./components/Preparedness').then((m) => ({ default: m.Preparedness }))
+);
+
 function LazyFallback() {
   return (
     <div className="flex items-center justify-center py-20">
@@ -49,6 +53,12 @@ function PageContent() {
       return (
         <Suspense fallback={<LazyFallback />}>
           <Statistics />
+        </Suspense>
+      );
+    case 'preparedness':
+      return (
+        <Suspense fallback={<LazyFallback />}>
+          <Preparedness />
         </Suspense>
       );
   }
