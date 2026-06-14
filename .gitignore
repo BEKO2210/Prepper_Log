@@ -22,6 +22,15 @@ Thumbs.db
 .env.*.local
 sync-backend/.env
 
+# Android / TWA (Bubblewrap) build artifacts & signing keys — NEVER commit
+*.keystore
+*.jks
+*.aab
+*.apk
+*.idsig
+android/
+app/
+
 # Local sync backend data
 sync-backend/data/
 
