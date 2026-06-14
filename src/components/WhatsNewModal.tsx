@@ -16,7 +16,10 @@ export function WhatsNewModal() {
   useEffect(() => {
     try {
       const seen = localStorage.getItem(STORAGE_KEY);
-      if (seen !== appVersion) {
+      const onboarded = localStorage.getItem('preptrack-onboarded') === 'true';
+      // First-time users see the onboarding modal instead; only returning users
+      // who upgraded should get the "What's new" dialog.
+      if (onboarded && seen !== appVersion) {
         setOpen(true);
       }
     } catch {
