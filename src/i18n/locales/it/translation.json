@@ -118,7 +118,11 @@
     "saveChanges": "Salva modifiche",
     "saveProduct": "Salva prodotto",
     "imageError": "Impossibile elaborare l'immagine.",
-    "saveError": "Errore durante il salvataggio. Riprova."
+    "saveError": "Errore durante il salvataggio. Riprova.",
+    "ocrScanDate": "Scansiona data",
+    "ocrRunning": "Lettura…",
+    "ocrSuccess": "Data rilevata — verifica.",
+    "ocrError": "Nessuna data trovata. Inseriscila manualmente."
   },
   "scanner": {
     "title": "Scansiona codice a barre",

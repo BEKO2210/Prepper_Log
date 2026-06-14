@@ -118,7 +118,11 @@
     "saveChanges": "Enregistrer les modifications",
     "saveProduct": "Enregistrer le produit",
     "imageError": "L'image n'a pas pu être traitée.",
-    "saveError": "Erreur lors de l'enregistrement. Veuillez réessayer."
+    "saveError": "Erreur lors de l'enregistrement. Veuillez réessayer.",
+    "ocrScanDate": "Scanner la date",
+    "ocrRunning": "Lecture…",
+    "ocrSuccess": "Date détectée — vérifiez.",
+    "ocrError": "Aucune date trouvée. Saisissez-la manuellement."
   },
   "scanner": {
     "title": "Scanner un code-barres",

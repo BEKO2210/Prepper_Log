@@ -13,7 +13,7 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,wasm,gz,traineddata}'],
         globIgnores: ['**/Icon_3117x3117*'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallback: 'index.html',
@@ -126,9 +126,11 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // @zxing is dynamically imported by the scanner — keep it in its
-            // own lazy chunk instead of bundling it into the eager vendor chunk.
+            // @zxing (scanner) and tesseract.js (date OCR) are dynamically
+            // imported — keep them in their own lazy chunks instead of bundling
+            // them into the eager vendor chunk.
             if (id.includes('@zxing')) return undefined;
+            if (id.includes('tesseract.js')) return undefined;
             return 'vendor';
           }
           return undefined;
