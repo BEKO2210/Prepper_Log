@@ -3,12 +3,13 @@
     "collect": {
       "staticDistDir": "./dist",
       "url": ["http://localhost/index.html"],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "preset": "desktop"
       }
     },
     "assert": {
+      "aggregationMethod": "median",
       "assertions": {
         "categories:performance": ["error", { "minScore": 0.9 }],
         "categories:accessibility": ["warn", { "minScore": 0.9 }],
