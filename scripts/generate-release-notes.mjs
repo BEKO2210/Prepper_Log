@@ -52,6 +52,8 @@ const items = [];
 for (const { subject, sha } of commits) {
   const clean = subject.replace(/\s+/g, ' ').trim();
   if (!clean) continue;
+  // Automatische Release-Bump-Commits nicht im "Was ist neu" anzeigen.
+  if (/^chore\(release\)/i.test(clean)) continue;
   if (seen.has(clean.toLowerCase())) continue;
   seen.add(clean.toLowerCase());
   items.push({ message: clean, sha: sha.slice(0, 7) });

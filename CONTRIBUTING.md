@@ -51,8 +51,11 @@ npm install
 # Start development server
 npm run dev
 
-# Run tests
+# Run unit tests (Vitest)
 npm run test
+
+# Run end-to-end tests (Playwright, against the production build)
+npm run test:e2e
 
 # Type check
 npx tsc --noEmit
@@ -130,7 +133,8 @@ chore: update dependencies
 2. Run all checks:
    ```bash
    npx tsc --noEmit    # No type errors
-   npm run test         # All tests pass
+   npm run test         # All unit tests pass
+   npm run test:e2e     # All E2E tests pass
    npm run build        # Build succeeds
    ```
 3. Fill out the PR template completely

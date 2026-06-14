@@ -73,6 +73,9 @@ PrepTrack supports **6 languages** with full translations for every screen, noti
 
 | Feature | Description |
 |---------|-------------|
+| **Crisis-Readiness Score** | Enter household size & target days → get a 0–100 readiness score, precise **water range** (BBK rule), basic-category coverage, and an auto-generated shopping list. |
+| **Expiry-Date OCR** | Scan the best-before date with your camera — the recognized date pre-fills the form. Works **fully offline** (bundled Tesseract engine). |
+| **Guided Onboarding** | A short 3-step intro on first launch gets new users productive immediately. |
 | **Barcode Scanner** | Scan barcodes with your camera. Auto-lookup via Open Food Facts API with **automatic product image download**. Duplicate detection. |
 | **Product Management** | Name, category, location, quantity, unit, expiry date (day/month/year precision), photo, notes. |
 | **Expiry Tracking** | Color-coded warnings: Red (expired/critical), Orange (warning), Yellow (soon), Green (OK). |
@@ -175,7 +178,9 @@ PrepTrack supports **6 languages** with full translations for every screen, noti
 | **API** | Open Food Facts | Free product database with images |
 | **Optional Backend** | Fastify + SQLite (Docker) | LAN device synchronization |
 | **CI/CD** | GitHub Actions | Auto-deploy to GitHub Pages |
-| **Testing** | Vitest | Unit tests (59 tests) |
+| **Testing** | Vitest + Playwright | Unit tests (98) + E2E smoke tests (2) |
+| **OCR** | Tesseract.js | Offline expiry-date recognition (bundled core + EN model) |
+| **Android** | Bubblewrap (TWA) | Play Store packaging — see [docs/PLAY_STORE.md](docs/PLAY_STORE.md) |
 
 ---
 
@@ -286,9 +291,11 @@ PrepTrack takes your privacy seriously:
 ```
 src/
 ├── components/           UI Components
-│   ├── Dashboard.tsx         Main overview with stats
+│   ├── Dashboard.tsx         Main overview with stats + readiness card
+│   ├── Preparedness.tsx      Crisis-readiness score, calculator, shopping list
+│   ├── OnboardingModal.tsx   Guided first-run intro
 │   ├── ProductList.tsx       Product list with filters
-│   ├── ProductForm.tsx       Add/edit form with draft persistence
+│   ├── ProductForm.tsx       Add/edit form (draft persistence, expiry OCR)
 │   ├── BarcodeScanner.tsx    Camera barcode scanner
 │   ├── Settings.tsx          Settings, language, export/import, legal
 │   ├── Statistics.tsx        Consumption statistics
@@ -307,7 +314,10 @@ src/
 ├── lib/                  Business Logic
 │   ├── db.ts                 Dexie.js database, CRUD, export/import
 │   ├── utils.ts              Expiry calculation, formatting, barcode lookup
-│   ├── utils.test.ts         Unit tests (59 tests)
+│   ├── preparedness.ts       Crisis-readiness score, water range, shopping list
+│   ├── dateOcr.ts            Offline expiry-date OCR + date parser
+│   ├── sync.ts               Optional self-hosted LAN sync engine
+│   ├── *.test.ts             Unit tests (Vitest)
 │   └── notifications.ts      Local notifications
 ├── store/                State Management
 │   └── useAppStore.ts        Zustand store (navigation, filters, state)
@@ -436,6 +446,9 @@ PrepTrack unterstützt **6 Sprachen** mit vollständigen Übersetzungen für jed
 
 | Funktion | Beschreibung |
 |----------|-------------|
+| **Krisenfestigkeit-Score** | Haushaltsgröße & Zieltage eingeben → 0–100-Score, präzise **Wasser-Reichweite** (BBK-Regel), Basis-Abdeckung und automatische Einkaufsliste. |
+| **MHD-OCR** | Ablaufdatum mit der Kamera scannen — das erkannte Datum wird ins Formular vorausgefüllt. Funktioniert **komplett offline** (gebündelte Tesseract-Engine). |
+| **Geführtes Onboarding** | Eine kurze 3-Schritte-Einführung beim ersten Start macht neue Nutzer sofort produktiv. |
 | **Barcode-Scanner** | Barcode scannen mit der Kamera. Automatische Erkennung via Open Food Facts API mit **automatischem Produktbild-Download**. Duplikat-Warnung. |
 | **Produktverwaltung** | Name, Kategorie, Lagerort, Menge, Einheit, MHD (Tag/Monat/Jahr), Foto, Notizen. |
 | **MHD-Tracking** | Farbcodierte Warnung: Rot (abgelaufen/kritisch), Orange (Warnung), Gelb (bald), Grün (OK). |

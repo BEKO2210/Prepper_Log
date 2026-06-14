@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -41,10 +41,28 @@ jobs:
       - name: Run tests
         run: npm run test
 
+      # Auto-advance the patch version on every merge to main, so the deployed
+      # app always reports a fresh version and the "What's new" dialog fires.
+      # The bump happens BEFORE the new tag is created, so the release-notes
+      # script still sees the previous tag and lists the actual new changes.
+      - name: Auto-bump patch version
+        run: npm version patch --no-git-tag-version
+
       - name: Build
         run: npm run build
         env:
           GITHUB_PAGES: 'true'
+
+      - name: Commit & tag new version
+        run: |
+          NEW_VERSION="v$(node -p "require('./package.json').version")"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json src/generated/release-notes.json
+          git commit -m "chore(release): ${NEW_VERSION} [skip ci]"
+          git tag -a "${NEW_VERSION}" -m "${NEW_VERSION}"
+          # Pushes made with GITHUB_TOKEN do not re-trigger workflows -> no loop.
+          git push origin HEAD:main --follow-tags
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
