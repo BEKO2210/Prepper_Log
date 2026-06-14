@@ -31,7 +31,8 @@ import {
   Minus,
   Plus,
 } from 'lucide-react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { archiveProduct, deleteProduct, logConsumption, updateProduct } from '../lib/db';
 import { useModal } from '../hooks/useModal';
 import { useToast } from './Toast';
@@ -219,13 +220,14 @@ export function ProductList() {
 
       <div className="space-y-2">
         {filtered.map((product) => (
-          <div
+          <SwipeableRow
             key={product.id}
-            onClick={() => setSelectedProduct(product.id!)}
-            className="flex cursor-pointer overflow-hidden rounded-lg border border-primary-700 bg-primary-800/60 transition-colors hover:bg-primary-800"
+            canConsume={!showArchived}
+            statusColorClass={STATUS_COLORS[product.status]}
+            onTap={() => setSelectedProduct(product.id!)}
+            onConsume={() => setConsumeProduct(product.id!)}
+            onDelete={() => setConfirmDelete(product.id!)}
           >
-            <div className={`w-1 shrink-0 ${STATUS_COLORS[product.status]}`} />
-            <div className="flex-1 p-3">
               <div className="flex items-start gap-3">
                 {product.photo ? (
                   <img src={product.photo} alt="" loading="lazy" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
@@ -284,8 +286,7 @@ export function ProductList() {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
+          </SwipeableRow>
         ))}
 
         {filtered.length === 0 && (
@@ -298,6 +299,74 @@ export function ProductList() {
 
       {consumeProduct && <ConsumeModal productId={consumeProduct} products={products} onConfirm={handleConsumeConfirm} onClose={() => setConsumeProduct(null)} />}
       {selectedProduct && <ProductDetailModal productId={selectedProduct} products={products} onClose={() => setSelectedProduct(null)} onDelete={handleDelete} />}
+    </div>
+  );
+}
+
+interface SwipeableRowProps {
+  canConsume: boolean;
+  statusColorClass: string;
+  onTap: () => void;
+  onConsume: () => void;
+  onDelete: () => void;
+  children: ReactNode;
+}
+
+/**
+ * Product row with swipe shortcuts: swipe right → consume, swipe left → delete.
+ * Purely additive — the explicit action buttons remain for keyboard/non-touch.
+ */
+function SwipeableRow({ canConsume, statusColorClass, onTap, onConsume, onDelete, children }: SwipeableRowProps) {
+  const x = useMotionValue(0);
+  const consumeOpacity = useTransform(x, [0, 64], [0, 1]);
+  const deleteOpacity = useTransform(x, [-64, 0], [1, 0]);
+  const draggingRef = useRef(false);
+  const THRESHOLD = 80;
+
+  function buzz() {
+    try { navigator.vibrate?.(15); } catch { /* no haptics */ }
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-lg">
+      {canConsume && (
+        <motion.div
+          aria-hidden
+          style={{ opacity: consumeOpacity }}
+          className="absolute inset-0 flex items-center justify-start rounded-lg bg-green-600 ps-5"
+        >
+          <ShoppingCart size={22} className="text-white" />
+        </motion.div>
+      )}
+      <motion.div
+        aria-hidden
+        style={{ opacity: deleteOpacity }}
+        className="absolute inset-0 flex items-center justify-end rounded-lg bg-red-600 pe-5"
+      >
+        <Trash2 size={22} className="text-white" />
+      </motion.div>
+      <motion.div
+        drag="x"
+        dragDirectionLock
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.6}
+        style={{ x }}
+        onDragStart={() => { draggingRef.current = true; }}
+        onDragEnd={(_, info) => {
+          if (info.offset.x <= -THRESHOLD) { buzz(); onDelete(); }
+          else if (canConsume && info.offset.x >= THRESHOLD) { buzz(); onConsume(); }
+          window.setTimeout(() => { draggingRef.current = false; }, 0);
+        }}
+        className="relative flex overflow-hidden rounded-lg border border-primary-700 bg-primary-800 transition-colors hover:border-primary-600"
+      >
+        <div className={`w-1 shrink-0 ${statusColorClass}`} />
+        <div
+          className="flex-1 cursor-pointer p-3"
+          onClick={() => { if (!draggingRef.current) onTap(); }}
+        >
+          {children}
+        </div>
+      </motion.div>
     </div>
   );
 }
