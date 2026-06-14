@@ -3,6 +3,52 @@
 All notable changes to PrepTrack are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+> From v2.0.0 onward the patch version is **auto-incremented on every merge to
+> `main`** (CI), so the in-app "What's new" dialog always reflects the latest
+> deployed changes. The release channel is **Stable**.
+
+---
+
+## [2.0.0] - 2026-06-14
+
+Major release — PrepTrack grows from a stock tracker into a full crisis-readiness
+companion, with perfect Lighthouse scores and a path to the Play Store.
+
+### Added
+- **Crisis-readiness score & preparedness calculator** — a new dedicated page
+  computes a 0–100 readiness score from your household size and target days:
+  precise **water range** (BBK rule: 2 L drinking water per person per day),
+  **basic-category coverage**, and stock freshness. (`src/lib/preparedness.ts`)
+- **Auto-generated shopping list** — derived from low stock and the water deficit,
+  with one-tap copy to clipboard.
+- **Dashboard readiness card** — score ring + days of water as an entry point.
+- **Expiry-date OCR** — scan the best-before date with the camera; the recognized
+  date pre-fills the form for you to confirm. Fully **offline** (bundled
+  Tesseract core + English model, precached). (`src/lib/dateOcr.ts`)
+- **Guided first-run onboarding** — a 3-step intro modal on first launch.
+- **Optional self-hosted LAN sync** — pair devices via a shared code against your
+  own Docker backend (Fastify + SQLite); last-write-wins, queue + cursor based.
+- **Play Store readiness (TWA)** — Bubblewrap `twa-manifest.json`, Digital Asset
+  Links template, and a step-by-step guide (`docs/PLAY_STORE.md`).
+- **End-to-end tests** — Playwright smoke suite + CI workflow.
+- **Animated key figures** (CountUp) and a "What's new" dialog driven by real
+  commit history.
+
+### Changed
+- **Lighthouse 100 / 100 / 100 / 100** (Performance, Accessibility, Best
+  Practices, SEO) on the desktop preset.
+- **Self-hosted web fonts** via `@fontsource` (Latin subset) instead of a CDN —
+  removes an external request, improves offline-first behaviour and privacy.
+- **WCAG AA contrast** — primary buttons darkened to `green-700` (white text
+  5.0:1); the bright accent green is darkened in light mode for readability.
+- Auto-incrementing patch version on merge to `main` (CI).
+
+### Fixed
+- **Content-Security-Policy** now allows `'wasm-unsafe-eval'` and `worker-src
+  blob:`, so the offline OCR WebAssembly runs reliably under the CSP.
+- A browser-console error from the failing external font request is gone
+  (fonts are now local).
+
 ---
 
 ## [1.2.0] - 2026-03-10
@@ -124,19 +170,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Project Statistics
 
 ```
-Source Code .................. ~5,000 lines
-Source Files ................. 26 TypeScript/TSX
 Translation Files ............ 6 (de, en, pt, ar, it, fr)
-Translation Keys ............. 222+ per language
-Build Size (total) ........... ~1.3 MB
-  JS (minified) .............. ~560 KB (main) + ~420 KB (scanner, lazy)
-  CSS (minified) ............. ~28 KB
-Runtime Dependencies ......... 12
-Dev Dependencies ............. 14
-Test Framework ............... Vitest
-Tests ........................ 59 (all passing)
+Test Frameworks .............. Vitest (unit) + Playwright (E2E)
+Tests ........................ 100 (98 unit + 2 E2E, all passing)
 Languages .................... DE, EN, PT, AR (RTL), IT, FR
-Lighthouse PWA Score ......... 100
+Offline OCR .................. Tesseract.js (bundled core + EN model)
+Lighthouse ................... 100 Performance / 100 Accessibility /
+                               100 Best Practices / 100 SEO (desktop preset)
+Release Channel .............. Stable (auto-incrementing patch version)
 ```
 
 ---
