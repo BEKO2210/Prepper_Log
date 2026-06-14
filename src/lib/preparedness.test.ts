@@ -1,0 +1,123 @@
+import { describe, it, expect } from 'vitest';
+import {
+  computePreparedness,
+  computeShoppingList,
+  DEFAULT_HOUSEHOLD,
+  ESSENTIAL_CATEGORIES,
+} from './preparedness';
+import type { Product } from '../types';
+
+function makeProduct(overrides: Partial<Product> = {}): Product {
+  return {
+    id: 1,
+    name: 'Testprodukt',
+    barcode: '',
+    category: 'konserven',
+    storageLocation: 'Keller',
+    quantity: 5,
+    unit: 'Stück',
+    expiryDate: new Date(Date.now() + 90 * 86_400_000).toISOString(),
+    expiryPrecision: 'day',
+    archived: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+const futureWater = (liters: number, unit = 'Liter') =>
+  makeProduct({ category: 'wasser', quantity: liters, unit });
+
+describe('computePreparedness — water range', () => {
+  it('computes whole days of water from the BBK 2 L/person/day rule', () => {
+    // 2 persons * 2 L = 4 L/day. 20 L -> 5 days.
+    const result = computePreparedness([futureWater(20)], { persons: 2, days: 10 });
+    expect(result.waterLiters).toBe(20);
+    expect(result.waterDays).toBe(5);
+    expect(result.waterTargetLiters).toBe(40);
+    expect(result.waterDeficitLiters).toBe(20);
+  });
+
+  it('converts millilitres to litres', () => {
+    const result = computePreparedness([futureWater(1500, 'ml')], { persons: 1, days: 1 });
+    expect(result.waterLiters).toBe(1.5);
+  });
+
+  it('ignores ambiguous container units (Flasche, Dose)', () => {
+    const result = computePreparedness([futureWater(10, 'Flasche')], DEFAULT_HOUSEHOLD);
+    expect(result.waterLiters).toBe(0);
+  });
+
+  it('excludes expired water from the available amount', () => {
+    const expired = futureWater(50);
+    expired.expiryDate = new Date(Date.now() - 86_400_000).toISOString();
+    const result = computePreparedness([expired], { persons: 1, days: 5 });
+    expect(result.waterLiters).toBe(0);
+    expect(result.waterDays).toBe(0);
+  });
+
+  it('reports no deficit once the target is reached', () => {
+    const result = computePreparedness([futureWater(40)], { persons: 2, days: 10 });
+    expect(result.waterDeficitLiters).toBe(0);
+  });
+});
+
+describe('computePreparedness — score & coverage', () => {
+  it('keeps the score within 0..100', () => {
+    const empty = computePreparedness([], DEFAULT_HOUSEHOLD);
+    expect(empty.score).toBeGreaterThanOrEqual(0);
+    expect(empty.score).toBeLessThanOrEqual(100);
+  });
+
+  it('marks essential categories as covered only with fresh stock', () => {
+    const products = [
+      futureWater(40),
+      makeProduct({ category: 'lebensmittel' }),
+      makeProduct({ category: 'medizin' }),
+    ];
+    const result = computePreparedness(products, { persons: 2, days: 10 });
+    const covered = result.coverage.filter((c) => c.present).map((c) => c.key);
+    expect(covered).toContain('wasser');
+    expect(covered).toContain('lebensmittel');
+    expect(covered).toContain('medizin');
+    expect(result.essentialCovered).toBe(3);
+    expect(result.essentialTotal).toBe(ESSENTIAL_CATEGORIES.length);
+  });
+
+  it('rewards a fully stocked, fresh household with a high score', () => {
+    const products = ESSENTIAL_CATEGORIES.map((category) =>
+      category === 'wasser' ? futureWater(40) : makeProduct({ category })
+    );
+    const result = computePreparedness(products, { persons: 2, days: 10 });
+    expect(result.score).toBeGreaterThan(80);
+    expect(result.freshRatio).toBe(1);
+  });
+});
+
+describe('computeShoppingList', () => {
+  it('lists products below their minimum stock with the missing amount', () => {
+    const product = makeProduct({ name: 'Reis', quantity: 1, minStock: 5, unit: 'kg' });
+    const list = computeShoppingList([product], DEFAULT_HOUSEHOLD);
+    const rice = list.find((i) => i.name === 'Reis');
+    expect(rice).toBeDefined();
+    expect(rice?.needed).toBe(4);
+    expect(rice?.reason).toBe('lowStock');
+  });
+
+  it('adds a water item when there is a deficit', () => {
+    const list = computeShoppingList([futureWater(10)], { persons: 2, days: 10 });
+    const water = list.find((i) => i.reason === 'water');
+    expect(water).toBeDefined();
+    expect(water?.needed).toBe(30);
+    expect(water?.unit).toBe('Liter');
+  });
+
+  it('returns an empty list when everything is stocked', () => {
+    const products = [
+      futureWater(40),
+      makeProduct({ name: 'Reis', quantity: 5, minStock: 5, unit: 'kg' }),
+    ];
+    const list = computeShoppingList(products, { persons: 2, days: 10 });
+    expect(list).toHaveLength(0);
+  });
+});

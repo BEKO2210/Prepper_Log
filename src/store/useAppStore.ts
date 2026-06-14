@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import { DEFAULT_HOUSEHOLD, type HouseholdConfig } from '../lib/preparedness';
 
-type Page = 'dashboard' | 'products' | 'add' | 'settings' | 'stats';
+type Page = 'dashboard' | 'products' | 'add' | 'settings' | 'stats' | 'preparedness';
 
 interface FilterState {
   search: string;
@@ -31,10 +32,13 @@ interface AppState {
   clearScanRequest: () => void;
   notificationsEnabled: boolean;
   setNotificationsEnabled: (enabled: boolean) => void;
+  household: HouseholdConfig;
+  setHousehold: (config: HouseholdConfig) => void;
 }
 
 const NOTIF_KEY = 'preptrack-notifications-enabled';
 const FORM_STORAGE_KEY = 'preptrack-form-draft';
+const HOUSEHOLD_KEY = 'preptrack-household';
 
 function getStoredNotifications(): boolean {
   try {
@@ -44,6 +48,23 @@ function getStoredNotifications(): boolean {
   } catch {
     return false;
   }
+}
+
+function getStoredHousehold(): HouseholdConfig {
+  try {
+    const raw = localStorage.getItem(HOUSEHOLD_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const persons = Math.max(1, Math.round(Number(parsed.persons)));
+      const days = Math.max(1, Math.round(Number(parsed.days)));
+      if (Number.isFinite(persons) && Number.isFinite(days)) {
+        return { persons, days };
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return { ...DEFAULT_HOUSEHOLD };
 }
 
 function getInitialPage(): Page {
@@ -94,5 +115,14 @@ export const useAppStore = create<AppState>((set) => ({
   setNotificationsEnabled: (enabled) => {
     try { localStorage.setItem(NOTIF_KEY, String(enabled)); } catch { /* storage unavailable */ }
     set({ notificationsEnabled: enabled });
+  },
+  household: getStoredHousehold(),
+  setHousehold: (config) => {
+    const safe: HouseholdConfig = {
+      persons: Math.max(1, Math.round(config.persons)),
+      days: Math.max(1, Math.round(config.days)),
+    };
+    try { localStorage.setItem(HOUSEHOLD_KEY, JSON.stringify(safe)); } catch { /* storage unavailable */ }
+    set({ household: safe });
   },
 }));
