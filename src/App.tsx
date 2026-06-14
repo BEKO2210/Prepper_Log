@@ -9,6 +9,7 @@ import { OfflineBanner } from './components/OfflineBanner';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { WhatsNewModal } from './components/WhatsNewModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { ToastProvider } from './components/Toast';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ProductList } from './components/ProductList';
@@ -89,6 +90,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <MotionConfig reducedMotion="user">
+        <ToastProvider>
         <div className="min-h-screen bg-primary-900">
           <OfflineBanner />
 
@@ -120,6 +122,7 @@ export default function App() {
           <OnboardingModal />
           <WhatsNewModal />
         </div>
+        </ToastProvider>
       </MotionConfig>
     </ErrorBoundary>
   );
