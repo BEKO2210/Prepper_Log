@@ -6,6 +6,7 @@ import { computeStats, getExpiryStatus, getDaysUntilExpiry, formatDate, formatDa
 import { computePreparedness } from '../lib/preparedness';
 import { useAppStore } from '../store/useAppStore';
 import { useToast } from './Toast';
+import { SectionHeader } from './SectionHeader';
 import type { ProductCategory } from '../types';
 import { StatRing } from './StatRing';
 import { CountUp } from './CountUp';
@@ -24,6 +25,8 @@ import {
   ScanBarcode,
   Upload,
   ShieldCheck,
+  PieChart,
+  AlertTriangle,
 } from 'lucide-react';
 
 function preparednessColor(score: number): string {
@@ -251,7 +254,7 @@ export function Dashboard() {
 
       {stats.totalProducts > 0 && (
         <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.expiryDistribution')}</h2>
+          <SectionHeader icon={PieChart} title={t('dashboard.expiryDistribution')} tone="green" />
           <div className="mb-2 flex h-3 overflow-hidden rounded-full bg-primary-700">
             {stats.expiredCount > 0 && <div className="bg-red-500 transition-all" style={{ width: `${(stats.expiredCount / total) * 100}%` }} />}
             {stats.criticalCount > 0 && <div className="bg-red-400 transition-all" style={{ width: `${(stats.criticalCount / total) * 100}%` }} />}
@@ -269,12 +272,16 @@ export function Dashboard() {
 
       {urgentProducts.length > 0 && (
         <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.urgent')}</h2>
-            <button onClick={() => setPage('products')} className="flex items-center gap-0.5 text-xs text-green-400 hover:text-green-300">
-              {t('dashboard.all')} <ChevronRight size={14} />
-            </button>
-          </div>
+          <SectionHeader
+            icon={AlertTriangle}
+            title={t('dashboard.urgent')}
+            tone="orange"
+            action={
+              <button onClick={() => setPage('products')} className="flex shrink-0 items-center gap-0.5 text-xs text-green-400 hover:text-green-300">
+                {t('dashboard.all')} <ChevronRight size={14} />
+              </button>
+            }
+          />
           <div className="space-y-2">
             {urgentProducts.map((product) => (
               <button key={product.id} onClick={() => setEditingProductId(product.id!)} className="flex w-full overflow-hidden rounded-lg bg-primary-900/40 text-start transition-colors hover:bg-primary-900/70">

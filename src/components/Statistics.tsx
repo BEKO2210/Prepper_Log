@@ -6,6 +6,7 @@ import { getExpiryStatus, computeStats } from '../lib/utils';
 import type { ExpiryStatus, ProductCategory } from '../types';
 import { BarChart3, TrendingUp, Package, Calendar, MapPin, Loader2 } from 'lucide-react';
 import { CountUp } from './CountUp';
+import { SectionHeader } from './SectionHeader';
 
 const RANK_STYLES = ['bg-yellow-400/20 text-yellow-300', 'bg-gray-400/20 text-gray-200', 'bg-orange-500/20 text-orange-300'];
 
@@ -125,10 +126,7 @@ export function Statistics() {
 
       {/* Expiry Distribution */}
       <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <BarChart3 size={18} className="text-green-400" />
-          {t('stats.expiryDistribution')}
-        </h3>
+        <SectionHeader icon={BarChart3} title={t('stats.expiryDistribution')} tone="green" />
         <div className="space-y-2">
           {[
             { label: t('stats.expired'), count: expiryDist.expired, color: 'bg-red-500' },
@@ -159,10 +157,7 @@ export function Statistics() {
       {/* Category breakdown */}
       {categoryBreakdown.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-            <Package size={18} className="text-purple-400" />
-            {t('stats.byCategory')}
-          </h3>
+          <SectionHeader icon={Package} title={t('stats.byCategory')} tone="purple" />
           <div className="space-y-2.5">
             {categoryBreakdown.map(({ key, label, count }) => (
               <div key={key}>
@@ -182,10 +177,7 @@ export function Statistics() {
       {/* Location breakdown */}
       {locationBreakdown.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-            <MapPin size={18} className="text-cyan-400" />
-            {t('stats.byLocation')}
-          </h3>
+          <SectionHeader icon={MapPin} title={t('stats.byLocation')} tone="cyan" />
           <div className="space-y-2.5">
             {locationBreakdown.map(([name, count]) => (
               <div key={name}>
@@ -205,10 +197,7 @@ export function Statistics() {
       {/* Top consumed */}
       {topConsumed.length > 0 && (
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-            <TrendingUp size={18} className="text-green-400" />
-            {t('stats.mostConsumed')}
-          </h3>
+          <SectionHeader icon={TrendingUp} title={t('stats.mostConsumed')} tone="green" />
           <div className="space-y-2">
             {topConsumed.map(([name, count], i) => (
               <div
