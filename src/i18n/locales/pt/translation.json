@@ -118,7 +118,11 @@
     "saveChanges": "Salvar alterações",
     "saveProduct": "Salvar produto",
     "imageError": "Não foi possível processar a imagem.",
-    "saveError": "Erro ao salvar. Por favor, tente novamente."
+    "saveError": "Erro ao salvar. Por favor, tente novamente.",
+    "ocrScanDate": "Digitalizar data",
+    "ocrRunning": "A ler…",
+    "ocrSuccess": "Data detetada — verifica, por favor.",
+    "ocrError": "Nenhuma data encontrada. Introduz manualmente."
   },
   "scanner": {
     "title": "Escanear código de barras",

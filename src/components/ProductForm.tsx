@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addProduct, updateProduct } from '../lib/db';
 import { useAppStore } from '../store/useAppStore';
 import { compressImage, fetchAndCompressImage, lookupBarcode, formatDate, getDaysUntilExpiry, formatDaysUntil, getExpiryStatus, getStatusBadgeColor } from '../lib/utils';
+import { recognizeExpiryDate } from '../lib/dateOcr';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import {
   DEFAULT_UNITS,
@@ -26,6 +27,7 @@ import {
   Layers,
   PlusCircle,
   ChevronDown,
+  ScanText,
 } from 'lucide-react';
 
 const FORM_STORAGE_KEY = 'preptrack-form-draft';
@@ -379,6 +381,7 @@ export function ProductForm() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const dateOcrInputRef = useRef<HTMLInputElement>(null);
   const restoredRef = useRef(false);
   const populatedRef = useRef(false);
 
@@ -390,6 +393,7 @@ export function ProductForm() {
 
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [ocrState, setOcrState] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
 
   function getQuantityStep(unit: string): string {
     switch (unit) {
@@ -475,6 +479,32 @@ export function ProductForm() {
   function handleCameraClick() {
     saveFormDraft(form, editingProductId);
     cameraInputRef.current?.click();
+  }
+
+  function handleDateOcrClick() {
+    saveFormDraft(form, editingProductId);
+    dateOcrInputRef.current?.click();
+  }
+
+  async function handleDateOcrSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setOcrState('running');
+    try {
+      const parsed = await recognizeExpiryDate(file);
+      if (parsed) {
+        setForm((prev) => ({ ...prev, expiryDate: parsed.date, expiryPrecision: parsed.precision }));
+        setOcrState('success');
+      } else {
+        setOcrState('error');
+      }
+    } catch {
+      setOcrState('error');
+    } finally {
+      clearFormDraft();
+    }
+    setTimeout(() => setOcrState('idle'), 4000);
   }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -615,7 +645,18 @@ export function ProductForm() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.expiryDate')}</label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="block text-sm font-medium text-gray-300">{t('form.expiryDate')}</label>
+            <button
+              type="button"
+              onClick={handleDateOcrClick}
+              disabled={ocrState === 'running'}
+              className="flex items-center gap-1 text-xs text-green-400 transition-colors hover:text-green-300 disabled:opacity-60"
+            >
+              {ocrState === 'running' ? <Loader2 size={13} className="animate-spin" /> : <ScanText size={13} />}
+              {ocrState === 'running' ? t('form.ocrRunning') : t('form.ocrScanDate')}
+            </button>
+          </div>
           <div className="flex gap-2">
             <input type="date" required value={form.expiryDate} onChange={(e) => updateField('expiryDate', e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
             <select value={form.expiryPrecision} onChange={(e) => updateField('expiryPrecision', e.target.value as 'day' | 'month' | 'year')} className="rounded-lg border border-primary-600 bg-primary-800 px-3 py-2.5 text-sm text-gray-200 focus:border-green-500 focus:outline-none">
@@ -624,6 +665,9 @@ export function ProductForm() {
               <option value="year">{t('form.precisionYear')}</option>
             </select>
           </div>
+          {ocrState === 'success' && <p className="mt-1 text-xs text-green-400">{t('form.ocrSuccess')}</p>}
+          {ocrState === 'error' && <p className="mt-1 text-xs text-orange-400">{t('form.ocrError')}</p>}
+          <input ref={dateOcrInputRef} type="file" accept="image/*" capture="environment" onChange={handleDateOcrSelect} className="hidden" />
         </div>
 
         <div>

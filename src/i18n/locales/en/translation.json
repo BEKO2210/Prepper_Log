@@ -118,7 +118,11 @@
     "saveChanges": "Save changes",
     "saveProduct": "Save product",
     "imageError": "Image could not be processed.",
-    "saveError": "Error saving. Please try again."
+    "saveError": "Error saving. Please try again.",
+    "ocrScanDate": "Scan date",
+    "ocrRunning": "Reading…",
+    "ocrSuccess": "Date detected — please verify.",
+    "ocrError": "No date found. Please enter manually."
   },
   "scanner": {
     "title": "Scan barcode",

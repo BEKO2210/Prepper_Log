@@ -118,7 +118,11 @@
     "saveChanges": "Änderungen speichern",
     "saveProduct": "Produkt speichern",
     "imageError": "Bild konnte nicht verarbeitet werden.",
-    "saveError": "Fehler beim Speichern. Bitte versuche es erneut."
+    "saveError": "Fehler beim Speichern. Bitte versuche es erneut.",
+    "ocrScanDate": "Datum scannen",
+    "ocrRunning": "Erkenne…",
+    "ocrSuccess": "MHD erkannt — bitte prüfen.",
+    "ocrError": "Kein Datum erkannt. Bitte manuell eingeben."
   },
   "scanner": {
     "title": "Barcode scannen",
