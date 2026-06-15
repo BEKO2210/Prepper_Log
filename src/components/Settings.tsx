@@ -8,6 +8,8 @@ import { useDarkMode } from '../hooks/useDarkMode';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
+import { encryptBackup, decryptBackup, isEncryptedBackup } from '../lib/cryptoBackup';
+import { useModal } from '../hooks/useModal';
 import { getSyncConfig, saveSyncConfig, clearSyncPairing } from '../lib/syncConfig';
 import { SyncHomeServerGuide } from './SyncHomeServerGuide';
 import {
@@ -87,6 +89,7 @@ export function Settings() {
   const [showInfo, setShowInfo] = useState(false);
   const [showSyncGuide, setShowSyncGuide] = useState(false);
   const [imageLoadProgress, setImageLoadProgress] = useState<{ loaded: number; total: number } | null>(null);
+  const [passDialog, setPassDialog] = useState<{ mode: 'export' | 'import'; file?: string } | null>(null);
   const { t, i18n } = useTranslation();
 
   async function handleToggleNotifications() {
@@ -126,27 +129,49 @@ export function Settings() {
     setImageLoadProgress(null);
   }
 
-  async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function doEncryptedExport(passphrase: string) {
+    const data = await exportData();
+    const enc = await encryptBackup(data, passphrase);
+    downloadFile(enc, `preptrack-backup-${new Date().toISOString().split('T')[0]}.ptbak`, 'application/json');
+    setPassDialog(null);
+    setImportStatus({ message: t('settings.encExportDone'), type: 'success' });
+  }
 
+  async function applyImportedJson(text: string) {
     try {
-      const text = await file.text();
       const result = await importData(text);
       setImportStatus({ message: t('import.success', { count: result.imported }), type: 'success' });
-      // Bilder im Hintergrund nachladen
       startImageLoading(result.productsNeedingImages);
     } catch (err) {
       if (err instanceof ImportResult) {
         setImportStatus({ message: err.message, type: 'warning' });
-        // Auch bei teilweisem Import Bilder nachladen
         startImageLoading(err.productsNeedingImages);
       } else {
         setImportStatus({ message: t('import.error', { message: err instanceof Error ? err.message : t('import.importFailed') }), type: 'error' });
       }
     }
+  }
 
+  async function doEncryptedImport(passphrase: string) {
+    // decryptBackup throws on a wrong passphrase -> handled by the dialog.
+    const plain = await decryptBackup(passDialog?.file ?? '', passphrase);
+    setPassDialog(null);
+    await applyImportedJson(plain);
+  }
+
+  async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
     e.target.value = '';
+    if (!file) return;
+
+    const text = await file.text();
+    // Encrypted backup? -> ask for the passphrase, decrypt, then import.
+    if (isEncryptedBackup(text)) {
+      setPassDialog({ mode: 'import', file: text });
+      return;
+    }
+
+    await applyImportedJson(text);
   }
 
   async function handleInstall() {
@@ -528,6 +553,18 @@ export function Settings() {
           </button>
 
           <button
+            onClick={() => setPassDialog({ mode: 'export' })}
+            className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
+          >
+            <Lock size={20} className="text-green-400" />
+            <div className="text-start">
+              <span>{t('settings.encBackup')}</span>
+              <p className="text-xs text-gray-400">{t('settings.encBackupDesc')}</p>
+            </div>
+            <Download size={16} className="ms-auto text-gray-400" />
+          </button>
+
+          <button
             onClick={handleExportCSV}
             className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
           >
@@ -547,7 +584,7 @@ export function Settings() {
             </div>
             <input
               type="file"
-              accept=".json"
+              accept=".json,.ptbak"
               onChange={handleImport}
               className="hidden"
             />
@@ -900,6 +937,86 @@ export function Settings() {
         <p>{t('settings.appSlogan')}</p>
         <p>&copy; {new Date().getFullYear()} Belkis Aslani</p>
       </section>
+
+      {passDialog && (
+        <PassphraseDialog
+          mode={passDialog.mode}
+          onClose={() => setPassDialog(null)}
+          onSubmit={passDialog.mode === 'export' ? doEncryptedExport : doEncryptedImport}
+        />
+      )}
+    </div>
+  );
+}
+
+function PassphraseDialog({ mode, onSubmit, onClose }: {
+  mode: 'export' | 'import';
+  onSubmit: (passphrase: string) => Promise<void>;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const [pass, setPass] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const ref = useModal(true, onClose);
+
+  async function submit() {
+    setError(null);
+    if (mode === 'export') {
+      if (pass.length < 8) { setError(t('settings.encErrShort')); return; }
+      if (pass !== confirm) { setError(t('settings.encErrMismatch')); return; }
+    } else if (!pass) {
+      return;
+    }
+    setBusy(true);
+    try {
+      await onSubmit(pass);
+    } catch {
+      setError(t('settings.encErrWrong'));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" onClick={onClose}>
+      <div ref={ref} onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-t-2xl border border-primary-700 bg-primary-800 p-5 shadow-2xl sm:rounded-2xl">
+        <div className="mb-3 flex items-center gap-2">
+          <Lock size={18} className="text-green-400" />
+          <h2 className="text-lg font-bold text-gray-100">
+            {mode === 'export' ? t('settings.encExportTitle') : t('settings.encImportTitle')}
+          </h2>
+        </div>
+        <input
+          type="password"
+          autoFocus
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          placeholder={t('settings.encPassphrase')}
+          onKeyDown={(e) => { if (e.key === 'Enter' && mode === 'import') submit(); }}
+          className="mb-2 w-full rounded-lg border border-primary-600 bg-primary-900 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+        />
+        {mode === 'export' && (
+          <input
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder={t('settings.encPassphraseConfirm')}
+            className="mb-2 w-full rounded-lg border border-primary-600 bg-primary-900 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+          />
+        )}
+        {mode === 'export' && <p className="mb-2 text-xs text-orange-300">{t('settings.encHint')}</p>}
+        {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
+        <div className="flex gap-2">
+          <button type="button" onClick={onClose} className="flex-1 rounded-lg border border-primary-600 px-4 py-2.5 text-sm text-gray-300 hover:bg-primary-700">
+            {t('settings.encCancel')}
+          </button>
+          <button type="button" onClick={submit} disabled={busy} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-60">
+            {busy && <Loader2 size={15} className="animate-spin" />}
+            {mode === 'export' ? t('settings.encCreate') : t('settings.encDecrypt')}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
