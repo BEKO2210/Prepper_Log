@@ -81,6 +81,7 @@
     "minStock": "الحد الأدنى للمخزون",
     "storedSince": "مخزّن منذ",
     "lastEdited": "آخر تعديل",
+    "calories": "السعرات",
     "notes": "ملاحظات",
     "countdownRemaining": "{{time}} متبقي",
     "countdownExpired": "منتهي منذ {{time}}",

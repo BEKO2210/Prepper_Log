@@ -24,6 +24,7 @@ import {
   MapPin,
   Calendar,
   Layers,
+  Flame,
   Clock,
   Tag,
   FileText,
@@ -530,6 +531,13 @@ function ProductDetailModal({ productId, products, onClose, onDelete }: { produc
             <DetailItem icon={<Calendar size={16} />} label={t('detail.expiryDate')} value={formatDate(product.expiryDate, product.expiryPrecision)} />
             {product.barcode && <DetailItem icon={<Package size={16} />} label={t('detail.barcode')} value={product.barcode} />}
             {product.minStock !== undefined && product.minStock > 0 && <DetailItem icon={<Layers size={16} />} label={t('detail.minStock')} value={`${product.minStock} ${product.unit}`} />}
+            {typeof product.kcalPerUnit === 'number' && product.kcalPerUnit > 0 && (
+              <DetailItem
+                icon={<Flame size={16} />}
+                label={t('detail.calories')}
+                value={`${product.kcalPerUnit} kcal / ${t(`units.${product.unit}`, product.unit)}`}
+              />
+            )}
             <DetailItem icon={<Clock size={16} />} label={t('detail.storedSince')} value={formatDuration(storedDays)} />
             {product.updatedAt !== product.createdAt && <DetailItem icon={<Calendar size={16} />} label={t('detail.lastEdited')} value={new Date(product.updatedAt).toLocaleDateString(locale)} />}
           </div>
