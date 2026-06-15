@@ -90,11 +90,20 @@ export function Preparedness() {
   );
 
   async function handleCopy() {
-    const lines = shopping.map(
-      (item) => `- ${item.name}: ${item.needed} ${t(`units.${item.unit}`, item.unit)}`
-    );
+    const text = shopping
+      .map((item) => `- ${item.name}: ${item.needed} ${t(`units.${item.unit}`, item.unit)}`)
+      .join('\n');
+    // Prefer the native share sheet on mobile, fall back to clipboard.
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title: t('preparedness.shoppingTitle'), text });
+        return;
+      } catch {
+        // user cancelled or share unavailable — fall through to clipboard
+      }
+    }
     try {
-      await navigator.clipboard.writeText(lines.join('\n'));
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

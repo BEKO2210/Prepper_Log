@@ -65,6 +65,20 @@ export default function App() {
       console.error('[PrepTrack] seedDefaults fehlgeschlagen:', err)
     );
 
+    // Web Share Target: when the app is opened via "share to PrepTrack", use the
+    // shared title/text as a starting product name and jump to the add form.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const shared = (params.get('title') || params.get('text') || '').trim();
+      if (shared) {
+        useAppStore.getState().navigateToAddWithScan({ barcode: '', name: shared.slice(0, 80) });
+        // Clean the URL so a refresh doesn't re-trigger the prefill.
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    } catch {
+      // ignore malformed share params
+    }
+
     const interval = startNotificationChecker();
     const stopSync = startSyncEngine();
     return () => {

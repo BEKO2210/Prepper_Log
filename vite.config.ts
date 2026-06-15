@@ -62,6 +62,11 @@ export default defineConfig({
         start_url: './',
         lang: 'de',
         categories: ['utilities', 'lifestyle', 'food'],
+        share_target: {
+          action: './',
+          method: 'GET',
+          params: { title: 'title', text: 'text', url: 'url' },
+        },
         icons: [
           {
             src: 'icons/icon-48x48.png',
