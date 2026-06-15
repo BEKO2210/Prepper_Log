@@ -124,7 +124,10 @@
     "ocrSuccess": "Date detected — please verify.",
     "ocrError": "No date found. Try again or enter manually.",
     "ocrCapture": "Capture photo",
-    "ocrHint": "Place the date inside the green frame and capture."
+    "ocrHint": "Place the date inside the green frame and capture.",
+    "yearPlaceholder": "YYYY",
+    "errNameRequired": "Please enter a product name.",
+    "errDateRequired": "Please set an expiry date."
   },
   "scanner": {
     "title": "Scan barcode",

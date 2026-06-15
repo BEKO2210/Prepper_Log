@@ -124,7 +124,10 @@
     "ocrSuccess": "Data rilevata — verifica.",
     "ocrError": "Nessuna data trovata. Riprova o inseriscila manualmente.",
     "ocrCapture": "Scatta foto",
-    "ocrHint": "Inquadra la data nel riquadro verde e scatta."
+    "ocrHint": "Inquadra la data nel riquadro verde e scatta.",
+    "yearPlaceholder": "AAAA",
+    "errNameRequired": "Inserisci un nome prodotto.",
+    "errDateRequired": "Imposta una data di scadenza."
   },
   "scanner": {
     "title": "Scansiona codice a barre",
