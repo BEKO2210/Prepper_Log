@@ -100,6 +100,7 @@ type ScanState =
 function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { barcode: string; name?: string; imageUrl?: string }) => void; autoStart?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
+  const cancelledRef = useRef(false);
   const processedRef = useRef(false);
   const [scanState, setScanState] = useState<ScanState>({ type: 'idle' });
   const [cameraActive, setCameraActive] = useState(false);
@@ -126,6 +127,7 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
       // Dynamically import @zxing/browser only when needed
       const { BrowserMultiFormatReader } = await import('@zxing/browser');
       stopCamera();
+      cancelledRef.current = false;
       processedRef.current = false;
       setScanState({ type: 'scanning' });
       setExpanded(true);
@@ -140,13 +142,14 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
         { video: { facingMode: 'environment' } },
         videoRef.current,
         async (result) => {
-          if (result && !processedRef.current) {
-            processedRef.current = true;
-            const barcode = result.getText();
-            stopCamera();
-            vibrate(100);
-            setScanState({ type: 'loading', barcode });
+          if (!result || processedRef.current) return;
+          processedRef.current = true;
+          const barcode = result.getText();
+          stopCamera();
+          vibrate(100);
+          setScanState({ type: 'loading', barcode });
 
+          try {
             // Check for duplicates
             const existing = await db.products
               .where('barcode')
@@ -173,9 +176,19 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
               setScanState({ type: 'success', barcode });
               onScanned({ barcode });
             }
+          } catch (err) {
+            // Never leave the spinner stuck — proceed with the bare barcode.
+            console.error('[PrepTrack] Barcode-Verarbeitung fehlgeschlagen:', err);
+            setScanState({ type: 'success', barcode });
+            onScanned({ barcode });
           }
         }
       );
+
+      if (cancelledRef.current) {
+        controls.stop();
+        return;
+      }
 
       controlsRef.current = controls;
       setCameraActive(true);
@@ -189,7 +202,7 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
   }, [stopCamera, onScanned, t]);
 
   useEffect(() => {
-    return () => { stopCamera(); };
+    return () => { cancelledRef.current = true; stopCamera(); };
   }, [stopCamera]);
 
   useEffect(() => {

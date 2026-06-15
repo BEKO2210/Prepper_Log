@@ -1,5 +1,5 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
+import { motion, MotionConfig } from 'framer-motion';
 import { useAppStore } from './store/useAppStore';
 import { seedDefaults } from './lib/db';
 import { startNotificationChecker } from './lib/notifications';
@@ -90,21 +90,20 @@ export default function App() {
           </header>
 
           <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
-            {/* Single Suspense boundary OUTSIDE AnimatePresence: a lazy page that
-                suspends must not do so inside the keyed motion.div, or mode="wait"
-                deadlocks and leaves the page blank until a manual refresh. */}
+            {/* No AnimatePresence / mode="wait": exit-gated transitions can
+                deadlock on rapid tab switches and leave the page blank. A plain
+                keyed fade-in remounts the page on navigation — the old page
+                unmounts immediately, so a blank state is impossible. Suspense
+                stays outside so a lazy page can't suspend mid-transition. */}
             <Suspense fallback={<LazyFallback />}>
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={currentPage}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                >
-                  <PageContent />
-                </motion.div>
-              </AnimatePresence>
+              <motion.div
+                key={currentPage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+              >
+                <PageContent />
+              </motion.div>
             </Suspense>
           </main>
 

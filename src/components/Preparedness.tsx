@@ -142,7 +142,7 @@ export function Preparedness() {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-16 right-0 h-48 w-48 rounded-full opacity-20 blur-3xl"
+          className="pointer-events-none absolute -top-16 end-0 h-48 w-48 rounded-full opacity-20 blur-3xl"
           style={{ background: color }}
         />
         <div className="relative flex flex-col items-center text-center">

@@ -369,35 +369,47 @@ export function subscribeSyncRuntime(
   };
 }
 
+let engineRefCount = 0;
+
 export function startSyncEngine(): () => void {
-  if (syncInterval) {
-    return () => undefined;
+  // Reference-count starts so that overlapping callers (React StrictMode's
+  // double-invoke, or a fast unmount/remount) share one engine and clean up
+  // symmetrically — a no-op cleanup previously left listeners leaked or the
+  // engine stopped while a consumer still thought it was running.
+  engineRefCount += 1;
+
+  if (engineRefCount === 1) {
+    const cfg = getSyncConfig();
+    emitRuntimeState({
+      status: cfg.enabled ? 'idle' : 'disabled',
+    });
+
+    void runSyncNow('startup').catch(() => undefined);
+
+    syncInterval = setInterval(() => {
+      void runSyncNow('interval').catch(() => undefined);
+    }, cfg.intervalMs);
+
+    onlineHandler = () => {
+      void runSyncNow('online').catch(() => undefined);
+    };
+    window.addEventListener('online', onlineHandler);
+
+    visibilityHandler = () => {
+      if (document.visibilityState === 'visible') {
+        void runSyncNow('visibility').catch(() => undefined);
+      }
+    };
+    document.addEventListener('visibilitychange', visibilityHandler);
   }
 
-  const cfg = getSyncConfig();
-  emitRuntimeState({
-    status: cfg.enabled ? 'idle' : 'disabled',
-  });
-
-  void runSyncNow('startup').catch(() => undefined);
-
-  syncInterval = setInterval(() => {
-    void runSyncNow('interval').catch(() => undefined);
-  }, cfg.intervalMs);
-
-  onlineHandler = () => {
-    void runSyncNow('online').catch(() => undefined);
-  };
-  window.addEventListener('online', onlineHandler);
-
-  visibilityHandler = () => {
-    if (document.visibilityState === 'visible') {
-      void runSyncNow('visibility').catch(() => undefined);
-    }
-  };
-  document.addEventListener('visibilitychange', visibilityHandler);
-
+  let stopped = false;
   return () => {
+    if (stopped) return;
+    stopped = true;
+    engineRefCount -= 1;
+    if (engineRefCount > 0) return;
+
     if (syncInterval) {
       clearInterval(syncInterval);
       syncInterval = null;

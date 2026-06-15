@@ -27,4 +27,11 @@ test('rapid navigation across lazy pages never blanks', async ({ page }) => {
     await page.getByRole('button', { name: 'Dashboard' }).first().click();
     await expect(page.getByRole('heading', { name: 'PrepTrack', exact: true })).toBeVisible();
   }
+
+  // Rapid-fire switching without waiting between clicks must not deadlock the
+  // transition and leave a blank page (regression guard for the bottom-nav bug).
+  for (const name of ['Statistik', 'Einstellungen', 'Vorräte', 'Statistik', 'Dashboard', 'Einstellungen']) {
+    await page.getByRole('button', { name }).first().click();
+  }
+  await expect(page.getByRole('heading', { name: 'Einstellungen' })).toBeVisible();
 });

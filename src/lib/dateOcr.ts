@@ -14,7 +14,9 @@ function clampMonth(m: number): number | null {
 
 function fullYear(y: number): number {
   if (y >= 1000) return y;
-  if (y < 100) return y >= 70 ? 1900 + y : 2000 + y;
+  // Expiry dates are always in the (recent) future, so a 2-digit year maps to
+  // the 2000s — never the 1900s.
+  if (y < 100) return 2000 + y;
   return y;
 }
 
@@ -43,7 +45,7 @@ export function parseExpiryDate(raw: string): ParsedExpiry | null {
     const y = +m[1];
     const mo = clampMonth(+m[2]);
     const d = +m[3];
-    if (mo && d >= 1 && d <= 31) return { date: iso(y, mo, d), precision: 'day' };
+    if (mo && d >= 1 && d <= lastDayOfMonth(y, mo)) return { date: iso(y, mo, d), precision: 'day' };
   }
 
   // 2) DD.MM.YYYY / DD.MM.YY
@@ -52,7 +54,7 @@ export function parseExpiryDate(raw: string): ParsedExpiry | null {
     const d = +m[1];
     const mo = clampMonth(+m[2]);
     const y = fullYear(+m[3]);
-    if (mo && d >= 1 && d <= 31) return { date: iso(y, mo, d), precision: 'day' };
+    if (mo && d >= 1 && d <= lastDayOfMonth(y, mo)) return { date: iso(y, mo, d), precision: 'day' };
   }
 
   // 3) MM.YYYY / MM/YY (month precision -> last day of month)
@@ -63,8 +65,8 @@ export function parseExpiryDate(raw: string): ParsedExpiry | null {
     if (mo) return { date: iso(y, mo, lastDayOfMonth(y, mo)), precision: 'month' };
   }
 
-  // 4) Named month: "mar 2027", "dez 26"
-  m = text.match(/\b([a-zä]{3,})\s+(\d{2,4})\b/);
+  // 4) Named month: "mar 2027", "dez 26", "dez2026"
+  m = text.match(/\b([a-zä]{3,})\.?\s*(\d{2,4})\b/);
   if (m) {
     const mo = MONTH_NAMES[m[1].slice(0, 3)];
     if (mo) {
@@ -104,7 +106,14 @@ export async function recognizeExpiryDate(image: Blob | File): Promise<ParsedExp
       tessedit_char_whitelist: '0123456789.:/- ',
       tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
     });
-    const { data } = await worker.recognize(image);
+    // Guard against a hung worker so the "Datum scannen" button can never get
+    // stuck on the running state.
+    const { data } = await Promise.race([
+      worker.recognize(image),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('OCR timeout')), 20_000)
+      ),
+    ]);
     return parseExpiryDate(data.text);
   } finally {
     await worker.terminate();
