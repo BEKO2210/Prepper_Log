@@ -81,6 +81,7 @@
     "minStock": "Stock minimum",
     "storedSince": "Stocké depuis",
     "lastEdited": "Dernière modification",
+    "calories": "Calories",
     "notes": "Notes",
     "countdownRemaining": "{{time}} restant(s)",
     "countdownExpired": "Expiré depuis {{time}}",
