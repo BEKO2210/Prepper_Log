@@ -1,11 +1,11 @@
 {
-  "version": "2.0.15",
-  "generatedAt": "2026-06-15T17:42:35.650Z",
+  "version": "2.0.16",
+  "generatedAt": "2026-06-15T21:55:11.972Z",
   "sinceTag": null,
   "items": [
     {
-      "message": "Calories added",
-      "sha": "5eb2cc2"
+      "message": "Merge pull request #98 from BEKO2210/claude/pwa-world-leading-strategy-vivkbt",
+      "sha": "94f0831"
     }
   ]
 }
