@@ -627,6 +627,33 @@ export function ProductForm() {
     setForm((prev) => ({ ...prev, expiryDate: parsed.date, expiryPrecision: parsed.precision }));
   }
 
+  function expiryLastDay(y: number, m: number): number {
+    return new Date(y, m, 0).getDate();
+  }
+  function setExpiryFromMonth(value: string) {
+    if (!value) { updateField('expiryDate', ''); return; }
+    const [y, m] = value.split('-').map(Number);
+    if (!y || !m) { updateField('expiryDate', ''); return; }
+    updateField('expiryDate', `${y}-${String(m).padStart(2, '0')}-${String(expiryLastDay(y, m)).padStart(2, '0')}`);
+  }
+  function setExpiryFromYear(value: string) {
+    const y = parseInt(value, 10);
+    if (!y || value.length < 4) { updateField('expiryDate', ''); return; }
+    updateField('expiryDate', `${y}-12-31`);
+  }
+  // Switching precision keeps the date valid (so the field never silently empties).
+  function changePrecision(p: 'day' | 'month' | 'year') {
+    setForm((prev) => {
+      let date = prev.expiryDate;
+      if (date) {
+        const [y, m] = date.split('-').map(Number);
+        if (p === 'year') date = `${y}-12-31`;
+        else if (p === 'month') date = `${y}-${String(m).padStart(2, '0')}-${String(expiryLastDay(y, m)).padStart(2, '0')}`;
+      }
+      return { ...prev, expiryPrecision: p, expiryDate: date };
+    });
+  }
+
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -642,7 +669,9 @@ export function ProductForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!form.name.trim() || !form.expiryDate) return;
+    // Give clear feedback instead of a silently disabled button.
+    if (!form.name.trim()) { setFormError(t('form.errNameRequired')); return; }
+    if (!form.expiryDate) { setFormError(t('form.errDateRequired')); return; }
     setFormError(null);
     setSaving(true);
     try {
@@ -767,8 +796,16 @@ export function ProductForm() {
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.expiryDate')}</label>
           <div className="flex gap-2">
-            <input type="date" required value={form.expiryDate} onChange={(e) => updateField('expiryDate', e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
-            <select value={form.expiryPrecision} onChange={(e) => updateField('expiryPrecision', e.target.value as 'day' | 'month' | 'year')} className="rounded-lg border border-primary-600 bg-primary-800 px-3 py-2.5 text-sm text-gray-200 focus:border-green-500 focus:outline-none">
+            {form.expiryPrecision === 'day' && (
+              <input type="date" required value={form.expiryDate} onChange={(e) => updateField('expiryDate', e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
+            )}
+            {form.expiryPrecision === 'month' && (
+              <input type="month" required value={form.expiryDate ? form.expiryDate.slice(0, 7) : ''} onChange={(e) => setExpiryFromMonth(e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
+            )}
+            {form.expiryPrecision === 'year' && (
+              <input type="number" required min={2000} max={2100} placeholder={t('form.yearPlaceholder')} value={form.expiryDate ? form.expiryDate.slice(0, 4) : ''} onChange={(e) => setExpiryFromYear(e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
+            )}
+            <select value={form.expiryPrecision} onChange={(e) => changePrecision(e.target.value as 'day' | 'month' | 'year')} className="rounded-lg border border-primary-600 bg-primary-800 px-3 py-2.5 text-sm text-gray-200 focus:border-green-500 focus:outline-none">
               <option value="day">{t('form.precisionDay')}</option>
               <option value="month">{t('form.precisionMonth')}</option>
               <option value="year">{t('form.precisionYear')}</option>
@@ -789,7 +826,7 @@ export function ProductForm() {
           <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} rows={2} placeholder={t('form.notesPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
         </div>
 
-        <button type="submit" disabled={saving || !form.name.trim() || !form.expiryDate} className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-transform hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:scale-100">
+        <button type="submit" disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3 font-medium text-white shadow-lg shadow-green-600/20 transition-transform hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:scale-100">
           <Save size={20} />
           {saving ? t('form.saving') : editingProductId ? t('form.saveChanges') : t('form.saveProduct')}
         </button>

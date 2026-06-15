@@ -132,7 +132,7 @@ export function Dashboard() {
 
   if (activeProducts.length === 0) {
     return (
-      <div className="space-y-5 pb-4">
+      <div className="space-y-3 pb-4">
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl border border-green-500/30 bg-green-500/10">
@@ -179,7 +179,7 @@ export function Dashboard() {
         )}
 
         {/* Feature-Übersicht */}
-        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">{t('onboarding.features')}</h3>
           <div className="space-y-2">
             {[
@@ -202,19 +202,19 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-5 pb-4">
-      <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-5">
+    <div className="space-y-3 pb-4">
+      <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
         <div className="flex items-center justify-around">
-          <StatRing value={stats.expiredCount + stats.criticalCount} max={total} label={t('dashboard.critical')} color="#ef4444" />
-          <StatRing value={stats.warningCount + stats.soonCount} max={total} label={t('dashboard.soon')} color="#f97316" />
-          <StatRing value={stats.goodCount} max={total} label={t('dashboard.good')} color="#22c55e" />
-          <StatRing value={stats.totalProducts} max={stats.totalProducts} label={t('dashboard.total')} color="#9ca3af" />
+          <StatRing value={stats.expiredCount + stats.criticalCount} max={total} label={t('dashboard.critical')} color="#ef4444" size={68} strokeWidth={6} />
+          <StatRing value={stats.warningCount + stats.soonCount} max={total} label={t('dashboard.soon')} color="#f97316" size={68} strokeWidth={6} />
+          <StatRing value={stats.goodCount} max={total} label={t('dashboard.good')} color="#22c55e" size={68} strokeWidth={6} />
+          <StatRing value={stats.totalProducts} max={stats.totalProducts} label={t('dashboard.total')} color="#9ca3af" size={68} strokeWidth={6} />
         </div>
       </div>
 
       <button
         onClick={() => setPage('preparedness')}
-        className="flex w-full items-center gap-4 rounded-2xl border border-primary-700 bg-primary-800/60 p-4 text-start transition-colors hover:bg-primary-700/50 active:scale-[0.99]"
+        className="flex w-full items-center gap-4 rounded-2xl border border-primary-700 bg-primary-800/60 p-3 text-start transition-colors hover:bg-primary-700/50 active:scale-[0.99]"
       >
         <StatRing value={preparedness.score} max={100} label={t('preparedness.score')} color={preparednessColor(preparedness.score)} size={64} strokeWidth={6} />
         <div className="min-w-0 flex-1">
@@ -229,8 +229,8 @@ export function Dashboard() {
       </button>
 
       <div className="grid grid-cols-2 gap-3">
-        <button onClick={requestScan} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-600/20">
+        <button onClick={requestScan} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-3 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-600/20">
             <ScanBarcode size={20} className="text-green-400" />
           </div>
           <div className="min-w-0">
@@ -238,8 +238,8 @@ export function Dashboard() {
             <p className="truncate text-[0.65rem] text-gray-400">{t('dashboard.scanBarcode')}</p>
           </div>
         </button>
-        <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-4 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
+        <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-3 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
             <PlusCircle size={20} className="text-blue-400" />
           </div>
           <div className="min-w-0">
@@ -250,7 +250,7 @@ export function Dashboard() {
       </div>
 
       {stats.totalProducts > 0 && (
-        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
           <SectionHeader icon={PieChart} title={t('dashboard.expiryDistribution')} tone="green" />
           <div className="mb-2 flex h-3 overflow-hidden rounded-full bg-primary-700">
             {stats.expiredCount > 0 && <div className="bg-red-500 transition-all" style={{ width: `${(stats.expiredCount / total) * 100}%` }} />}
@@ -268,7 +268,7 @@ export function Dashboard() {
       )}
 
       {urgentProducts.length > 0 && (
-        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
           <SectionHeader
             icon={AlertTriangle}
             title={t('dashboard.urgent')}
@@ -298,7 +298,7 @@ export function Dashboard() {
 
       <div className="grid grid-cols-2 gap-3">
         {categoryBreakdown.length > 0 && (
-          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
             <h2 className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.categories')}</h2>
             <div className="space-y-1.5">
               {categoryBreakdown.map(({ key, label, count }) => (
@@ -311,14 +311,14 @@ export function Dashboard() {
           </div>
         )}
         <div className="space-y-3">
-          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
             <div className="flex items-center gap-2">
               <TrendingDown size={14} className="text-yellow-400" />
               <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.lowStock')}</span>
             </div>
             <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}><CountUp value={stats.lowStockCount} /></p>
           </div>
-          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
             <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.storageLocations')}</span>
             <p className="stat-number mt-1 text-2xl font-bold text-gray-300"><CountUp value={stats.totalLocations} /></p>
           </div>

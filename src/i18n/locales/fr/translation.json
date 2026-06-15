@@ -124,7 +124,10 @@
     "ocrSuccess": "Date détectée — vérifiez.",
     "ocrError": "Aucune date trouvée. Réessayez ou saisissez-la manuellement.",
     "ocrCapture": "Prendre la photo",
-    "ocrHint": "Placez la date dans le cadre vert et capturez."
+    "ocrHint": "Placez la date dans le cadre vert et capturez.",
+    "yearPlaceholder": "AAAA",
+    "errNameRequired": "Saisissez un nom de produit.",
+    "errDateRequired": "Indiquez une date de péremption."
   },
   "scanner": {
     "title": "Scanner un code-barres",

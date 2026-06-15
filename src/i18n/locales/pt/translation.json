@@ -124,7 +124,10 @@
     "ocrSuccess": "Data detetada — verifica, por favor.",
     "ocrError": "Nenhuma data encontrada. Tenta de novo ou introduz manualmente.",
     "ocrCapture": "Tirar foto",
-    "ocrHint": "Coloca a data dentro da moldura verde e captura."
+    "ocrHint": "Coloca a data dentro da moldura verde e captura.",
+    "yearPlaceholder": "AAAA",
+    "errNameRequired": "Introduz um nome de produto.",
+    "errDateRequired": "Define uma data de validade."
   },
   "scanner": {
     "title": "Escanear código de barras",

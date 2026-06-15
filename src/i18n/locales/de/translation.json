@@ -124,7 +124,10 @@
     "ocrSuccess": "MHD erkannt — bitte prüfen.",
     "ocrError": "Kein Datum erkannt. Bitte erneut versuchen oder manuell eingeben.",
     "ocrCapture": "Foto aufnehmen",
-    "ocrHint": "Datum im grünen Rahmen platzieren und auslösen."
+    "ocrHint": "Datum im grünen Rahmen platzieren und auslösen.",
+    "yearPlaceholder": "JJJJ",
+    "errNameRequired": "Bitte einen Produktnamen eingeben.",
+    "errDateRequired": "Bitte ein Mindesthaltbarkeitsdatum angeben."
   },
   "scanner": {
     "title": "Barcode scannen",
