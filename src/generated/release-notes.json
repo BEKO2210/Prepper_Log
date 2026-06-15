@@ -1,11 +1,11 @@
 {
-  "version": "2.0.16",
-  "generatedAt": "2026-06-15T21:55:11.972Z",
+  "version": "2.0.17",
+  "generatedAt": "2026-06-15T22:01:50.824Z",
   "sinceTag": null,
   "items": [
     {
-      "message": "Merge pull request #98 from BEKO2210/claude/pwa-world-leading-strategy-vivkbt",
-      "sha": "94f0831"
+      "message": "All bugs fixed",
+      "sha": "413aeb4"
     }
   ]
 }
