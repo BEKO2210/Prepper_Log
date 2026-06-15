@@ -174,6 +174,16 @@ export class PrepTrackDB extends Dexie {
 
 export const db = new PrepTrackDB();
 
+// Surface a stuck DB open instead of leaving every useLiveQuery hanging on
+// `undefined` forever (which renders a permanent loading skeleton). This happens
+// when another tab still holds the previous DB version open during an upgrade.
+db.on('blocked', () => {
+  console.warn('[PrepTrack] Datenbank-Upgrade blockiert — bitte andere Tabs der App schließen.');
+});
+db.open().catch((err) => {
+  console.error('[PrepTrack] Datenbank konnte nicht geöffnet werden:', err);
+});
+
 async function enqueueSyncChange(row: Omit<SyncQueueRow, 'id'>): Promise<void> {
   if (!shouldQueueSyncChange()) return;
   await db.syncQueue.add(row);
@@ -265,10 +275,14 @@ export async function queueFullSnapshotForSync(resetQueue = false): Promise<void
   }
 }
 
-// Seed default storage locations on first run
+// Seed default storage locations on first run. The count-check and the insert
+// run in one read-write transaction so concurrent callers (React StrictMode's
+// double-invoke, or two tabs opening at once) can't both seed and create
+// duplicate locations.
 export async function seedDefaults(): Promise<void> {
-  const count = await db.storageLocations.count();
-  if (count === 0) {
+  await db.transaction('rw', db.storageLocations, async () => {
+    const count = await db.storageLocations.count();
+    if (count > 0) return;
     const now = new Date().toISOString();
     await db.storageLocations.bulkAdd([
       { syncId: createSyncId(), name: 'Keller', createdAt: now, updatedAt: now },
@@ -280,7 +294,7 @@ export async function seedDefaults(): Promise<void> {
       { syncId: createSyncId(), name: 'Auto', createdAt: now, updatedAt: now },
       { syncId: createSyncId(), name: 'Gartenhaus', createdAt: now, updatedAt: now },
     ]);
-  }
+  });
 }
 
 // Product CRUD
