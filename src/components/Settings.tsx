@@ -802,7 +802,7 @@ export function Settings() {
           {t('settings.supportDesc')}
         </p>
         <a
-          href="https://www.paypal.com/paypalme/renateweinfurtner"
+          href="https://www.paypal.com/donate?business=renateweinfurtner%40gmx.de&currency_code=EUR&item_name=PrepTrack%20Spende"
           target="_blank"
           rel="noopener noreferrer"
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0070ba] px-4 py-3 font-medium text-white hover:bg-[#005ea6] active:scale-[0.98] transition-transform"
