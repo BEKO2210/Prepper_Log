@@ -388,6 +388,19 @@ export async function deleteProduct(id: number): Promise<void> {
   await Promise.all(logDeletes);
 }
 
+export async function deleteConsumptionLog(id: number): Promise<void> {
+  const log = await db.consumptionLogs.get(id);
+  if (!log) return;
+  await db.consumptionLogs.delete(id);
+  if (typeof log.syncId === 'string' && log.syncId.length > 0) {
+    await enqueueSyncChange({
+      entityType: 'consumptionLog',
+      entitySyncId: log.syncId,
+      op: 'delete',
+      updatedAt: new Date().toISOString(),
+    });
+  }
+}
 export async function archiveProduct(id: number): Promise<void> {
   await updateProduct(id, {
     archived: true,

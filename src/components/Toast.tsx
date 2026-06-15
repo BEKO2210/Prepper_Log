@@ -5,14 +5,20 @@ import { CheckCircle2, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface ToastItem {
   id: number;
   message: string;
   type: ToastType;
+  action?: ToastAction;
 }
 
 interface ToastContextValue {
-  showToast: (message: string, type?: ToastType) => void;
+  showToast: (message: string, type?: ToastType, action?: ToastAction) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -50,10 +56,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const showToast = useCallback(
-    (message: string, type: ToastType = 'success') => {
+    (message: string, type: ToastType = 'success', action?: ToastAction) => {
       const id = ++idRef.current;
-      setToasts((list) => [...list.slice(-2), { id, message, type }]);
-      window.setTimeout(() => remove(id), TOAST_DURATION);
+      setToasts((list) => [...list.slice(-2), { id, message, type, action }]);
+      // Give the user more time to react when there's an action (e.g. undo).
+      window.setTimeout(() => remove(id), action ? 6000 : TOAST_DURATION);
     },
     [remove]
   );
@@ -82,6 +89,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               >
                 <Icon size={18} className={`shrink-0 ${ACCENT[toast.type]}`} />
                 <span className="flex-1 text-sm text-gray-200">{toast.message}</span>
+                {toast.action && (
+                  <button
+                    onClick={() => { toast.action!.onClick(); remove(toast.id); }}
+                    className="shrink-0 rounded-md px-2 py-1 text-sm font-semibold text-green-400 transition-colors hover:bg-primary-700 hover:text-green-300"
+                  >
+                    {toast.action.label}
+                  </button>
+                )}
                 <button
                   onClick={() => remove(toast.id)}
                   className="shrink-0 rounded-md p-0.5 text-gray-500 transition-colors hover:text-gray-300"

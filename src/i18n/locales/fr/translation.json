@@ -367,7 +367,8 @@
   },
   "common": {
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "undo": "Annuler"
   },
   "sync": {
     "title": "Synchronisation LAN (facultatif)",
