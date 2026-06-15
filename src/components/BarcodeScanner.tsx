@@ -130,6 +130,7 @@ export function BarcodeScanner() {
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const processedRef = useRef(false);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
+  const cancelledRef = useRef(false);
   const [state, setState] = useState<ScanState>({ type: 'idle' });
   const [cameraActive, setCameraActive] = useState(false);
   const isOnline = useOnlineStatus();
@@ -152,6 +153,7 @@ export function BarcodeScanner() {
   const startCamera = useCallback(async () => {
     try {
       stopCamera();
+      cancelledRef.current = false;
       processedRef.current = false;
       setState({ type: 'scanning' });
       const reader = new BrowserMultiFormatReader();
@@ -168,14 +170,15 @@ export function BarcodeScanner() {
         constraints,
         videoRef.current,
         async (result) => {
-          if (result && !processedRef.current) {
-            processedRef.current = true;
-            const barcode = result.getText();
-            stopCamera();
-            vibrate(100);
+          if (!result || processedRef.current) return;
+          processedRef.current = true;
+          const barcode = result.getText();
+          stopCamera();
+          vibrate(100);
 
-            setState({ type: 'loading', barcode });
+          setState({ type: 'loading', barcode });
 
+          try {
             // Check if barcode already exists in the local DB
             const existing = await db.products
               .where('barcode')
@@ -206,9 +209,21 @@ export function BarcodeScanner() {
               name: product?.name,
               imageUrl: product?.imageUrl,
             });
+          } catch (err) {
+            // Never leave the spinner stuck on an unhandled rejection —
+            // fall back to manual entry with the scanned barcode.
+            console.error('[PrepTrack] Barcode-Verarbeitung fehlgeschlagen:', err);
+            navigateToAddWithScan({ barcode });
           }
         }
       );
+
+      // If the component unmounted while we were awaiting camera start, stop the
+      // freshly created stream so the camera doesn't stay on.
+      if (cancelledRef.current) {
+        controls.stop();
+        return;
+      }
 
       controlsRef.current = controls;
       setCameraActive(true);
@@ -241,6 +256,7 @@ export function BarcodeScanner() {
 
   useEffect(() => {
     return () => {
+      cancelledRef.current = true;
       stopCamera();
     };
   }, [stopCamera]);

@@ -408,7 +408,7 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
       <div ref={modalRef} onClick={(e) => e.stopPropagation()} className="relative mx-4 w-full max-w-sm rounded-2xl border border-primary-600 bg-primary-900 p-5 shadow-2xl animate-scale-in">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-100">{t('consume.title')}</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"><X size={20} /></button>
+          <button onClick={onClose} aria-label={t('pwa.close')} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"><X size={20} /></button>
         </div>
         <p className="mb-1 text-sm text-gray-400">{product.name}</p>
         <p className="mb-5 text-xs text-gray-400">{t('consume.stock', { quantity: product.quantity, unit: product.unit })}</p>
@@ -503,7 +503,7 @@ function ProductDetailModal({ productId, products, onClose, onDelete }: { produc
             <Info size={20} className="shrink-0 text-green-400" />
             <h2 className="truncate text-lg font-bold text-gray-100">{product.name}</h2>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"><X size={20} /></button>
+          <button onClick={onClose} aria-label={t('pwa.close')} className="rounded-lg p-1.5 text-gray-400 hover:bg-primary-700 hover:text-gray-200"><X size={20} /></button>
         </div>
         <div className="space-y-5 p-5">
           {product.photo && <img src={product.photo} alt={product.name} className="h-48 w-full rounded-xl object-cover" />}
