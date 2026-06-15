@@ -127,7 +127,9 @@
     "ocrHint": "Place the date inside the green frame and capture.",
     "yearPlaceholder": "YYYY",
     "errNameRequired": "Please enter a product name.",
-    "errDateRequired": "Please set an expiry date."
+    "errDateRequired": "Please set an expiry date.",
+    "kcalPerUnit": "kcal per {{unit}}",
+    "kcalPlaceholder": "e.g. 350"
   },
   "scanner": {
     "title": "Scan barcode",
@@ -447,6 +449,16 @@
     "reasonWater": "Water deficit",
     "copy": "Copy",
     "copied": "Copied!",
-    "back": "Back"
+    "back": "Back",
+    "foodTitle": "Food range",
+    "foodDays_one": "{{count}} day of food",
+    "foodDays_other": "{{count}} days of food",
+    "foodTarget": "Target: {{kcal}} kcal for {{persons}} people / {{days}} days",
+    "foodEnough": "Food target reached",
+    "foodDeficit": "{{kcal}} kcal missing",
+    "foodNote": "Basis: 2200 kcal per person per day (BBK recommendation).",
+    "foodNoData": "Add “kcal per unit” to your food items to calculate the food range.",
+    "survival_one": "Self-sufficient for ~{{count}} day",
+    "survival_other": "Self-sufficient for ~{{count}} days"
   }
 }

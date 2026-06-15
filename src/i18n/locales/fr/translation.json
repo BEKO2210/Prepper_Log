@@ -127,7 +127,9 @@
     "ocrHint": "Placez la date dans le cadre vert et capturez.",
     "yearPlaceholder": "AAAA",
     "errNameRequired": "Saisissez un nom de produit.",
-    "errDateRequired": "Indiquez une date de péremption."
+    "errDateRequired": "Indiquez une date de péremption.",
+    "kcalPerUnit": "kcal par {{unit}}",
+    "kcalPlaceholder": "p. ex. 350"
   },
   "scanner": {
     "title": "Scanner un code-barres",
@@ -447,6 +449,16 @@
     "reasonWater": "Déficit d'eau",
     "copy": "Copier",
     "copied": "Copié !",
-    "back": "Retour"
+    "back": "Retour",
+    "foodTitle": "Autonomie alimentaire",
+    "foodDays_one": "{{count}} jour de nourriture",
+    "foodDays_other": "{{count}} jours de nourriture",
+    "foodTarget": "Objectif : {{kcal}} kcal pour {{persons}} personnes / {{days}} jours",
+    "foodEnough": "Objectif alimentaire atteint",
+    "foodDeficit": "Il manque {{kcal}} kcal",
+    "foodNote": "Base : 2200 kcal par personne et par jour (recommandation BBK).",
+    "foodNoData": "Ajoutez « kcal par unité » à vos aliments pour calculer l'autonomie.",
+    "survival_one": "Autonome pendant ~{{count}} jour",
+    "survival_other": "Autonome pendant ~{{count}} jours"
   }
 }

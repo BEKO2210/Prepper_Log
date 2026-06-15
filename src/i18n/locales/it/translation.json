@@ -127,7 +127,9 @@
     "ocrHint": "Inquadra la data nel riquadro verde e scatta.",
     "yearPlaceholder": "AAAA",
     "errNameRequired": "Inserisci un nome prodotto.",
-    "errDateRequired": "Imposta una data di scadenza."
+    "errDateRequired": "Imposta una data di scadenza.",
+    "kcalPerUnit": "kcal per {{unit}}",
+    "kcalPlaceholder": "es. 350"
   },
   "scanner": {
     "title": "Scansiona codice a barre",
@@ -447,6 +449,16 @@
     "reasonWater": "Deficit idrico",
     "copy": "Copia",
     "copied": "Copiato!",
-    "back": "Indietro"
+    "back": "Indietro",
+    "foodTitle": "Autonomia alimentare",
+    "foodDays_one": "{{count}} giorno di cibo",
+    "foodDays_other": "{{count}} giorni di cibo",
+    "foodTarget": "Obiettivo: {{kcal}} kcal per {{persons}} persone / {{days}} giorni",
+    "foodEnough": "Obiettivo alimentare raggiunto",
+    "foodDeficit": "Mancano {{kcal}} kcal",
+    "foodNote": "Base: 2200 kcal per persona al giorno (raccomandazione BBK).",
+    "foodNoData": "Aggiungi “kcal per unità” ai tuoi alimenti per calcolare l'autonomia.",
+    "survival_one": "Autonomo per ~{{count}} giorno",
+    "survival_other": "Autonomo per ~{{count}} giorni"
   }
 }

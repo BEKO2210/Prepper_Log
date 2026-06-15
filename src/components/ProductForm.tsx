@@ -43,6 +43,7 @@ interface FormState {
   expiryPrecision: 'day' | 'month' | 'year';
   photo: string;
   minStock: string;
+  kcalPerUnit: string;
   notes: string;
 }
 
@@ -57,6 +58,7 @@ const defaultForm: FormState = {
   expiryPrecision: 'day',
   photo: '',
   minStock: '0',
+  kcalPerUnit: '',
   notes: '',
 };
 
@@ -565,6 +567,7 @@ export function ProductForm() {
         expiryPrecision: existingProduct.expiryPrecision,
         photo: existingProduct.photo || '',
         minStock: String(existingProduct.minStock || 0),
+        kcalPerUnit: existingProduct.kcalPerUnit ? String(existingProduct.kcalPerUnit) : '',
         notes: existingProduct.notes || '',
       });
     }
@@ -686,6 +689,7 @@ export function ProductForm() {
         expiryPrecision: form.expiryPrecision,
         photo: form.photo || undefined,
         minStock: parseFloat(form.minStock) || undefined,
+        kcalPerUnit: parseFloat(form.kcalPerUnit) || undefined,
         notes: form.notes || undefined,
         archived: false,
         createdAt: editingProductId ? existingProduct?.createdAt || new Date().toISOString() : new Date().toISOString(),
@@ -816,9 +820,15 @@ export function ProductForm() {
           </div>
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.minStock')}</label>
-          <input type="number" min="0" value={form.minStock} onChange={(e) => updateField('minStock', e.target.value)} placeholder={t('form.minStockPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.minStock')}</label>
+            <input type="number" min="0" value={form.minStock} onChange={(e) => updateField('minStock', e.target.value)} placeholder={t('form.minStockPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.kcalPerUnit', { unit: t(`units.${form.unit}`, form.unit) })}</label>
+            <input type="number" min="0" inputMode="numeric" value={form.kcalPerUnit} onChange={(e) => updateField('kcalPerUnit', e.target.value)} placeholder={t('form.kcalPlaceholder')} className="w-full rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none" />
+          </div>
         </div>
 
         <div>

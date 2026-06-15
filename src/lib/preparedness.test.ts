@@ -28,6 +28,42 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
 const futureWater = (liters: number, unit = 'Liter') =>
   makeProduct({ category: 'wasser', quantity: liters, unit });
 
+describe('computePreparedness — energy / food range', () => {
+  it('reports no energy data when no kcal is set', () => {
+    const r = computePreparedness([makeProduct({ category: 'konserven' })], DEFAULT_HOUSEHOLD);
+    expect(r.hasEnergyData).toBe(false);
+    expect(r.foodKcal).toBe(0);
+    expect(r.survivalDays).toBeNull();
+  });
+
+  it('computes food days from kcalPerUnit * quantity (BBK 2200 kcal/person/day)', () => {
+    // 2 persons * 2200 = 4400 kcal/day. 10 cans * 4400 kcal = 44000 -> 10 days.
+    const cans = makeProduct({ category: 'konserven', quantity: 10, unit: 'Dose', kcalPerUnit: 4400 });
+    const r = computePreparedness([cans], { persons: 2, days: 10 });
+    expect(r.hasEnergyData).toBe(true);
+    expect(r.foodKcal).toBe(44000);
+    expect(r.foodDays).toBe(10);
+    expect(r.foodTargetKcal).toBe(44000);
+  });
+
+  it('excludes expired food from available energy', () => {
+    const expired = makeProduct({ quantity: 10, unit: 'Dose', kcalPerUnit: 4400 });
+    expired.expiryDate = new Date(Date.now() - 86_400_000).toISOString();
+    const r = computePreparedness([expired], { persons: 2, days: 10 });
+    expect(r.hasEnergyData).toBe(false);
+    expect(r.foodKcal).toBe(0);
+  });
+
+  it('survivalDays is the minimum of water and food range', () => {
+    const water = futureWater(40); // 2 persons,10 days -> 10 water days
+    const food = makeProduct({ category: 'lebensmittel', quantity: 5, unit: 'Packung', kcalPerUnit: 4400 }); // 5 days food
+    const r = computePreparedness([water, food], { persons: 2, days: 10 });
+    expect(r.waterDays).toBe(10);
+    expect(r.foodDays).toBe(5);
+    expect(r.survivalDays).toBe(5);
+  });
+});
+
 describe('computePreparedness — water range', () => {
   it('computes whole days of water from the BBK 2 L/person/day rule', () => {
     // 2 persons * 2 L = 4 L/day. 20 L -> 5 days.
