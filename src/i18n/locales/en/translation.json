@@ -122,7 +122,9 @@
     "ocrScanDate": "Scan date",
     "ocrRunning": "Reading…",
     "ocrSuccess": "Date detected — please verify.",
-    "ocrError": "No date found. Please enter manually."
+    "ocrError": "No date found. Try again or enter manually.",
+    "ocrCapture": "Capture photo",
+    "ocrHint": "Place the date inside the green frame and capture."
   },
   "scanner": {
     "title": "Scan barcode",

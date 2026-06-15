@@ -122,7 +122,9 @@
     "ocrScanDate": "Scansiona data",
     "ocrRunning": "Lettura…",
     "ocrSuccess": "Data rilevata — verifica.",
-    "ocrError": "Nessuna data trovata. Inseriscila manualmente."
+    "ocrError": "Nessuna data trovata. Riprova o inseriscila manualmente.",
+    "ocrCapture": "Scatta foto",
+    "ocrHint": "Inquadra la data nel riquadro verde e scatta."
   },
   "scanner": {
     "title": "Scansiona codice a barre",

@@ -4,7 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addProduct, updateProduct } from '../lib/db';
 import { useAppStore } from '../store/useAppStore';
 import { compressImage, fetchAndCompressImage, lookupBarcode, formatDate, getDaysUntilExpiry, formatDaysUntil, getExpiryStatus, getStatusBadgeColor } from '../lib/utils';
-import { recognizeExpiryDate } from '../lib/dateOcr';
+import { recognizeExpiryDate, type ParsedExpiry } from '../lib/dateOcr';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import {
   DEFAULT_UNITS,
@@ -385,6 +385,137 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
   );
 }
 
+type DateScanState = 'idle' | 'live' | 'recognizing' | 'error';
+
+/**
+ * Inline expiry-date scanner: opens the camera ON THE PAGE (live <video> +
+ * shutter) and runs offline OCR on the captured frame. Unlike a native
+ * <input capture>, this never reloads the PWA, so the form state is preserved.
+ */
+function DateScanner({ onResult }: { onResult: (parsed: ParsedExpiry) => void }) {
+  const { t } = useTranslation();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const cancelledRef = useRef(false);
+  const [expanded, setExpanded] = useState(false);
+  const [state, setState] = useState<DateScanState>('idle');
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((tr) => tr.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    cancelledRef.current = false;
+    setState('idle');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false,
+      });
+      if (cancelledRef.current) {
+        stream.getTracks().forEach((tr) => tr.stop());
+        return;
+      }
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => undefined);
+      }
+      setState('live');
+    } catch {
+      setState('error');
+    }
+  }, []);
+
+  const close = useCallback(() => {
+    cancelledRef.current = true;
+    stopCamera();
+    setExpanded(false);
+    setState('idle');
+  }, [stopCamera]);
+
+  async function capture() {
+    const video = videoRef.current;
+    if (!video || !video.videoWidth) return;
+    setState('recognizing');
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { setState('error'); return; }
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', 0.9));
+      if (!blob) { setState('error'); return; }
+      const parsed = await recognizeExpiryDate(blob);
+      if (parsed) {
+        onResult(parsed);
+        vibrate(60);
+        close();
+      } else {
+        setState('error');
+      }
+    } catch {
+      setState('error');
+    }
+  }
+
+  useEffect(() => () => { cancelledRef.current = true; stopCamera(); }, [stopCamera]);
+
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => { setExpanded(true); startCamera(); }}
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-green-500/40 bg-green-500/5 px-4 py-2.5 text-sm font-medium text-green-400 transition-colors hover:border-green-500/60 hover:bg-green-500/10"
+      >
+        <ScanText size={16} />
+        {t('form.ocrScanDate')}
+      </button>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-xl border border-primary-600 bg-primary-800/50 p-3">
+      <div className="flex items-center justify-between text-sm font-medium text-gray-300">
+        <div className="flex items-center gap-2"><ScanText size={16} /> {t('form.ocrScanDate')}</div>
+        <button type="button" onClick={close} aria-label={t('pwa.close')} className="rounded-lg p-1 text-gray-400 hover:bg-primary-700 hover:text-gray-200">
+          <X size={18} />
+        </button>
+      </div>
+
+      <div className="relative overflow-hidden rounded-lg border border-primary-700 bg-black">
+        <video ref={videoRef} className="aspect-[4/3] w-full object-cover" autoPlay playsInline muted />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-1/4 w-4/5 rounded-lg border-2 border-green-400/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]" />
+        </div>
+        {state === 'recognizing' && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <span className="flex items-center gap-2 text-sm text-gray-100">
+              <Loader2 size={18} className="animate-spin" /> {t('form.ocrRunning')}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <p className="text-[0.7rem] text-gray-400">{t('form.ocrHint')}</p>
+      {state === 'error' && <p className="text-xs text-orange-400">{t('form.ocrError')}</p>}
+
+      <button
+        type="button"
+        onClick={capture}
+        disabled={state !== 'live'}
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white transition-transform hover:bg-green-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <Camera size={18} />
+        {state === 'recognizing' ? t('form.ocrRunning') : t('form.ocrCapture')}
+      </button>
+    </div>
+  );
+}
+
 export function ProductForm() {
   const { editingProductId, setPage, setEditingProductId, scannedData, setScannedData, scanRequested, clearScanRequest } = useAppStore();
   const [autoStartScan] = useState(scanRequested);
@@ -394,7 +525,6 @@ export function ProductForm() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  const dateOcrInputRef = useRef<HTMLInputElement>(null);
   const restoredRef = useRef(false);
   const populatedRef = useRef(false);
 
@@ -406,7 +536,6 @@ export function ProductForm() {
 
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [ocrState, setOcrState] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
 
   function getQuantityStep(unit: string): string {
     switch (unit) {
@@ -494,30 +623,8 @@ export function ProductForm() {
     cameraInputRef.current?.click();
   }
 
-  function handleDateOcrClick() {
-    saveFormDraft(form, editingProductId);
-    dateOcrInputRef.current?.click();
-  }
-
-  async function handleDateOcrSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    setOcrState('running');
-    try {
-      const parsed = await recognizeExpiryDate(file);
-      if (parsed) {
-        setForm((prev) => ({ ...prev, expiryDate: parsed.date, expiryPrecision: parsed.precision }));
-        setOcrState('success');
-      } else {
-        setOcrState('error');
-      }
-    } catch {
-      setOcrState('error');
-    } finally {
-      clearFormDraft();
-    }
-    setTimeout(() => setOcrState('idle'), 4000);
+  function handleDateScanned(parsed: ParsedExpiry) {
+    setForm((prev) => ({ ...prev, expiryDate: parsed.date, expiryPrecision: parsed.precision }));
   }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -658,18 +765,7 @@ export function ProductForm() {
         </div>
 
         <div>
-          <div className="mb-1 flex items-center justify-between gap-2">
-            <label className="block text-sm font-medium text-gray-300">{t('form.expiryDate')}</label>
-            <button
-              type="button"
-              onClick={handleDateOcrClick}
-              disabled={ocrState === 'running'}
-              className="flex items-center gap-1 text-xs text-green-400 transition-colors hover:text-green-300 disabled:opacity-60"
-            >
-              {ocrState === 'running' ? <Loader2 size={13} className="animate-spin" /> : <ScanText size={13} />}
-              {ocrState === 'running' ? t('form.ocrRunning') : t('form.ocrScanDate')}
-            </button>
-          </div>
+          <label className="mb-1 block text-sm font-medium text-gray-300">{t('form.expiryDate')}</label>
           <div className="flex gap-2">
             <input type="date" required value={form.expiryDate} onChange={(e) => updateField('expiryDate', e.target.value)} className="flex-1 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2.5 text-gray-200 focus:border-green-500 focus:outline-none" />
             <select value={form.expiryPrecision} onChange={(e) => updateField('expiryPrecision', e.target.value as 'day' | 'month' | 'year')} className="rounded-lg border border-primary-600 bg-primary-800 px-3 py-2.5 text-sm text-gray-200 focus:border-green-500 focus:outline-none">
@@ -678,9 +774,9 @@ export function ProductForm() {
               <option value="year">{t('form.precisionYear')}</option>
             </select>
           </div>
-          {ocrState === 'success' && <p className="mt-1 text-xs text-green-400">{t('form.ocrSuccess')}</p>}
-          {ocrState === 'error' && <p className="mt-1 text-xs text-orange-400">{t('form.ocrError')}</p>}
-          <input ref={dateOcrInputRef} type="file" accept="image/*" capture="environment" onChange={handleDateOcrSelect} className="hidden" />
+          <div className="mt-2">
+            <DateScanner onResult={handleDateScanned} />
+          </div>
         </div>
 
         <div>
