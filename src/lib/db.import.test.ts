@@ -113,4 +113,54 @@ describe('importData sync linkage', () => {
     expect(logSyncRow?.payload?.productSyncId).toBe(logs[0].productSyncId);
     expect(logSyncRow?.payload?.productId).toBe(logs[0].productId);
   });
+
+  it('does not throw on a syncId collision (re-import re-mints the syncId)', async () => {
+    const { db, addProduct, importData } = await import('./db');
+    await db.delete();
+    await db.open();
+
+    // Existing product with a fixed syncId.
+    await addProduct({
+      syncId: 'dup-sync-id',
+      name: 'Altes Produkt',
+      category: 'konserven',
+      storageLocation: 'Keller',
+      quantity: 1,
+      unit: 'Dose',
+      expiryDate: '2027-01-01T00:00:00.000Z',
+      expiryPrecision: 'day',
+      archived: false,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    });
+
+    // Import a DIFFERENT product (so dedup misses) that reuses the same syncId.
+    const payload = {
+      version: '2.0.0',
+      products: [
+        {
+          syncId: 'dup-sync-id',
+          name: 'Neues Produkt',
+          category: 'lebensmittel',
+          storageLocation: 'Garage',
+          quantity: 2,
+          unit: 'Packung',
+          expiryDate: '2028-06-30T00:00:00.000Z',
+          expiryPrecision: 'day',
+          archived: false,
+          createdAt: '2026-03-10T10:00:00.000Z',
+          updatedAt: '2026-03-10T10:00:00.000Z',
+        },
+      ],
+      storageLocations: [],
+      consumptionLogs: [],
+    };
+
+    await expect(importData(JSON.stringify(payload))).resolves.toBeTruthy();
+
+    const all = await db.products.toArray();
+    expect(all).toHaveLength(2);
+    const syncIds = all.map((p) => p.syncId);
+    expect(new Set(syncIds).size).toBe(2); // both unique, no collision
+  });
 });

@@ -208,6 +208,7 @@ export function BarcodeScanner() {
               barcode,
               name: product?.name,
               imageUrl: product?.imageUrl,
+              kcalPerUnit: product?.kcalPerUnit,
             });
           } catch (err) {
             // Never leave the spinner stuck on an unhandled rejection —

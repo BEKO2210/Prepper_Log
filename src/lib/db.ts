@@ -773,8 +773,12 @@ export async function importData(jsonString: string): Promise<ImportDataResult> 
           .first();
         if (!existing) {
           const now = new Date().toISOString();
+          let locSyncId = typeof loc.syncId === 'string' && loc.syncId ? loc.syncId : createSyncId();
+          if (await db.storageLocations.where('syncId').equals(locSyncId).first()) {
+            locSyncId = createSyncId();
+          }
           const next: Omit<StorageLocation, 'id'> = {
-            syncId: typeof loc.syncId === 'string' ? loc.syncId : createSyncId(),
+            syncId: locSyncId,
             name: loc.name,
             createdAt: (loc.createdAt as string) || now,
             updatedAt: (loc.updatedAt as string) || (loc.createdAt as string) || now,
@@ -835,9 +839,16 @@ export async function importData(jsonString: string): Promise<ImportDataResult> 
             : undefined;
         const now = new Date().toISOString();
 
+        // Preserve the incoming syncId only if it's free; otherwise mint a new
+        // one so re-importing a backup can't violate the unique syncId index.
+        let productSyncId = typeof product.syncId === 'string' && product.syncId ? product.syncId : createSyncId();
+        if (await db.products.where('syncId').equals(productSyncId).first()) {
+          productSyncId = createSyncId();
+        }
+
         // Only import known fields to prevent injection of unexpected data
         const next: Omit<Product, 'id'> = {
-          syncId: typeof product.syncId === 'string' ? product.syncId : createSyncId(),
+          syncId: productSyncId,
           name: String(product.name),
           barcode: typeof product.barcode === 'string' ? product.barcode : undefined,
           category:
@@ -907,8 +918,12 @@ export async function importData(jsonString: string): Promise<ImportDataResult> 
           }
         }
 
+        let logSyncId = typeof log.syncId === 'string' && log.syncId ? log.syncId : createSyncId();
+        if (await db.consumptionLogs.where('syncId').equals(logSyncId).first()) {
+          logSyncId = createSyncId();
+        }
         const next: Omit<ConsumptionLog, 'id'> = {
-          syncId: typeof log.syncId === 'string' ? log.syncId : createSyncId(),
+          syncId: logSyncId,
           productId: resolvedLocalProductId,
           productSyncId: resolvedProductSyncId,
           productName: typeof log.productName === 'string' ? log.productName : 'Produkt',

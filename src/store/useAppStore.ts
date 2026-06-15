@@ -14,6 +14,7 @@ export interface ScannedData {
   barcode: string;
   name?: string;
   imageUrl?: string;
+  kcalPerUnit?: number;
 }
 
 interface AppState {

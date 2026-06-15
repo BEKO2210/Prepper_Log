@@ -298,7 +298,7 @@ export async function fetchAndCompressImage(
 
 export async function lookupBarcode(
   barcode: string
-): Promise<{ name: string; category?: string; imageUrl?: string } | null> {
+): Promise<{ name: string; category?: string; imageUrl?: string; kcalPerUnit?: number } | null> {
   if (!barcode || !/^\d{8,14}$/.test(barcode)) return null;
 
   const controller = new AbortController();
@@ -306,7 +306,7 @@ export async function lookupBarcode(
 
   try {
     const response = await fetch(
-      `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}?fields=product_name,product_name_de,brands,categories,image_front_url,quantity&lc=de`,
+      `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}?fields=product_name,product_name_de,brands,categories,image_front_url,quantity,product_quantity,nutriments&lc=de`,
       {
         signal: controller.signal,
         headers: { Accept: 'application/json' },
@@ -322,6 +322,15 @@ export async function lookupBarcode(
     const product = data.product;
     const rawCategory = product.categories as string | undefined;
     const firstCategory = rawCategory?.split(',')[0]?.trim() || undefined;
+
+    // Energy of ONE package/unit = kcal/100g × package size (g/ml).
+    const kcal100 = Number(product.nutriments?.['energy-kcal_100g']);
+    const packageQty = Number(product.product_quantity);
+    const kcalPerUnit =
+      Number.isFinite(kcal100) && kcal100 > 0 && Number.isFinite(packageQty) && packageQty > 0
+        ? Math.round((kcal100 * packageQty) / 100)
+        : undefined;
+
     return {
       name:
         product.product_name_de ||
@@ -330,6 +339,7 @@ export async function lookupBarcode(
         i18n.t('dbErrors.unknownProduct'),
       category: firstCategory,
       imageUrl: product.image_front_url || undefined,
+      kcalPerUnit,
     };
   } catch {
     clearTimeout(timeoutId);
