@@ -396,7 +396,10 @@ export function Settings() {
 
       {/* Appearance */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.appearance')}</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <Sun size={18} className="text-yellow-400" />
+          {t('settings.appearance')}
+        </h3>
         <button
           onClick={toggleDark}
           role="switch"
@@ -430,7 +433,10 @@ export function Settings() {
 
       {/* Notifications */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.notifications')}</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <Bell size={18} className="text-orange-400" />
+          {t('settings.notifications')}
+        </h3>
         <button
           onClick={handleToggleNotifications}
           disabled={notifStatus === 'denied' || notifStatus === 'unsupported'}
@@ -480,7 +486,10 @@ export function Settings() {
 
       {/* Storage Locations */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.manageLocations')}</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <MapPin size={18} className="text-cyan-400" />
+          {t('settings.manageLocations')}
+        </h3>
         <div className="mb-3 flex gap-2">
           <div className="relative flex-1">
             <MapPin
@@ -538,7 +547,10 @@ export function Settings() {
 
       {/* Data Management */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-        <h3 className="mb-3 font-semibold text-gray-200">{t('settings.dataManagement')}</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
+          <HardDrive size={18} className="text-blue-400" />
+          {t('settings.dataManagement')}
+        </h3>
         <div className="space-y-2">
           <button
             onClick={handleExportJSON}

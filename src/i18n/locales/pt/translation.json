@@ -367,7 +367,8 @@
   },
   "common": {
     "yes": "Sim",
-    "no": "Não"
+    "no": "Não",
+    "undo": "Anular"
   },
   "sync": {
     "title": "Sincronização LAN (opcional)",

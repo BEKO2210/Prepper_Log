@@ -367,7 +367,8 @@
   },
   "common": {
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "undo": "Undo"
   },
   "sync": {
     "title": "LAN Sync (optional)",

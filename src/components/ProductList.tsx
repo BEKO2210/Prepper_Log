@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { archiveProduct, deleteProduct, logConsumption, updateProduct } from '../lib/db';
+import { addProduct, archiveProduct, deleteProduct, deleteConsumptionLog, logConsumption, updateProduct } from '../lib/db';
 import { useModal } from '../hooks/useModal';
 import { useToast } from './Toast';
 import { ListSkeleton } from './Skeleton';
@@ -88,8 +88,9 @@ export function ProductList() {
   async function handleConsumeConfirm(productId: number, amount: number) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
+    const prevQuantity = product.quantity;
 
-    await logConsumption({
+    const logId = await logConsumption({
       productId,
       productName: product.name,
       quantity: amount,
@@ -99,23 +100,38 @@ export function ProductList() {
     });
 
     const newQuantity = product.quantity - amount;
-    if (newQuantity <= 0) {
-      await archiveProduct(productId);
-      showToast(t('consume.toastConsumedAndArchived', { name: product.name, amount, unit: product.unit }), 'success');
-    } else {
-      await updateProduct(productId, { quantity: newQuantity });
-      showToast(t('consume.toastConsumed', { name: product.name, amount, unit: product.unit, remaining: newQuantity }), 'success');
-    }
+    if (newQuantity <= 0) await archiveProduct(productId);
+    else await updateProduct(productId, { quantity: newQuantity });
+
+    const undo = () => {
+      void (async () => {
+        await updateProduct(productId, { quantity: prevQuantity, archived: false });
+        await deleteConsumptionLog(logId);
+      })();
+    };
+    const message = newQuantity <= 0
+      ? t('consume.toastConsumedAndArchived', { name: product.name, amount, unit: product.unit })
+      : t('consume.toastConsumed', { name: product.name, amount, unit: product.unit, remaining: newQuantity });
+    showToast(message, 'success', { label: t('common.undo'), onClick: undo });
     setConsumeProduct(null);
   }
 
   async function handleDelete(id: number) {
-    const name = products.find((p) => p.id === id)?.name;
+    const product = products.find((p) => p.id === id);
     try {
       await deleteProduct(id);
       setConfirmDelete(null);
       setSelectedProduct((cur) => (cur === id ? null : cur));
-      if (name) showToast(t('products.deletedToast', { name }), 'success');
+      if (product) {
+        showToast(t('products.deletedToast', { name: product.name }), 'success', {
+          label: t('common.undo'),
+          onClick: () => {
+            const { id: _id, ...rest } = product;
+            void _id;
+            void addProduct(rest);
+          },
+        });
+      }
     } catch (err) {
       console.error('[PrepTrack] Löschen fehlgeschlagen:', err);
       showToast(t('products.deleteError'), 'error');
