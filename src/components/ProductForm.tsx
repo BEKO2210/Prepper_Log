@@ -99,7 +99,7 @@ type ScanState =
   | { type: 'error'; message: string }
   | { type: 'success'; barcode: string; name?: string };
 
-function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { barcode: string; name?: string; imageUrl?: string }) => void; autoStart?: boolean }) {
+function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { barcode: string; name?: string; imageUrl?: string; kcalPerUnit?: number }) => void; autoStart?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
   const cancelledRef = useRef(false);
@@ -173,7 +173,7 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
             if (isOnlineRef.current) {
               const product = await lookupBarcode(barcode);
               setScanState({ type: 'success', barcode, name: product?.name });
-              onScanned({ barcode, name: product?.name, imageUrl: product?.imageUrl });
+              onScanned({ barcode, name: product?.name, imageUrl: product?.imageUrl, kcalPerUnit: product?.kcalPerUnit });
             } else {
               setScanState({ type: 'success', barcode });
               onScanned({ barcode });
@@ -587,7 +587,12 @@ export function ProductForm() {
 
   useEffect(() => {
     if (scannedData && !editingProductId) {
-      setForm((prev) => ({ ...prev, barcode: scannedData.barcode || prev.barcode, name: scannedData.name || prev.name }));
+      setForm((prev) => ({
+        ...prev,
+        barcode: scannedData.barcode || prev.barcode,
+        name: scannedData.name || prev.name,
+        kcalPerUnit: scannedData.kcalPerUnit && !prev.kcalPerUnit ? String(scannedData.kcalPerUnit) : prev.kcalPerUnit,
+      }));
       const imageUrl = scannedData.imageUrl;
       setScannedData(null);
       if (imageUrl) {
@@ -608,11 +613,12 @@ export function ProductForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  const handleScanned = useCallback((data: { barcode: string; name?: string; imageUrl?: string }) => {
+  const handleScanned = useCallback((data: { barcode: string; name?: string; imageUrl?: string; kcalPerUnit?: number }) => {
     setForm((prev) => ({
       ...prev,
       barcode: data.barcode || prev.barcode,
       name: data.name || prev.name,
+      kcalPerUnit: data.kcalPerUnit && !prev.kcalPerUnit ? String(data.kcalPerUnit) : prev.kcalPerUnit,
     }));
     if (data.imageUrl) {
       fetchAndCompressImage(data.imageUrl).then((base64) => {
