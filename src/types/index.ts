@@ -13,6 +13,7 @@ export interface Product {
   expiryPrecision: 'day' | 'month' | 'year';
   photo?: string; // Base64 data URL
   minStock?: number;
+  kcalPerUnit?: number; // Energy of ONE unit (e.g. one can/pack/kg) — for the survival estimate
   notes?: string;
   archived: boolean;
   createdAt: string;

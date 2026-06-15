@@ -127,7 +127,9 @@
     "ocrHint": "Datum im grünen Rahmen platzieren und auslösen.",
     "yearPlaceholder": "JJJJ",
     "errNameRequired": "Bitte einen Produktnamen eingeben.",
-    "errDateRequired": "Bitte ein Mindesthaltbarkeitsdatum angeben."
+    "errDateRequired": "Bitte ein Mindesthaltbarkeitsdatum angeben.",
+    "kcalPerUnit": "kcal pro {{unit}}",
+    "kcalPlaceholder": "z. B. 350"
   },
   "scanner": {
     "title": "Barcode scannen",
@@ -447,6 +449,16 @@
     "reasonWater": "Wasser-Defizit",
     "copy": "Kopieren",
     "copied": "Kopiert!",
-    "back": "Zurück"
+    "back": "Zurück",
+    "foodTitle": "Lebensmittel-Reichweite",
+    "foodDays_one": "{{count}} Tag Nahrung",
+    "foodDays_other": "{{count}} Tage Nahrung",
+    "foodTarget": "Ziel: {{kcal}} kcal für {{persons}} Personen / {{days}} Tage",
+    "foodEnough": "Ernährungs-Ziel erreicht",
+    "foodDeficit": "Es fehlen {{kcal}} kcal",
+    "foodNote": "Basis: 2200 kcal pro Person und Tag (BBK-Empfehlung).",
+    "foodNoData": "Trage bei deinen Lebensmitteln „kcal pro Einheit“ ein, um die Ernährungs-Reichweite zu berechnen.",
+    "survival_one": "Autark für ~{{count}} Tag",
+    "survival_other": "Autark für ~{{count}} Tage"
   }
 }

@@ -222,7 +222,11 @@ export function Dashboard() {
             <ShieldCheck size={16} className="text-green-400" />
             <span className="text-sm font-semibold text-gray-200">{t('preparedness.cardTitle')}</span>
           </div>
-          <p className="mt-1 text-xs text-gray-400">{t('preparedness.waterDays', { count: preparedness.waterDays })}</p>
+          <p className="mt-1 text-xs text-gray-400">
+            {preparedness.survivalDays !== null
+              ? t('preparedness.survival', { count: preparedness.survivalDays })
+              : t('preparedness.waterDays', { count: preparedness.waterDays })}
+          </p>
           <p className="text-[0.65rem] text-gray-500">{t('preparedness.cardHint')}</p>
         </div>
         <ChevronRight size={18} className="shrink-0 text-gray-500" />

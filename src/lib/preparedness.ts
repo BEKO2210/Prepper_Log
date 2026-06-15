@@ -11,6 +11,9 @@ export const DEFAULT_HOUSEHOLD: HouseholdConfig = { persons: 2, days: 10 };
 // BBK-Empfehlung: 2 Liter Trinkwasser pro Person und Tag.
 export const WATER_LITERS_PER_PERSON_DAY = 2;
 
+// BBK-Empfehlung: ca. 2200 kcal pro Person und Tag (Notvorrat-Energiebedarf).
+export const KCAL_PER_PERSON_DAY = 2200;
+
 // Grundkategorien für die Basis-Abdeckung (BBK-Notvorrat-Logik).
 export const ESSENTIAL_CATEGORIES: ProductCategory[] = [
   'wasser',
@@ -36,6 +39,12 @@ export interface PreparednessResult {
   essentialTotal: number;
   freshRatio: number; // Anteil aktiver Produkte, die nicht abgelaufen sind
   targetDays: number;
+  // Energie / Ernährungs-Reichweite (nur aussagekräftig, wenn kcal-Daten gepflegt sind)
+  hasEnergyData: boolean;
+  foodKcal: number; // verfügbare, nicht abgelaufene kcal
+  foodTargetKcal: number;
+  foodDays: number; // ganze Tage Ernährung für den Haushalt
+  survivalDays: number | null; // min(Wasser, Ernährung) — null ohne kcal-Daten
 }
 
 export type ShoppingReason = 'lowStock' | 'water';
@@ -105,12 +114,29 @@ export function computePreparedness(
 
   const freshRatio = active.length > 0 ? fresh.length / active.length : 1;
 
+  // Energy / food range — counts any fresh product that has a kcal value set.
+  const foodKcal = Math.round(
+    fresh
+      .filter((p) => typeof p.kcalPerUnit === 'number' && p.kcalPerUnit > 0)
+      .reduce((sum, p) => sum + p.kcalPerUnit! * p.quantity, 0)
+  );
+  const hasEnergyData = foodKcal > 0;
+  const dailyKcalNeed = persons * KCAL_PER_PERSON_DAY;
+  const foodTargetKcal = dailyKcalNeed * targetDays;
+  const foodDays = Math.floor(foodKcal / dailyKcalNeed);
+  const survivalDays = hasEnergyData ? Math.min(waterDays, foodDays) : null;
+
   const waterScore = clamp01(waterDays / targetDays);
   const categoryScore = essentialCovered / essentialTotal;
   const freshScore = freshRatio;
+  const foodScore = clamp01(foodDays / targetDays);
 
+  // With real kcal data, energy replaces the coarse category-coverage signal.
   const score = Math.round(
-    100 * (0.45 * waterScore + 0.35 * categoryScore + 0.2 * freshScore)
+    100 *
+      (hasEnergyData
+        ? 0.4 * waterScore + 0.4 * foodScore + 0.2 * freshScore
+        : 0.45 * waterScore + 0.35 * categoryScore + 0.2 * freshScore)
   );
 
   return {
@@ -124,6 +150,11 @@ export function computePreparedness(
     essentialTotal,
     freshRatio,
     targetDays,
+    hasEnergyData,
+    foodKcal,
+    foodTargetKcal,
+    foodDays,
+    survivalDays,
   };
 }
 

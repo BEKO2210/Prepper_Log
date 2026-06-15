@@ -13,6 +13,7 @@ import {
   Users,
   CalendarDays,
   Droplets,
+  Flame,
   CheckCircle2,
   XCircle,
   ShoppingCart,
@@ -163,6 +164,11 @@ export function Preparedness() {
           <p className="mt-2 text-xs text-gray-400">
             {t('preparedness.coverageHint', { covered: result.essentialCovered, total: result.essentialTotal })}
           </p>
+          {result.survivalDays !== null && (
+            <p className="mt-1 text-sm font-semibold text-gray-100">
+              {t('preparedness.survival', { count: result.survivalDays })}
+            </p>
+          )}
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
@@ -225,6 +231,58 @@ export function Preparedness() {
             : t('preparedness.waterEnough')}
         </p>
         <p className="mt-2 text-[0.65rem] text-gray-500">{t('preparedness.waterNote')}</p>
+      </motion.div>
+
+      {/* Food / energy range */}
+      <motion.div
+        variants={card}
+        initial="initial"
+        animate="animate"
+        transition={{ duration: 0.3, delay: 0.08 }}
+        className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4"
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15">
+              <Flame size={16} className="text-amber-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-200">{t('preparedness.foodTitle')}</h3>
+          </div>
+          {result.hasEnergyData && (
+            <span className="text-2xl font-bold text-gray-100">{t('preparedness.foodDays', { count: result.foodDays })}</span>
+          )}
+        </div>
+        {result.hasEnergyData ? (
+          <>
+            <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-primary-700">
+              <motion.div
+                className="h-full rounded-full bg-amber-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(100, Math.round((result.foodDays / result.targetDays) * 100))}%` }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-xs text-gray-400">
+                {t('preparedness.foodTarget', {
+                  kcal: result.foodTargetKcal.toLocaleString(),
+                  persons: household.persons,
+                  days: household.days,
+                })}
+              </p>
+              <span className="shrink-0 text-xs font-semibold text-amber-400">{Math.min(100, Math.round((result.foodDays / result.targetDays) * 100))}%</span>
+            </div>
+            <p className={`mt-2 inline-flex items-center gap-1 text-xs ${result.foodKcal < result.foodTargetKcal ? 'text-orange-400' : 'text-green-400'}`}>
+              {result.foodKcal < result.foodTargetKcal ? <XCircle size={13} /> : <CheckCircle2 size={13} />}
+              {result.foodKcal < result.foodTargetKcal
+                ? t('preparedness.foodDeficit', { kcal: Math.max(0, result.foodTargetKcal - result.foodKcal).toLocaleString() })
+                : t('preparedness.foodEnough')}
+            </p>
+            <p className="mt-2 text-[0.65rem] text-gray-500">{t('preparedness.foodNote')}</p>
+          </>
+        ) : (
+          <p className="text-xs text-gray-400">{t('preparedness.foodNoData')}</p>
+        )}
       </motion.div>
 
       {/* Coverage chips */}

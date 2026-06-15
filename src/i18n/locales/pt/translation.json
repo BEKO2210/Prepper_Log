@@ -127,7 +127,9 @@
     "ocrHint": "Coloca a data dentro da moldura verde e captura.",
     "yearPlaceholder": "AAAA",
     "errNameRequired": "Introduz um nome de produto.",
-    "errDateRequired": "Define uma data de validade."
+    "errDateRequired": "Define uma data de validade.",
+    "kcalPerUnit": "kcal por {{unit}}",
+    "kcalPlaceholder": "ex. 350"
   },
   "scanner": {
     "title": "Escanear código de barras",
@@ -447,6 +449,16 @@
     "reasonWater": "Défice de água",
     "copy": "Copiar",
     "copied": "Copiado!",
-    "back": "Voltar"
+    "back": "Voltar",
+    "foodTitle": "Autonomia de alimentos",
+    "foodDays_one": "{{count}} dia de comida",
+    "foodDays_other": "{{count}} dias de comida",
+    "foodTarget": "Meta: {{kcal}} kcal para {{persons}} pessoas / {{days}} dias",
+    "foodEnough": "Meta de alimentos atingida",
+    "foodDeficit": "Faltam {{kcal}} kcal",
+    "foodNote": "Base: 2200 kcal por pessoa por dia (recomendação BBK).",
+    "foodNoData": "Adiciona “kcal por unidade” aos teus alimentos para calcular a autonomia.",
+    "survival_one": "Autónomo por ~{{count}} dia",
+    "survival_other": "Autónomo por ~{{count}} dias"
   }
 }
