@@ -122,7 +122,9 @@
     "ocrScanDate": "Datum scannen",
     "ocrRunning": "Erkenne…",
     "ocrSuccess": "MHD erkannt — bitte prüfen.",
-    "ocrError": "Kein Datum erkannt. Bitte manuell eingeben."
+    "ocrError": "Kein Datum erkannt. Bitte erneut versuchen oder manuell eingeben.",
+    "ocrCapture": "Foto aufnehmen",
+    "ocrHint": "Datum im grünen Rahmen platzieren und auslösen."
   },
   "scanner": {
     "title": "Barcode scannen",

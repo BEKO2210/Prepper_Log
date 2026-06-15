@@ -122,7 +122,9 @@
     "ocrScanDate": "Digitalizar data",
     "ocrRunning": "A ler…",
     "ocrSuccess": "Data detetada — verifica, por favor.",
-    "ocrError": "Nenhuma data encontrada. Introduz manualmente."
+    "ocrError": "Nenhuma data encontrada. Tenta de novo ou introduz manualmente.",
+    "ocrCapture": "Tirar foto",
+    "ocrHint": "Coloca a data dentro da moldura verde e captura."
   },
   "scanner": {
     "title": "Escanear código de barras",
