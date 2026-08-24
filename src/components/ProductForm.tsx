@@ -720,7 +720,7 @@ export function ProductForm() {
             <ArrowLeft size={20} />
           </button>
         )}
-        <h2 className="text-2xl font-bold text-gray-100">
+        <h2 className="title-display text-4xl text-gray-100">
           {editingProductId ? t('form.editTitle') : t('form.addTitle')}
         </h2>
       </div>

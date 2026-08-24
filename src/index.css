@@ -91,7 +91,7 @@ html:not(.dark) {
     font-family: 'Bebas Neue', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    line-height: 0.95;
+    line-height: 1.1; /* Umlaut-Punkte (Ä/Ö/Ü) brauchen Luft nach oben */
   }
 
   /* Alle Zahlen, Mengen, Datumsangaben */

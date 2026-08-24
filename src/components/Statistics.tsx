@@ -79,7 +79,7 @@ export function Statistics() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-100">{t('stats.title')}</h2>
+          <h2 className="title-display text-4xl text-gray-100">{t('stats.title')}</h2>
           <p className="text-sm text-gray-400">{t('stats.subtitle')}</p>
         </div>
         <div className="flex flex-col items-center rounded-xl border border-primary-700 bg-primary-800/60 px-6 py-14 text-center">
@@ -96,27 +96,27 @@ export function Statistics() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-100">{t('stats.title')}</h2>
+        <h2 className="title-display text-4xl text-gray-100">{t('stats.title')}</h2>
         <p className="text-sm text-gray-400">{t('stats.subtitle')}</p>
       </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <div className="flex items-center gap-2 text-blue-400">
-            <Package size={18} />
-            <span className="text-sm">{t('stats.activeProducts')}</span>
+          <div className="flex items-center gap-2 text-[color:var(--pt-accent)]">
+            <Package size={15} />
+            <span className="eyebrow">{t('stats.activeProducts')}</span>
           </div>
-          <p className="mt-1 text-3xl font-bold text-gray-100">
+          <p className="num mt-2 text-3xl font-bold text-gray-100">
             <CountUp value={stats.totalProducts} />
           </p>
         </div>
         <div className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
-          <div className="flex items-center gap-2 text-orange-400">
-            <Calendar size={18} />
-            <span className="text-sm">{t('stats.expiryRate')}</span>
+          <div className="flex items-center gap-2 text-[color:var(--pt-accent)]">
+            <Calendar size={15} />
+            <span className="eyebrow">{t('stats.expiryRate')}</span>
           </div>
-          <p className="mt-1 text-3xl font-bold text-gray-100"><CountUp value={expiryRate} suffix="%" /></p>
+          <p className="num mt-2 text-3xl font-bold text-gray-100"><CountUp value={expiryRate} suffix="%" /></p>
           <p className="text-xs text-gray-400">{t('stats.ofArchived')}</p>
         </div>
       </div>
@@ -126,18 +126,18 @@ export function Statistics() {
         <SectionHeader icon={BarChart3} title={t('stats.expiryDistribution')} tone="green" />
         <div className="space-y-2">
           {[
-            { label: t('stats.expired'), count: expiryDist.expired, color: 'bg-red-500' },
-            { label: t('stats.critical'), count: expiryDist.critical, color: 'bg-red-400' },
-            { label: t('stats.warning'), count: expiryDist.warning, color: 'bg-orange-400' },
-            { label: t('stats.soon'), count: expiryDist.soon, color: 'bg-yellow-400' },
-            { label: t('stats.ok'), count: expiryDist.good, color: 'bg-green-500' },
+            { label: t('stats.expired'), count: expiryDist.expired, color: 'bg-[color:var(--pt-crit)]' },
+            { label: t('stats.critical'), count: expiryDist.critical, color: 'bg-[color:var(--pt-crit)]' },
+            { label: t('stats.warning'), count: expiryDist.warning, color: 'bg-[color:var(--pt-warn)]' },
+            { label: t('stats.soon'), count: expiryDist.soon, color: 'bg-[color:var(--pt-warn)]' },
+            { label: t('stats.ok'), count: expiryDist.good, color: 'bg-[color:var(--pt-ok)]' },
           ].map(({ label, count, color }) => {
             const pct = Math.round((count / totalForDist) * 100);
             return (
               <div key={label}>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">{label}</span>
-                  <span className="text-gray-300">{count} <span className="text-gray-500">· {pct}%</span></span>
+                  <span className="num text-gray-300">{count} <span className="text-gray-500">· {pct}%</span></span>
                 </div>
                 <div className="mt-1 h-2 overflow-hidden rounded-full bg-primary-700">
                   <div
@@ -160,10 +160,10 @@ export function Statistics() {
               <div key={key}>
                 <div className="mb-1 flex items-center justify-between text-sm">
                   <span className="text-gray-300">{label}</span>
-                  <span className="font-semibold text-gray-200">{count}</span>
+                  <span className="num font-semibold text-gray-200">{count}</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-primary-700">
-                  <div className="h-full rounded-full bg-purple-400/70 transition-all" style={{ width: `${Math.max((count / categoryMax) * 100, 4)}%` }} />
+                  <div className="h-full rounded-full bg-[color:var(--pt-accent)] opacity-80 transition-all" style={{ width: `${Math.max((count / categoryMax) * 100, 4)}%` }} />
                 </div>
               </div>
             ))}
@@ -180,10 +180,10 @@ export function Statistics() {
               <div key={name}>
                 <div className="mb-1 flex items-center justify-between text-sm">
                   <span className="text-gray-300">{name}</span>
-                  <span className="font-semibold text-gray-200">{count}</span>
+                  <span className="num font-semibold text-gray-200">{count}</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-primary-700">
-                  <div className="h-full rounded-full bg-cyan-400/70 transition-all" style={{ width: `${Math.max((count / locationMax) * 100, 4)}%` }} />
+                  <div className="h-full rounded-full bg-[color:var(--pt-accent)] opacity-80 transition-all" style={{ width: `${Math.max((count / locationMax) * 100, 4)}%` }} />
                 </div>
               </div>
             ))}
@@ -210,7 +210,7 @@ export function Statistics() {
                     <span className="shrink-0 font-semibold text-gray-200">{count}x</span>
                   </div>
                   <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-primary-800">
-                    <div className="h-full rounded-full bg-green-400/70 transition-all" style={{ width: `${Math.max((count / topConsumedMax) * 100, 4)}%` }} />
+                    <div className="h-full rounded-full bg-[color:var(--pt-accent)] opacity-80 transition-all" style={{ width: `${Math.max((count / topConsumedMax) * 100, 4)}%` }} />
                   </div>
                 </div>
               </div>

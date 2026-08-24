@@ -145,10 +145,10 @@ export function ProductList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-100">
+        <h2 className="title-display text-4xl text-gray-100">
           {showArchived ? t('products.archive') : t('products.title')}
         </h2>
-        <button onClick={() => setShowArchived(!showArchived)} className="-me-2 inline-flex min-h-[44px] items-center rounded-lg px-2 text-sm text-green-400 hover:text-green-300">
+        <button onClick={() => setShowArchived(!showArchived)} className="-me-2 inline-flex min-h-[44px] items-center rounded-lg px-2 text-sm text-[color:var(--pt-accent)] hover:brightness-110">
           {showArchived ? t('products.showActive') : t('products.showArchive')}
         </button>
       </div>
@@ -231,7 +231,7 @@ export function ProductList() {
         </div>
       )}
 
-      <p className="text-sm text-gray-400">
+      <p className="num text-sm text-gray-400">
         {t('products.productCount', { count: filtered.length })}
       </p>
 
@@ -266,8 +266,8 @@ export function ProductList() {
                     </span>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
-                    <span>{t('products.mhd')}: {formatDate(product.expiryDate, product.expiryPrecision)} ({formatDaysUntil(product.daysLeft)})</span>
-                    <span>{product.quantity} {product.unit}</span>
+                    <span>{t('products.mhd')}: <span className="num">{formatDate(product.expiryDate, product.expiryPrecision)}</span> <span className="num">({formatDaysUntil(product.daysLeft)})</span></span>
+                    <span><span className="num font-semibold text-gray-300">{product.quantity}</span> {product.unit}</span>
                     {product.minStock !== undefined && product.minStock > 0 && product.quantity < product.minStock && (
                       <span className="text-yellow-400">{t('products.lowStockWarning', { min: product.minStock })}</span>
                     )}

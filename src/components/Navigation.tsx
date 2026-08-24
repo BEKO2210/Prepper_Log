@@ -50,7 +50,7 @@ function NavItem({ label, icon: Icon, isActive, onClick }: NavItemProps) {
       >
         <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
       </motion.span>
-      <span className="title-display w-full truncate text-center text-[0.8125rem] leading-none" style={{ letterSpacing: '0.08em' }}>{label}</span>
+      <span className="title-display w-full truncate text-center text-[0.75rem]" style={{ letterSpacing: '0.04em' }}>{label}</span>
     </button>
   );
 }

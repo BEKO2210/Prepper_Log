@@ -281,7 +281,7 @@ export function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-100">{t('settings.title')}</h2>
+        <h2 className="title-display text-4xl text-gray-100">{t('settings.title')}</h2>
       </div>
 
       {/* Über PrepTrack / Info */}
@@ -300,12 +300,12 @@ export function Settings() {
           <div className="mt-4 space-y-3">
             <div className="space-y-2.5">
               {[
-                { icon: <WifiOff size={16} className="text-blue-400" />, text: t('onboarding.featureOffline') },
+                { icon: <WifiOff size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureOffline') },
                 { icon: <Camera size={16} className="text-green-400" />, text: t('onboarding.featureCamera') },
-                { icon: <ImageIcon size={16} className="text-purple-400" />, text: t('onboarding.featureImages') },
-                { icon: <BellRing size={16} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
+                { icon: <ImageIcon size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureImages') },
+                { icon: <BellRing size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureNotifications') },
                 { icon: <HardDrive size={16} className="text-orange-400" />, text: t('onboarding.featureExport') },
-                { icon: <Lock size={16} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },
+                { icon: <Lock size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featurePrivacy') },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 rounded-lg bg-primary-700/30 px-3 py-2.5">
                   <span className="mt-0.5 shrink-0">{item.icon}</span>
@@ -320,7 +320,7 @@ export function Settings() {
       {/* Language */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <Globe size={18} className="text-blue-400" />
+          <Globe size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.language')}
         </h3>
         <div className="grid grid-cols-2 gap-2">
@@ -353,7 +353,7 @@ export function Settings() {
             <div className="space-y-2 text-sm text-gray-400">
               <p>
                 {t('settings.iosInstallHint')}{' '}
-                <Share size={14} className="inline text-blue-400" />{' '}
+                <Share size={14} className="inline text-[color:var(--pt-accent)]" />{' '}
                 <strong className="text-gray-300">{t('settings.iosShare')}</strong>{' '}
                 <strong className="text-gray-300">&quot;{t('settings.iosHomeScreen')}&quot;</strong>.
               </p>
@@ -397,7 +397,7 @@ export function Settings() {
       {/* Appearance */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <Sun size={18} className="text-yellow-400" />
+          <Sun size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.appearance')}
         </h3>
         <button
@@ -487,7 +487,7 @@ export function Settings() {
       {/* Storage Locations */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <MapPin size={18} className="text-cyan-400" />
+          <MapPin size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.manageLocations')}
         </h3>
         <div className="mb-3 flex gap-2">
@@ -548,7 +548,7 @@ export function Settings() {
       {/* Data Management */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <HardDrive size={18} className="text-blue-400" />
+          <HardDrive size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.dataManagement')}
         </h3>
         <div className="space-y-2">
@@ -556,7 +556,7 @@ export function Settings() {
             onClick={handleExportJSON}
             className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
           >
-            <FileJson size={20} className="text-blue-400" />
+            <FileJson size={20} className="text-[color:var(--pt-accent)]" />
             <div className="text-start">
               <span>{t('settings.jsonBackup')}</span>
               <p className="text-xs text-gray-400">{t('settings.jsonBackupDesc')}</p>
@@ -642,7 +642,7 @@ export function Settings() {
       {/* Sync */}
       <section className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <Cloud size={18} className="text-sky-400" />
+          <Cloud size={18} className="text-[color:var(--pt-accent)]" />
           {t('sync.title')}
         </h3>
 
@@ -825,7 +825,7 @@ export function Settings() {
           className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
-            <Info size={18} className="text-blue-400" />
+            <Info size={18} className="text-[color:var(--pt-accent)]" />
             {t('settings.impressum')}
           </h3>
           {showImpressum ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
@@ -902,7 +902,7 @@ export function Settings() {
           className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
-            <FileText size={18} className="text-blue-400" />
+            <FileText size={18} className="text-[color:var(--pt-accent)]" />
             {t('settings.terms')}
           </h3>
           {showAGB ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
