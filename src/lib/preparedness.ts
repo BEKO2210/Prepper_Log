@@ -122,7 +122,9 @@ export function computePreparedness(
   const essentialCovered = coverage.filter((c) => c.present).length;
   const essentialTotal = ESSENTIAL_CATEGORIES.length;
 
-  const freshRatio = active.length > 0 ? fresh.length / active.length : 1;
+  // Ohne aktiven Vorrat gibt es nichts Frisches zu bewerten: 0, nicht 1.
+  // Sonst schenkt der Frische-Anteil 20 Punkte fuer ein leeres Lager.
+  const freshRatio = active.length > 0 ? fresh.length / active.length : 0;
 
   // Energy / food range — counts any fresh product that has a kcal value set.
   const foodKcal = Math.round(

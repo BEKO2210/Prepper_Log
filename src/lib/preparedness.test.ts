@@ -215,3 +215,22 @@ describe('computePreparedness — nicht zaehlbare Wassermengen', () => {
     expect(result.waterUncountedCount).toBe(1);
   });
 });
+
+
+describe('computePreparedness — leerer Vorrat', () => {
+  it('vergibt ohne jeden Vorrat 0 Punkte', () => {
+    const result = computePreparedness([], DEFAULT_HOUSEHOLD);
+    expect(result.score).toBe(0);
+    expect(result.freshRatio).toBe(0);
+  });
+
+  it('vergibt auch bei ausschliesslich archiviertem Vorrat 0 Punkte', () => {
+    const result = computePreparedness([makeProduct({ archived: true })], DEFAULT_HOUSEHOLD);
+    expect(result.score).toBe(0);
+  });
+
+  it('zaehlt einen vollstaendig abgelaufenen Vorrat als 0 Frische', () => {
+    const expired = makeProduct({ expiryDate: new Date(Date.now() - 86_400_000).toISOString() });
+    expect(computePreparedness([expired], DEFAULT_HOUSEHOLD).freshRatio).toBe(0);
+  });
+});
