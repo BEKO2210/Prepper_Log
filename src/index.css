@@ -58,6 +58,50 @@
   }
 }
 
+/* ===== Gestaltungs-Grundlagen "Lagerlogbuch" =====
+   Akzent = Messing/Khaki (Konservendeckel) fuer Beschriftungen und Struktur,
+   Rot/Orange/Gruen bleiben ausschliesslich Statusfarben.
+   Zahlen und Datumsangaben laufen in JetBrains Mono wie auf einem Inventarblatt. */
+:root {
+  --pt-accent: #d1bf84;
+  --pt-accent-soft: rgba(209, 191, 132, 0.14);
+  --pt-crit: #f26d5b;
+  --pt-warn: #e8763a;
+  --pt-ok: #4ade80;
+}
+
+html:not(.dark) {
+  --pt-accent: #6e6330;
+  --pt-accent-soft: rgba(110, 99, 48, 0.1);
+}
+
+@layer components {
+  /* Kleine Versalien-Beschriftung ueber Abschnitten und Kennzahlen */
+  .eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.8125rem;
+    line-height: 1;
+    color: var(--pt-accent);
+  }
+
+  /* Seitentitel und Kachel-Ueberschriften */
+  .title-display {
+    font-family: 'Bebas Neue', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 0.95;
+  }
+
+  /* Alle Zahlen, Mengen, Datumsangaben */
+  .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
