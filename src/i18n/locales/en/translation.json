@@ -469,6 +469,8 @@
     "foodNote": "Basis: 2200 kcal per person per day (BBK recommendation).",
     "foodNoData": "Add “kcal per unit” to your food items to calculate the food range.",
     "survival_one": "Self-sufficient for ~{{count}} day",
-    "survival_other": "Self-sufficient for ~{{count}} days"
+    "survival_other": "Self-sufficient for ~{{count}} days",
+    "waterUncounted_one": "{{count}} water product isn't counted because its unit gives no litre figure. Enter the amount in litres or ml.",
+    "waterUncounted_other": "{{count}} water products aren't counted because their units give no litre figure. Enter the amounts in litres or ml."
   }
 }

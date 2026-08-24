@@ -34,6 +34,10 @@ export interface PreparednessResult {
   waterDays: number; // ganze Tage Wasser für den Haushalt
   waterTargetLiters: number;
   waterDeficitLiters: number;
+  /** Zieldeckung 0..1, aus Litern — deckt sich mit dem angezeigten Defizit. */
+  waterProgress: number;
+  /** Frische Wasserprodukte, deren Einheit keine Literzahl hergibt (z. B. Flasche). */
+  waterUncountedCount: number;
   coverage: CategoryCoverage[];
   essentialCovered: number;
   essentialTotal: number;
@@ -44,6 +48,8 @@ export interface PreparednessResult {
   foodKcal: number; // verfügbare, nicht abgelaufene kcal
   foodTargetKcal: number;
   foodDays: number; // ganze Tage Ernährung für den Haushalt
+  /** Zieldeckung 0..1, aus kcal. */
+  foodProgress: number;
   survivalDays: number | null; // min(Wasser, Ernährung) — null ohne kcal-Daten
 }
 
@@ -94,16 +100,20 @@ export function computePreparedness(
   const active = products.filter((p) => !p.archived);
   const fresh = active.filter((p) => !isExpired(p));
 
+  const freshWater = fresh.filter((p) => p.category === 'wasser');
   const waterLiters = round1(
-    fresh
-      .filter((p) => p.category === 'wasser')
-      .reduce((sum, p) => sum + toLiters(p.quantity, p.unit), 0)
+    freshWater.reduce((sum, p) => sum + toLiters(p.quantity, p.unit), 0)
   );
+  // Gebinde ohne Literangabe (Flasche, Dose, Karton …) fliessen nicht in die
+  // Rechnung ein. Ohne diesen Zaehler steht in der App "0 Tage Wasser",
+  // obwohl der Keller voll ist — der Hinweis erklaert die Luecke.
+  const waterUncountedCount = freshWater.filter((p) => toLiters(p.quantity, p.unit) === 0).length;
 
   const dailyNeed = persons * WATER_LITERS_PER_PERSON_DAY;
   const waterTargetLiters = dailyNeed * targetDays;
   const waterDays = Math.floor(waterLiters / dailyNeed);
   const waterDeficitLiters = round1(Math.max(0, waterTargetLiters - waterLiters));
+  const waterProgress = waterTargetLiters > 0 ? clamp01(waterLiters / waterTargetLiters) : 1;
 
   const coverage: CategoryCoverage[] = ESSENTIAL_CATEGORIES.map((key) => ({
     key,
@@ -124,12 +134,13 @@ export function computePreparedness(
   const dailyKcalNeed = persons * KCAL_PER_PERSON_DAY;
   const foodTargetKcal = dailyKcalNeed * targetDays;
   const foodDays = Math.floor(foodKcal / dailyKcalNeed);
+  const foodProgress = foodTargetKcal > 0 ? clamp01(foodKcal / foodTargetKcal) : 1;
   const survivalDays = hasEnergyData ? Math.min(waterDays, foodDays) : null;
 
-  const waterScore = clamp01(waterDays / targetDays);
+  const waterScore = waterProgress;
   const categoryScore = essentialCovered / essentialTotal;
   const freshScore = freshRatio;
-  const foodScore = clamp01(foodDays / targetDays);
+  const foodScore = foodProgress;
 
   // With real kcal data, energy replaces the coarse category-coverage signal.
   const score = Math.round(
@@ -145,6 +156,8 @@ export function computePreparedness(
     waterDays,
     waterTargetLiters,
     waterDeficitLiters,
+    waterProgress,
+    waterUncountedCount,
     coverage,
     essentialCovered,
     essentialTotal,
@@ -154,6 +167,7 @@ export function computePreparedness(
     foodKcal,
     foodTargetKcal,
     foodDays,
+    foodProgress,
     survivalDays,
   };
 }

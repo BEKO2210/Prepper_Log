@@ -123,7 +123,8 @@ export function Preparedness() {
       : result.score >= 40
         ? t('preparedness.scoreOk')
         : t('preparedness.scoreWeak');
-  const waterPct = Math.min(100, Math.round((result.waterDays / result.targetDays) * 100));
+  const waterPct = Math.round(result.waterProgress * 100);
+  const foodPct = Math.round(result.foodProgress * 100);
 
   return (
     <div className="space-y-4 pb-4">
@@ -230,6 +231,12 @@ export function Preparedness() {
             ? t('preparedness.waterDeficit', { liters: result.waterDeficitLiters })
             : t('preparedness.waterEnough')}
         </p>
+        {result.waterUncountedCount > 0 && (
+          <p className="mt-2 inline-flex items-start gap-1 rounded-lg border border-primary-700 bg-primary-900/40 px-3 py-2 text-xs text-gray-400">
+            <XCircle size={13} className="mt-0.5 shrink-0 text-orange-400" />
+            {t('preparedness.waterUncounted', { count: result.waterUncountedCount })}
+          </p>
+        )}
         <p className="mt-2 text-[0.65rem] text-gray-500">{t('preparedness.waterNote')}</p>
       </motion.div>
 
@@ -258,7 +265,7 @@ export function Preparedness() {
               <motion.div
                 className="h-full rounded-full bg-amber-500"
                 initial={{ width: 0 }}
-                animate={{ width: `${Math.min(100, Math.round((result.foodDays / result.targetDays) * 100))}%` }}
+                animate={{ width: `${foodPct}%` }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
               />
             </div>
@@ -270,7 +277,7 @@ export function Preparedness() {
                   days: household.days,
                 })}
               </p>
-              <span className="shrink-0 text-xs font-semibold text-amber-400">{Math.min(100, Math.round((result.foodDays / result.targetDays) * 100))}%</span>
+              <span className="shrink-0 text-xs font-semibold text-amber-400">{foodPct}%</span>
             </div>
             <p className={`mt-2 inline-flex items-center gap-1 text-xs ${result.foodKcal < result.foodTargetKcal ? 'text-orange-400' : 'text-green-400'}`}>
               {result.foodKcal < result.foodTargetKcal ? <XCircle size={13} /> : <CheckCircle2 size={13} />}

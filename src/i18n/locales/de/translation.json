@@ -469,6 +469,8 @@
     "foodNote": "Basis: 2200 kcal pro Person und Tag (BBK-Empfehlung).",
     "foodNoData": "Trage bei deinen Lebensmitteln „kcal pro Einheit“ ein, um die Ernährungs-Reichweite zu berechnen.",
     "survival_one": "Autark für ~{{count}} Tag",
-    "survival_other": "Autark für ~{{count}} Tage"
+    "survival_other": "Autark für ~{{count}} Tage",
+    "waterUncounted_one": "{{count}} Wasserprodukt zählt nicht mit, weil seine Einheit keine Literzahl ergibt. Trage die Menge in Liter oder ml ein.",
+    "waterUncounted_other": "{{count}} Wasserprodukte zählen nicht mit, weil ihre Einheit keine Literzahl ergibt. Trage die Mengen in Liter oder ml ein."
   }
 }

@@ -157,3 +157,61 @@ describe('computeShoppingList', () => {
     expect(list).toHaveLength(0);
   });
 });
+
+describe('computePreparedness — Fortschritt deckt sich mit dem Defizit', () => {
+  const household = { persons: 2, days: 10 }; // Ziel 40 L
+
+  it('meldet den Wasser-Fortschritt in Litern, nicht in ganzen Tagen', () => {
+    // 39 von 40 L: knapp unter Ziel. Ganze Tage (floor(39/4) = 9) wuerden
+    // 90 % anzeigen, obwohl nur 1 L fehlt — Balken und Defizit widersprechen sich.
+    const result = computePreparedness([futureWater(39)], household);
+    expect(result.waterDeficitLiters).toBe(1);
+    expect(result.waterProgress).toBeCloseTo(0.975, 3);
+  });
+
+  it('deckelt den Fortschritt bei vollem Vorrat auf 1', () => {
+    const result = computePreparedness([futureWater(80)], household);
+    expect(result.waterProgress).toBe(1);
+    expect(result.waterDeficitLiters).toBe(0);
+  });
+
+  it('meldet den Ernaehrungs-Fortschritt in kcal statt in ganzen Tagen', () => {
+    // Ziel 44.000 kcal; 43.000 kcal = 97,7 %, ganze Tage waeren 9/10 = 90 %.
+    const result = computePreparedness(
+      [makeProduct({ category: 'lebensmittel', quantity: 1, kcalPerUnit: 43_000 })],
+      household
+    );
+    expect(result.foodProgress).toBeCloseTo(43_000 / 44_000, 3);
+  });
+});
+
+describe('computePreparedness — nicht zaehlbare Wassermengen', () => {
+  it('zaehlt Wasser in Flaschen nicht mit, meldet es aber getrennt', () => {
+    const result = computePreparedness(
+      [futureWater(12, 'Flasche'), futureWater(4, 'Liter')],
+      DEFAULT_HOUSEHOLD
+    );
+    expect(result.waterLiters).toBe(4);
+    expect(result.waterUncountedCount).toBe(1);
+  });
+
+  it('meldet keine ungezaehlten Mengen, wenn alle Einheiten eindeutig sind', () => {
+    const result = computePreparedness(
+      [futureWater(4, 'Liter'), futureWater(500, 'ml')],
+      DEFAULT_HOUSEHOLD
+    );
+    expect(result.waterUncountedCount).toBe(0);
+    expect(result.waterLiters).toBe(4.5);
+  });
+
+  it('zaehlt abgelaufenes Flaschenwasser nicht als ungezaehlt', () => {
+    const result = computePreparedness(
+      [futureWater(12, 'Flasche'), makeProduct({
+        category: 'wasser', unit: 'Flasche', quantity: 6,
+        expiryDate: new Date(Date.now() - 86_400_000).toISOString(),
+      })],
+      DEFAULT_HOUSEHOLD
+    );
+    expect(result.waterUncountedCount).toBe(1);
+  });
+});

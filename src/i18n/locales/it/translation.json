@@ -469,6 +469,8 @@
     "foodNote": "Base: 2200 kcal per persona al giorno (raccomandazione BBK).",
     "foodNoData": "Aggiungi “kcal per unità” ai tuoi alimenti per calcolare l'autonomia.",
     "survival_one": "Autonomo per ~{{count}} giorno",
-    "survival_other": "Autonomo per ~{{count}} giorni"
+    "survival_other": "Autonomo per ~{{count}} giorni",
+    "waterUncounted_one": "{{count}} prodotto d'acqua non viene conteggiato perché la sua unità non indica i litri. Inserisci la quantità in litri o ml.",
+    "waterUncounted_other": "{{count}} prodotti d'acqua non vengono conteggiati perché le loro unità non indicano i litri. Inserisci le quantità in litri o ml."
   }
 }
