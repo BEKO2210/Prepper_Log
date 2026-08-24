@@ -5,7 +5,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { requestNotificationPermission, getNotificationPermissionStatus } from '../lib/notifications';
 import { useDarkMode } from '../hooks/useDarkMode';
-import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
 import { encryptBackup, decryptBackup, isEncryptedBackup } from '../lib/cryptoBackup';
@@ -31,8 +30,6 @@ import {
   FileJson,
   Shield,
   Heart,
-  Smartphone,
-  Share,
   FileText,
   ChevronDown,
   ChevronUp,
@@ -68,12 +65,10 @@ function formatSyncTime(value?: string): string {
 export function Settings() {
   const [isDark, toggleDark] = useDarkMode();
   const { notificationsEnabled, setNotificationsEnabled } = useAppStore();
-  const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
-  const [installError, setInstallError] = useState<string | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [syncConfigState, setSyncConfigState] = useState(() => getSyncConfig());
   const [syncServerUrl, setSyncServerUrl] = useState(syncConfigState.serverUrl);
@@ -172,14 +167,6 @@ export function Settings() {
     }
 
     await applyImportedJson(text);
-  }
-
-  async function handleInstall() {
-    setInstallError(null);
-    const success = await install();
-    if (!success) {
-      setInstallError(t('settings.installError'));
-    }
   }
 
   function handleLanguageChange(langCode: string) {
@@ -342,57 +329,6 @@ export function Settings() {
         </div>
       </section>
 
-      {/* PWA Install */}
-      {!isInstalled && (
-        <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-            <Smartphone size={18} className="text-green-400" />
-            {t('settings.installApp')}
-          </h3>
-          {isIOS ? (
-            <div className="space-y-2 text-sm text-gray-400">
-              <p>
-                {t('settings.iosInstallHint')}{' '}
-                <Share size={14} className="inline text-[color:var(--pt-accent)]" />{' '}
-                <strong className="text-gray-300">{t('settings.iosShare')}</strong>{' '}
-                <strong className="text-gray-300">&quot;{t('settings.iosHomeScreen')}&quot;</strong>.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-400">
-                {t('settings.installDescription')}
-              </p>
-              <button
-                onClick={handleInstall}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform"
-              >
-                <Download size={18} />
-                {isInstallable ? t('settings.installNow') : t('settings.installApp2')}
-              </button>
-              {installError && (
-                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400" role="alert">
-                  {installError}
-                </p>
-              )}
-              {!isInstallable && (
-                <p className="text-xs text-gray-400">
-                  {t('settings.installTip')}
-                </p>
-              )}
-            </div>
-          )}
-        </section>
-      )}
-
-      {isInstalled && (
-        <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
-          <div className="flex items-center gap-2">
-            <Smartphone size={18} className="text-green-400" />
-            <span className="text-sm font-medium text-green-400">{t('settings.appInstalled')}</span>
-          </div>
-        </section>
-      )}
 
       {/* Appearance */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
