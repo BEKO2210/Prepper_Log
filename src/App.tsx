@@ -1,7 +1,9 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from './store/useAppStore';
-import { seedDefaults } from './lib/db';
+import { db, seedDefaults } from './lib/db';
 import { startNotificationChecker } from './lib/notifications';
 import { startSyncEngine } from './lib/sync';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -30,6 +32,30 @@ const Preparedness = lazy(() =>
 
 function LazyFallback() {
   return <PageSkeleton />;
+}
+
+/** Kopfzeile: Wortmarke plus die eine Zahl, die immer zaehlt — wie viel liegt im Lager. */
+function AppHeader() {
+  const { t } = useTranslation();
+  const activeCount = useLiveQuery(() => db.products.filter((p) => !p.archived).count(), [], null);
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-primary-700 bg-primary-800/95 backdrop-blur">
+      <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
+        <div className="flex items-center gap-2.5">
+          <img src="./icons/icon-48x48.png" alt="" className="h-7 w-7" />
+          <h1 className="title-display text-2xl text-gray-100" style={{ letterSpacing: '0.12em' }}>
+            PrepTrack
+          </h1>
+        </div>
+        {activeCount !== null && activeCount > 0 && (
+          <span className="num text-xs text-gray-400">
+            {t('products.productCount', { count: activeCount })}
+          </span>
+        )}
+      </div>
+    </header>
+  );
 }
 
 function PageContent() {
@@ -94,16 +120,9 @@ export default function App() {
         <div className="min-h-screen bg-primary-900">
           <OfflineBanner />
 
-          <header className="sticky top-0 z-30 border-b border-primary-700 bg-primary-800">
-            <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-2">
-                <img src="./icons/icon-48x48.png" alt="PrepTrack" className="h-8 w-8" />
-                <h1 className="text-lg font-bold text-gray-100">PrepTrack</h1>
-              </div>
-            </div>
-          </header>
+          <AppHeader />
 
-          <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
+          <main className="mx-auto max-w-2xl px-4 pt-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
             {/* No AnimatePresence / mode="wait": exit-gated transitions can
                 deadlock on rapid tab switches and leave the page blank. A plain
                 keyed fade-in remounts the page on navigation — the old page

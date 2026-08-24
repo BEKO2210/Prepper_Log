@@ -137,7 +137,7 @@ export function Preparedness() {
           <ArrowLeft size={18} />
         </button>
         <div>
-          <h2 className="text-lg font-bold text-gray-100">{t('preparedness.title')}</h2>
+          <h2 className="title-display text-3xl text-gray-100">{t('preparedness.title')}</h2>
           <p className="text-xs text-gray-400">{t('preparedness.subtitle')}</p>
         </div>
       </div>

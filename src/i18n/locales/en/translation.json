@@ -52,7 +52,7 @@
     "confirmDelete": "Really delete? This cannot be undone.",
     "deleteBtn": "Delete",
     "cancel": "Cancel",
-    "noFilterResults": "No results for these filters.",
+    "noFilterResults": "Nothing found — adjust your search or filters.",
     "archiveEmpty": "Archive is empty.",
     "noProducts": "No products added yet.",
     "lowStockWarning": "Low stock (Min: {{min}})",

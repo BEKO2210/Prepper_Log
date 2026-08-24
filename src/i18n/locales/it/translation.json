@@ -52,7 +52,7 @@
     "confirmDelete": "Eliminare davvero? Non si può annullare.",
     "deleteBtn": "Elimina",
     "cancel": "Annulla",
-    "noFilterResults": "Nessun risultato per questi filtri.",
+    "noFilterResults": "Nessun risultato — modifica la ricerca o i filtri.",
     "archiveEmpty": "L'archivio è vuoto.",
     "noProducts": "Nessun prodotto aggiunto ancora.",
     "lowStockWarning": "Scorte basse (Min: {{min}})",

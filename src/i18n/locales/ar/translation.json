@@ -52,7 +52,7 @@
     "confirmDelete": "هل تريد الحذف فعلاً؟ لا يمكن التراجع.",
     "deleteBtn": "حذف",
     "cancel": "إلغاء",
-    "noFilterResults": "لا توجد نتائج لهذه الفلاتر.",
+    "noFilterResults": "لا توجد نتائج — عدّل البحث أو عوامل التصفية.",
     "archiveEmpty": "الأرشيف فارغ.",
     "noProducts": "لم يتم تسجيل أي منتجات بعد.",
     "lowStockWarning": "مخزون منخفض (الحد الأدنى: {{min}})",

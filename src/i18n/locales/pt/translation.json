@@ -52,7 +52,7 @@
     "confirmDelete": "Realmente excluir? Não pode ser desfeito.",
     "deleteBtn": "Excluir",
     "cancel": "Cancelar",
-    "noFilterResults": "Nenhum resultado para estes filtros.",
+    "noFilterResults": "Nada encontrado — ajusta a pesquisa ou os filtros.",
     "archiveEmpty": "Arquivo vazio.",
     "noProducts": "Nenhum produto cadastrado.",
     "lowStockWarning": "Estoque baixo (Mín: {{min}})",

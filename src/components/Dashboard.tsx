@@ -144,12 +144,12 @@ export function Dashboard() {
         <div className="flex flex-col items-center text-center">
           <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
           <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
+          <div className="mt-6 flex w-full max-w-xs flex-col gap-3">
+            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
               <PlusCircle size={18} />
               {t('nav.add')}
             </button>
-            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-primary-600 bg-primary-800 px-5 py-3 font-medium text-gray-300 hover:border-green-500 hover:text-gray-200 active:scale-[0.98] transition-transform">
+            <button onClick={() => fileInputRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-xl border border-green-600/40 bg-transparent px-5 py-3 font-medium text-green-400 hover:border-green-500 hover:bg-green-500/10 active:scale-[0.98] transition-transform">
               <Upload size={18} />
               {t('onboarding.startImport')}
             </button>
@@ -180,15 +180,15 @@ export function Dashboard() {
 
         {/* Feature-Übersicht */}
         <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">{t('onboarding.features')}</h3>
+          <h3 className="eyebrow mb-3">{t('onboarding.features')}</h3>
           <div className="space-y-2">
             {[
-              { icon: <WifiOff size={15} className="text-blue-400" />, text: t('onboarding.featureOffline') },
-              { icon: <Camera size={15} className="text-green-400" />, text: t('onboarding.featureCamera') },
-              { icon: <Image size={15} className="text-purple-400" />, text: t('onboarding.featureImages') },
-              { icon: <BellRing size={15} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
-              { icon: <HardDrive size={15} className="text-orange-400" />, text: t('onboarding.featureExport') },
-              { icon: <Lock size={15} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },
+              { icon: <WifiOff size={15} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureOffline') },
+              { icon: <Camera size={15} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureCamera') },
+              { icon: <Image size={15} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureImages') },
+              { icon: <BellRing size={15} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureNotifications') },
+              { icon: <HardDrive size={15} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureExport') },
+              { icon: <Lock size={15} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featurePrivacy') },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
                 <span className="mt-0.5 shrink-0">{item.icon}</span>
@@ -203,12 +203,30 @@ export function Dashboard() {
 
   return (
     <div className="space-y-3 pb-4">
-      <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-        <div className="flex items-center justify-around">
-          <StatRing value={stats.expiredCount + stats.criticalCount} max={total} label={t('dashboard.critical')} color="#ef4444" size={68} strokeWidth={6} />
-          <StatRing value={stats.warningCount + stats.soonCount} max={total} label={t('dashboard.soon')} color="#f97316" size={68} strokeWidth={6} />
-          <StatRing value={stats.goodCount} max={total} label={t('dashboard.good')} color="#22c55e" size={68} strokeWidth={6} />
-          <StatRing value={stats.totalProducts} max={stats.totalProducts} label={t('dashboard.total')} color="#9ca3af" size={68} strokeWidth={6} />
+      {/* Lagerstand: eine Zahl, ein Balken, eine Legende — statt vier Ringen
+          plus separatem Verteilungsbalken mit denselben Daten. */}
+      <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-4">
+        <SectionHeader icon={PieChart} title={t('dashboard.expiryDistribution')} tone="green" className="mb-3" />
+        <div className="flex items-baseline gap-2.5">
+          <p className="num text-5xl font-bold leading-none text-gray-100"><CountUp value={stats.totalProducts} /></p>
+          <p className="eyebrow">{t('dashboard.total')}</p>
+        </div>
+        <div className="mt-3 flex h-2.5 gap-0.5 overflow-hidden rounded-full">
+          {stats.expiredCount + stats.criticalCount > 0 && <div className="rounded-full bg-[color:var(--pt-crit)] transition-all" style={{ width: `${((stats.expiredCount + stats.criticalCount) / total) * 100}%` }} />}
+          {stats.warningCount + stats.soonCount > 0 && <div className="rounded-full bg-[color:var(--pt-warn)] transition-all" style={{ width: `${((stats.warningCount + stats.soonCount) / total) * 100}%` }} />}
+          {stats.goodCount > 0 && <div className="rounded-full bg-[color:var(--pt-ok)] transition-all" style={{ width: `${(stats.goodCount / total) * 100}%` }} />}
+          {total === 0 && <div className="w-full rounded-full bg-primary-700" />}
+        </div>
+        <div className="mt-2.5 flex items-center justify-between text-xs">
+          <span className={stats.expiredCount + stats.criticalCount > 0 ? 'text-[color:var(--pt-crit)]' : 'text-gray-500'}>
+            <span className="num font-semibold">{stats.expiredCount + stats.criticalCount}</span> {t('dashboard.critical')}
+          </span>
+          <span className={stats.warningCount + stats.soonCount > 0 ? 'text-[color:var(--pt-warn)]' : 'text-gray-500'}>
+            <span className="num font-semibold">{stats.warningCount + stats.soonCount}</span> {t('dashboard.soon')}
+          </span>
+          <span className={stats.goodCount > 0 ? 'text-[color:var(--pt-ok)]' : 'text-gray-500'}>
+            <span className="num font-semibold">{stats.goodCount}</span> {t('dashboard.good')}
+          </span>
         </div>
       </div>
 
@@ -219,8 +237,8 @@ export function Dashboard() {
         <StatRing value={preparedness.score} max={100} label={t('preparedness.score')} color={preparednessColor(preparedness.score)} size={64} strokeWidth={6} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <ShieldCheck size={16} className="text-green-400" />
-            <span className="text-sm font-semibold text-gray-200">{t('preparedness.cardTitle')}</span>
+            <ShieldCheck size={15} className="text-[color:var(--pt-accent)]" />
+            <span className="eyebrow">{t('preparedness.cardTitle')}</span>
           </div>
           <p className="mt-1 text-xs text-gray-400">
             {preparedness.survivalDays !== null
@@ -234,8 +252,8 @@ export function Dashboard() {
 
       <div className="grid grid-cols-2 gap-3">
         <button onClick={requestScan} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-3 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-600/20">
-            <ScanBarcode size={20} className="text-green-400" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[color:var(--pt-accent-soft)]">
+            <ScanBarcode size={20} className="text-[color:var(--pt-accent)]" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-gray-200">{t('dashboard.scan')}</p>
@@ -243,8 +261,8 @@ export function Dashboard() {
           </div>
         </button>
         <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-3 rounded-xl border border-primary-700 bg-primary-800/60 p-3 text-start hover:bg-primary-700/50 active:scale-[0.98] transition-transform">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
-            <PlusCircle size={20} className="text-blue-400" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[color:var(--pt-accent-soft)]">
+            <PlusCircle size={20} className="text-[color:var(--pt-accent)]" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-gray-200">{t('dashboard.addProduct')}</p>
@@ -253,24 +271,6 @@ export function Dashboard() {
         </button>
       </div>
 
-      {stats.totalProducts > 0 && (
-        <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-          <SectionHeader icon={PieChart} title={t('dashboard.expiryDistribution')} tone="green" />
-          <div className="mb-2 flex h-3 overflow-hidden rounded-full bg-primary-700">
-            {stats.expiredCount > 0 && <div className="bg-red-500 transition-all" style={{ width: `${(stats.expiredCount / total) * 100}%` }} />}
-            {stats.criticalCount > 0 && <div className="bg-red-400 transition-all" style={{ width: `${(stats.criticalCount / total) * 100}%` }} />}
-            {stats.warningCount > 0 && <div className="bg-orange-400 transition-all" style={{ width: `${(stats.warningCount / total) * 100}%` }} />}
-            {stats.soonCount > 0 && <div className="bg-yellow-400 transition-all" style={{ width: `${(stats.soonCount / total) * 100}%` }} />}
-            {stats.goodCount > 0 && <div className="bg-green-500 transition-all" style={{ width: `${(stats.goodCount / total) * 100}%` }} />}
-          </div>
-          <div className="flex justify-between text-[0.6rem] text-gray-400">
-            <span>{t('dashboard.expired_count', { count: stats.expiredCount })}</span>
-            <span>{t('dashboard.warning_count', { count: stats.warningCount + stats.soonCount })}</span>
-            <span>{t('dashboard.ok_count', { count: stats.goodCount })}</span>
-          </div>
-        </div>
-      )}
-
       {urgentProducts.length > 0 && (
         <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
           <SectionHeader
@@ -278,7 +278,7 @@ export function Dashboard() {
             title={t('dashboard.urgent')}
             tone="orange"
             action={
-              <button onClick={() => setPage('products')} className="flex shrink-0 items-center gap-0.5 text-xs text-green-400 hover:text-green-300">
+              <button onClick={() => setPage('products')} className="-me-2 flex min-h-[44px] shrink-0 items-center gap-0.5 rounded-lg px-2 text-xs text-green-400 hover:text-green-300">
                 {t('dashboard.all')} <ChevronRight size={14} />
               </button>
             }
@@ -290,9 +290,9 @@ export function Dashboard() {
                 <div className="flex flex-1 items-center justify-between p-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-200">{product.name}</p>
-                    <p className="text-xs text-gray-400">{product.storageLocation} &middot; {formatDate(product.expiryDate, product.expiryPrecision)}</p>
+                    <p className="text-xs text-gray-400">{product.storageLocation} &middot; <span className="num">{formatDate(product.expiryDate, product.expiryPrecision)}</span></p>
                   </div>
-                  <span className={`shrink-0 text-xs font-bold ${URGENT_TEXT_COLORS[product.status]}`}>{formatDaysUntil(product.daysLeft)}</span>
+                  <span className={`num shrink-0 text-xs font-bold ${URGENT_TEXT_COLORS[product.status]}`}>{formatDaysUntil(product.daysLeft)}</span>
                 </div>
               </button>
             ))}
@@ -303,12 +303,12 @@ export function Dashboard() {
       <div className="grid grid-cols-2 gap-3">
         {categoryBreakdown.length > 0 && (
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-            <h2 className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.categories')}</h2>
+            <h2 className="eyebrow mb-2.5">{t('dashboard.categories')}</h2>
             <div className="space-y-1.5">
               {categoryBreakdown.map(({ key, label, count }) => (
                 <div key={key} className="flex items-center justify-between">
                   <span className="text-xs text-gray-400">{label}</span>
-                  <span className="text-xs font-semibold text-gray-300">{count}</span>
+                  <span className="num text-xs font-semibold text-gray-300">{count}</span>
                 </div>
               ))}
             </div>
@@ -317,14 +317,14 @@ export function Dashboard() {
         <div className="space-y-3">
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
             <div className="flex items-center gap-2">
-              <TrendingDown size={14} className="text-yellow-400" />
-              <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.lowStock')}</span>
+              <TrendingDown size={14} className={stats.lowStockCount > 0 ? 'text-[color:var(--pt-warn)]' : 'text-[color:var(--pt-accent)]'} />
+              <span className="eyebrow">{t('dashboard.lowStock')}</span>
             </div>
-            <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}><CountUp value={stats.lowStockCount} /></p>
+            <p className={`stat-number num mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-[color:var(--pt-warn)]' : 'text-gray-300'}`}><CountUp value={stats.lowStockCount} /></p>
           </div>
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-            <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.storageLocations')}</span>
-            <p className="stat-number mt-1 text-2xl font-bold text-gray-300"><CountUp value={stats.totalLocations} /></p>
+            <span className="eyebrow">{t('dashboard.storageLocations')}</span>
+            <p className="stat-number num mt-1 text-2xl font-bold text-gray-300"><CountUp value={stats.totalLocations} /></p>
           </div>
         </div>
       </div>

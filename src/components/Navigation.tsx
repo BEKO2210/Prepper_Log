@@ -32,7 +32,7 @@ function NavItem({ label, icon: Icon, isActive, onClick }: NavItemProps) {
     <button
       onClick={onClick}
       className={`relative flex min-w-0 flex-col items-center gap-0.5 px-1 pb-2 pt-2.5 transition-colors ${
-        isActive ? 'text-green-400' : 'text-gray-300 hover:text-gray-200'
+        isActive ? 'text-[color:var(--pt-accent)]' : 'text-gray-400 hover:text-gray-200'
       }`}
       aria-label={label}
       aria-current={isActive ? 'page' : undefined}
@@ -40,7 +40,7 @@ function NavItem({ label, icon: Icon, isActive, onClick }: NavItemProps) {
       {isActive && (
         <motion.span
           layoutId="nav-active"
-          className="absolute top-0 h-0.5 w-7 rounded-full bg-green-400"
+          className="absolute top-0 h-0.5 w-8 bg-[color:var(--pt-accent)]"
           transition={{ type: 'spring', stiffness: 500, damping: 34 }}
         />
       )}
@@ -50,7 +50,7 @@ function NavItem({ label, icon: Icon, isActive, onClick }: NavItemProps) {
       >
         <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
       </motion.span>
-      <span className="w-full truncate text-center text-[10px] leading-tight">{label}</span>
+      <span className="title-display w-full truncate text-center text-[0.75rem]" style={{ letterSpacing: '0.04em' }}>{label}</span>
     </button>
   );
 }

@@ -52,7 +52,7 @@
     "confirmDelete": "Vraiment supprimer ? Cette action est irréversible.",
     "deleteBtn": "Supprimer",
     "cancel": "Annuler",
-    "noFilterResults": "Aucun résultat pour ces filtres.",
+    "noFilterResults": "Aucun résultat — ajustez la recherche ou les filtres.",
     "archiveEmpty": "Les archives sont vides.",
     "noProducts": "Aucun produit ajouté encore.",
     "lowStockWarning": "Stock faible (Min : {{min}})",

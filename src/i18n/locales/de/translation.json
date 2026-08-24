@@ -52,7 +52,7 @@
     "confirmDelete": "Wirklich löschen? Nicht rückgängig machbar.",
     "deleteBtn": "Löschen",
     "cancel": "Abbrechen",
-    "noFilterResults": "Kein Treffer für diese Filter.",
+    "noFilterResults": "Nichts gefunden — Suche oder Filter anpassen.",
     "archiveEmpty": "Archiv ist leer.",
     "noProducts": "Noch keine Produkte erfasst.",
     "lowStockWarning": "Unterbestand (Min: {{min}})",

@@ -3,14 +3,16 @@ import type { LucideIcon } from 'lucide-react';
 
 type Tone = 'green' | 'blue' | 'orange' | 'yellow' | 'purple' | 'cyan' | 'red';
 
+/* Struktur spricht in Messing, Farbe bleibt dem Status vorbehalten:
+   nur "orange" und "red" faerben wirklich, alles andere ist Beschriftung. */
 const TONES: Record<Tone, string> = {
-  green: 'bg-green-500/15 text-green-400',
-  blue: 'bg-blue-500/15 text-blue-400',
-  orange: 'bg-orange-500/15 text-orange-400',
-  yellow: 'bg-yellow-500/15 text-yellow-400',
-  purple: 'bg-purple-500/15 text-purple-400',
-  cyan: 'bg-cyan-500/15 text-cyan-400',
-  red: 'bg-red-500/15 text-red-400',
+  green: 'text-[color:var(--pt-accent)]',
+  blue: 'text-[color:var(--pt-accent)]',
+  orange: 'text-[color:var(--pt-warn)]',
+  yellow: 'text-[color:var(--pt-accent)]',
+  purple: 'text-[color:var(--pt-accent)]',
+  cyan: 'text-[color:var(--pt-accent)]',
+  red: 'text-[color:var(--pt-crit)]',
 };
 
 interface SectionHeaderProps {
@@ -22,16 +24,15 @@ interface SectionHeaderProps {
   className?: string;
 }
 
-/** Consistent section header: a tinted icon badge + title (matches the score page). */
+/** Abschnittskopf im Inventarblatt-Stil: Symbol, Versalien-Beschriftung, feine Linie. */
 export function SectionHeader({ icon: Icon, title, tone = 'green', action, className = 'mb-3' }: SectionHeaderProps) {
+  const toneClass = TONES[tone];
+
   return (
-    <div className={`flex items-center justify-between gap-2 ${className}`}>
-      <div className="flex min-w-0 items-center gap-2">
-        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${TONES[tone]}`}>
-          <Icon size={16} />
-        </span>
-        <h3 className="truncate text-sm font-semibold text-gray-200">{title}</h3>
-      </div>
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <Icon size={15} className={`shrink-0 ${toneClass}`} />
+      <h3 className={`eyebrow shrink-0 ${toneClass}`}>{title}</h3>
+      <span className="h-px min-w-4 flex-1 bg-primary-700" aria-hidden="true" />
       {action}
     </div>
   );

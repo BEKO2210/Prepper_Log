@@ -5,7 +5,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addStorageLocation, deleteStorageLocation, exportData, exportCSV, importData, loadImportedImages, ImportResult } from '../lib/db';
 import { requestNotificationPermission, getNotificationPermissionStatus } from '../lib/notifications';
 import { useDarkMode } from '../hooks/useDarkMode';
-import { usePWAInstall } from '../hooks/usePWAInstall';
 import { useAppStore } from '../store/useAppStore';
 import { downloadFile } from '../lib/utils';
 import { encryptBackup, decryptBackup, isEncryptedBackup } from '../lib/cryptoBackup';
@@ -31,8 +30,6 @@ import {
   FileJson,
   Shield,
   Heart,
-  Smartphone,
-  Share,
   FileText,
   ChevronDown,
   ChevronUp,
@@ -68,12 +65,10 @@ function formatSyncTime(value?: string): string {
 export function Settings() {
   const [isDark, toggleDark] = useDarkMode();
   const { notificationsEnabled, setNotificationsEnabled } = useAppStore();
-  const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
   const locations = useLiveQuery(() => db.storageLocations.toArray()) ?? [];
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const [newLocation, setNewLocation] = useState('');
   const [importStatus, setImportStatus] = useState<{ message: string; type: 'success' | 'warning' | 'error' } | null>(null);
-  const [installError, setInstallError] = useState<string | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [syncConfigState, setSyncConfigState] = useState(() => getSyncConfig());
   const [syncServerUrl, setSyncServerUrl] = useState(syncConfigState.serverUrl);
@@ -172,14 +167,6 @@ export function Settings() {
     }
 
     await applyImportedJson(text);
-  }
-
-  async function handleInstall() {
-    setInstallError(null);
-    const success = await install();
-    if (!success) {
-      setInstallError(t('settings.installError'));
-    }
   }
 
   function handleLanguageChange(langCode: string) {
@@ -281,14 +268,14 @@ export function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-100">{t('settings.title')}</h2>
+        <h2 className="title-display text-4xl text-gray-100">{t('settings.title')}</h2>
       </div>
 
       {/* Über PrepTrack / Info */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowInfo(!showInfo)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Info size={18} className="text-green-400" />
@@ -300,12 +287,12 @@ export function Settings() {
           <div className="mt-4 space-y-3">
             <div className="space-y-2.5">
               {[
-                { icon: <WifiOff size={16} className="text-blue-400" />, text: t('onboarding.featureOffline') },
+                { icon: <WifiOff size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureOffline') },
                 { icon: <Camera size={16} className="text-green-400" />, text: t('onboarding.featureCamera') },
-                { icon: <ImageIcon size={16} className="text-purple-400" />, text: t('onboarding.featureImages') },
-                { icon: <BellRing size={16} className="text-yellow-400" />, text: t('onboarding.featureNotifications') },
+                { icon: <ImageIcon size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureImages') },
+                { icon: <BellRing size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featureNotifications') },
                 { icon: <HardDrive size={16} className="text-orange-400" />, text: t('onboarding.featureExport') },
-                { icon: <Lock size={16} className="text-emerald-400" />, text: t('onboarding.featurePrivacy') },
+                { icon: <Lock size={16} className="text-[color:var(--pt-accent)]" />, text: t('onboarding.featurePrivacy') },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 rounded-lg bg-primary-700/30 px-3 py-2.5">
                   <span className="mt-0.5 shrink-0">{item.icon}</span>
@@ -320,7 +307,7 @@ export function Settings() {
       {/* Language */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <Globe size={18} className="text-blue-400" />
+          <Globe size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.language')}
         </h3>
         <div className="grid grid-cols-2 gap-2">
@@ -342,62 +329,11 @@ export function Settings() {
         </div>
       </section>
 
-      {/* PWA Install */}
-      {!isInstalled && (
-        <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-            <Smartphone size={18} className="text-green-400" />
-            {t('settings.installApp')}
-          </h3>
-          {isIOS ? (
-            <div className="space-y-2 text-sm text-gray-400">
-              <p>
-                {t('settings.iosInstallHint')}{' '}
-                <Share size={14} className="inline text-blue-400" />{' '}
-                <strong className="text-gray-300">{t('settings.iosShare')}</strong>{' '}
-                <strong className="text-gray-300">&quot;{t('settings.iosHomeScreen')}&quot;</strong>.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-400">
-                {t('settings.installDescription')}
-              </p>
-              <button
-                onClick={handleInstall}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform"
-              >
-                <Download size={18} />
-                {isInstallable ? t('settings.installNow') : t('settings.installApp2')}
-              </button>
-              {installError && (
-                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400" role="alert">
-                  {installError}
-                </p>
-              )}
-              {!isInstallable && (
-                <p className="text-xs text-gray-400">
-                  {t('settings.installTip')}
-                </p>
-              )}
-            </div>
-          )}
-        </section>
-      )}
-
-      {isInstalled && (
-        <section className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
-          <div className="flex items-center gap-2">
-            <Smartphone size={18} className="text-green-400" />
-            <span className="text-sm font-medium text-green-400">{t('settings.appInstalled')}</span>
-          </div>
-        </section>
-      )}
 
       {/* Appearance */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <Sun size={18} className="text-yellow-400" />
+          <Sun size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.appearance')}
         </h3>
         <button
@@ -487,7 +423,7 @@ export function Settings() {
       {/* Storage Locations */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <MapPin size={18} className="text-cyan-400" />
+          <MapPin size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.manageLocations')}
         </h3>
         <div className="mb-3 flex gap-2">
@@ -502,13 +438,13 @@ export function Settings() {
               onChange={(e) => setNewLocation(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddLocation()}
               placeholder={t('settings.newLocationPlaceholder')}
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 py-2 ps-9 pe-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+              className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 py-2 ps-9 pe-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
             />
           </div>
           <button
             onClick={handleAddLocation}
             disabled={!newLocation.trim()}
-            className="rounded-lg bg-green-700 px-3 py-2 text-white hover:bg-green-600 disabled:opacity-50"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-green-700 px-3 py-2 text-white hover:bg-green-600 disabled:opacity-50"
           >
             <Plus size={18} />
           </button>
@@ -531,9 +467,9 @@ export function Settings() {
                   deleteStorageLocation(loc.id!);
                 }}
                 aria-label={t('settings.deleteLocation', { name: loc.name })}
-                className="rounded p-1.5 text-gray-400 transition-colors hover:bg-primary-600 hover:text-red-400"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-primary-600 hover:text-red-400"
               >
-                <Trash2 size={14} />
+                <Trash2 size={18} />
               </button>
             </div>
           ))}
@@ -548,7 +484,7 @@ export function Settings() {
       {/* Data Management */}
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <HardDrive size={18} className="text-blue-400" />
+          <HardDrive size={18} className="text-[color:var(--pt-accent)]" />
           {t('settings.dataManagement')}
         </h3>
         <div className="space-y-2">
@@ -556,7 +492,7 @@ export function Settings() {
             onClick={handleExportJSON}
             className="flex w-full items-center gap-3 rounded-lg bg-primary-700/50 px-4 py-3 text-gray-200 hover:bg-primary-700"
           >
-            <FileJson size={20} className="text-blue-400" />
+            <FileJson size={20} className="text-[color:var(--pt-accent)]" />
             <div className="text-start">
               <span>{t('settings.jsonBackup')}</span>
               <p className="text-xs text-gray-400">{t('settings.jsonBackupDesc')}</p>
@@ -642,7 +578,7 @@ export function Settings() {
       {/* Sync */}
       <section className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4">
         <h3 className="mb-3 flex items-center gap-2 font-semibold text-gray-200">
-          <Cloud size={18} className="text-sky-400" />
+          <Cloud size={18} className="text-[color:var(--pt-accent)]" />
           {t('sync.title')}
         </h3>
 
@@ -658,7 +594,7 @@ export function Settings() {
               value={syncServerUrl}
               onChange={(e) => setSyncServerUrl(e.target.value)}
               placeholder="http://192.168.0.20:8787"
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+              className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
             />
           </div>
 
@@ -669,7 +605,7 @@ export function Settings() {
               value={syncDeviceName}
               onChange={(e) => setSyncDeviceName(e.target.value)}
               placeholder={t('sync.deviceNamePlaceholder')}
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+              className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
             />
           </div>
 
@@ -681,7 +617,7 @@ export function Settings() {
                 value={syncCode}
                 onChange={(e) => setSyncCode(e.target.value)}
                 placeholder={t('sync.syncCodePlaceholder')}
-                className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+                className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
               />
             </div>
           )}
@@ -689,7 +625,7 @@ export function Settings() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <button
               onClick={handleSaveSyncSettings}
-              className="rounded-lg bg-primary-700 px-3 py-2 text-sm text-gray-200 hover:bg-primary-600"
+              className="min-h-[44px] rounded-lg bg-primary-700 px-3 py-2 text-sm text-gray-200 hover:bg-primary-600"
             >
               {t('sync.saveSettings')}
             </button>
@@ -698,7 +634,7 @@ export function Settings() {
               <button
                 onClick={handlePairSyncDevice}
                 disabled={syncBusy}
-                className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-[44px] rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {showRepair ? t('sync.repairDevice') : t('sync.pairDevice')}
               </button>
@@ -706,7 +642,7 @@ export function Settings() {
               <button
                 onClick={handleSyncNowClick}
                 disabled={syncBusy || !syncConfigState.enabled}
-                className="flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RefreshCw size={15} className={syncBusy ? 'animate-spin' : ''} />
                 {t('sync.syncNow')}
@@ -716,7 +652,7 @@ export function Settings() {
 
           <button
             onClick={handleOpenSyncGuide}
-            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
+            className="min-h-[44px] w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
           >
             {t('sync.openGuide')}
           </button>
@@ -822,10 +758,10 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowImpressum(!showImpressum)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
-            <Info size={18} className="text-blue-400" />
+            <Info size={18} className="text-[color:var(--pt-accent)]" />
             {t('settings.impressum')}
           </h3>
           {showImpressum ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
@@ -859,7 +795,7 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowDatenschutz(!showDatenschutz)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Shield size={18} className="text-green-400" />
@@ -899,10 +835,10 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowAGB(!showAGB)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
-            <FileText size={18} className="text-blue-400" />
+            <FileText size={18} className="text-[color:var(--pt-accent)]" />
             {t('settings.terms')}
           </h3>
           {showAGB ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
