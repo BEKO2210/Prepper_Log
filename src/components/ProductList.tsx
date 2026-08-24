@@ -148,7 +148,7 @@ export function ProductList() {
         <h2 className="text-2xl font-bold text-gray-100">
           {showArchived ? t('products.archive') : t('products.title')}
         </h2>
-        <button onClick={() => setShowArchived(!showArchived)} className="text-sm text-green-400 hover:text-green-300">
+        <button onClick={() => setShowArchived(!showArchived)} className="-me-2 inline-flex min-h-[44px] items-center rounded-lg px-2 text-sm text-green-400 hover:text-green-300">
           {showArchived ? t('products.showActive') : t('products.showArchive')}
         </button>
       </div>
@@ -161,7 +161,7 @@ export function ProductList() {
             placeholder={t('products.searchPlaceholder')}
             value={filters.search}
             onChange={(e) => setFilter('search', e.target.value)}
-            className={`w-full rounded-lg border border-primary-600 bg-primary-800 py-2 ps-10 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none ${filters.search ? 'pe-10' : 'pe-4'}`}
+            className={`min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-800 py-2 ps-10 text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none ${filters.search ? 'pe-10' : 'pe-4'}`}
           />
           {filters.search && (
             <button
@@ -178,7 +178,7 @@ export function ProductList() {
           onClick={() => setShowFilters(!showFilters)}
           aria-label={t('products.filter')}
           aria-expanded={showFilters}
-          className={`flex items-center gap-1 rounded-lg border px-3 py-2 transition-colors ${hasActiveFilters ? 'border-green-500 text-green-400' : 'border-primary-600 text-gray-400 hover:text-gray-300'}`}
+          className={`flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg border px-3 py-2 transition-colors ${hasActiveFilters ? 'border-green-500 text-green-400' : 'border-primary-600 text-gray-400 hover:text-gray-300'}`}
         >
           <Filter size={18} />
           <ChevronDown size={14} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
@@ -196,17 +196,17 @@ export function ProductList() {
             )}
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <select value={filters.category} onChange={(e) => setFilter('category', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
+            <select value={filters.category} onChange={(e) => setFilter('category', e.target.value)} className="min-h-[44px] rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
               <option value="">{t('products.allCategories')}</option>
               {(['konserven', 'wasser', 'medizin', 'werkzeug', 'hygiene', 'lebensmittel', 'getranke', 'elektronik', 'kleidung', 'sonstiges'] as ProductCategory[]).map((key) => (
                 <option key={key} value={key}>{t(`categories.${key}`)}</option>
               ))}
             </select>
-            <select value={filters.location} onChange={(e) => setFilter('location', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
+            <select value={filters.location} onChange={(e) => setFilter('location', e.target.value)} className="min-h-[44px] rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
               <option value="">{t('products.allLocations')}</option>
               {locations.map((loc) => (<option key={loc.id} value={loc.name}>{loc.name}</option>))}
             </select>
-            <select value={filters.status} onChange={(e) => setFilter('status', e.target.value)} className="rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
+            <select value={filters.status} onChange={(e) => setFilter('status', e.target.value)} className="min-h-[44px] rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-300 focus:border-green-500 focus:outline-none">
               <option value="">{t('products.allStatus')}</option>
               <option value="expired">{t('products.statusExpired')}</option>
               <option value="critical">{t('products.statusCritical')}</option>
@@ -273,21 +273,21 @@ export function ProductList() {
                     )}
                   </div>
                   {!showArchived && (
-                    <div className="mt-2 flex gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-gray-200" title={t('products.edit')} aria-label={t('products.edit')}>
-                        <Edit3 size={16} />
+                    <div className="-ms-3 mt-2 flex gap-1.5">
+                      <button onClick={(e) => { e.stopPropagation(); setEditingProductId(product.id!); }} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-primary-700 hover:text-gray-200" title={t('products.edit')} aria-label={t('products.edit')}>
+                        <Edit3 size={18} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-green-400" title={t('products.consumed')} aria-label={t('products.consumed')}>
-                        <ShoppingCart size={16} />
+                      <button onClick={(e) => { e.stopPropagation(); setConsumeProduct(product.id!); }} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-primary-700 hover:text-green-400" title={t('products.consumed')} aria-label={t('products.consumed')}>
+                        <ShoppingCart size={18} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-red-400" title={t('products.delete')} aria-label={t('products.delete')}>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-primary-700 hover:text-red-400" title={t('products.delete')} aria-label={t('products.delete')}>
                         <Trash2 size={16} />
                       </button>
                     </div>
                   )}
                   {showArchived && (
-                    <div className="mt-2 flex gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-700 hover:text-red-400" title={t('products.delete')} aria-label={t('products.delete')}>
+                    <div className="-ms-3 mt-2 flex gap-1.5">
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(product.id!); }} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-primary-700 hover:text-red-400" title={t('products.delete')} aria-label={t('products.delete')}>
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -298,8 +298,8 @@ export function ProductList() {
                 <div className="mt-2 flex items-center justify-between rounded-lg border border-red-500/30 bg-red-500/10 p-2">
                   <span className="text-sm text-red-400">{t('products.confirmDelete')}</span>
                   <div className="flex gap-2">
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(product.id!); }} className="rounded bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500">{t('products.deleteBtn')}</button>
-                    <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }} className="rounded bg-primary-700 px-3 py-1 text-xs text-gray-300 hover:bg-primary-600">{t('products.cancel')}</button>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(product.id!); }} className="min-h-[44px] rounded-lg bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500">{t('products.deleteBtn')}</button>
+                    <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }} className="min-h-[44px] rounded-lg bg-primary-700 px-3 py-1 text-xs text-gray-300 hover:bg-primary-600">{t('products.cancel')}</button>
                   </div>
                 </div>
               )}
@@ -443,14 +443,14 @@ function ConsumeModal({ productId, products, onConfirm, onClose }: { productId: 
             if (val < step || (fraction < 1 && val === max)) return null;
             const label = fraction === 1 ? t('consume.allQuick') : `${Math.round(fraction * 100)}%`;
             return (
-              <button key={fraction} onClick={() => setAmount(val)} className={`flex-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${amount === val ? 'border-green-500 bg-green-500/10 text-green-400' : 'border-primary-600 text-gray-400 hover:bg-primary-700'}`}>{label}</button>
+              <button key={fraction} onClick={() => setAmount(val)} className={`min-h-[44px] flex-1 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${amount === val ? 'border-green-500 bg-green-500/10 text-green-400' : 'border-primary-600 text-gray-400 hover:bg-primary-700'}`}>{label}</button>
             );
           })}
         </div>
         {isAll && <p className="mb-4 rounded-lg border border-orange-500/30 bg-orange-500/5 px-3 py-2 text-xs text-orange-300">{t('consume.archiveWarning')}</p>}
         <div className="flex gap-2">
           <button onClick={() => onConfirm(productId, amount)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
-            <ShoppingCart size={16} />
+            <ShoppingCart size={18} />
             {t('consume.takeBtn', { amount, unit: product.unit })}
           </button>
           <button onClick={onClose} className="rounded-lg border border-primary-600 px-4 py-2.5 text-sm text-gray-400 hover:bg-primary-700">{t('consume.cancel')}</button>

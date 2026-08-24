@@ -144,12 +144,12 @@ export function Dashboard() {
         <div className="flex flex-col items-center text-center">
           <p className="mt-5 text-xl font-semibold text-gray-200">{t('dashboard.noProducts')}</p>
           <p className="mt-2 max-w-xs text-sm text-gray-400">{t('dashboard.noProductsDesc')}</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex items-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
+          <div className="mt-6 flex w-full max-w-xs flex-col gap-3">
+            <button onClick={() => { setEditingProductId(null); setPage('add'); }} className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-3 font-medium text-white hover:bg-green-600 active:scale-[0.98] transition-transform">
               <PlusCircle size={18} />
               {t('nav.add')}
             </button>
-            <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-primary-600 bg-primary-800 px-5 py-3 font-medium text-gray-300 hover:border-green-500 hover:text-gray-200 active:scale-[0.98] transition-transform">
+            <button onClick={() => fileInputRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-xl border border-green-600/40 bg-transparent px-5 py-3 font-medium text-green-400 hover:border-green-500 hover:bg-green-500/10 active:scale-[0.98] transition-transform">
               <Upload size={18} />
               {t('onboarding.startImport')}
             </button>
@@ -263,9 +263,9 @@ export function Dashboard() {
             {stats.soonCount > 0 && <div className="bg-yellow-400 transition-all" style={{ width: `${(stats.soonCount / total) * 100}%` }} />}
             {stats.goodCount > 0 && <div className="bg-green-500 transition-all" style={{ width: `${(stats.goodCount / total) * 100}%` }} />}
           </div>
-          <div className="flex justify-between text-[0.6rem] text-gray-400">
+          <div className="flex justify-between text-xs text-gray-400">
             <span>{t('dashboard.expired_count', { count: stats.expiredCount })}</span>
-            <span>{t('dashboard.warning_count', { count: stats.warningCount + stats.soonCount })}</span>
+            <span>{t('dashboard.warning_count', { count: stats.criticalCount + stats.warningCount + stats.soonCount })}</span>
             <span>{t('dashboard.ok_count', { count: stats.goodCount })}</span>
           </div>
         </div>
@@ -278,7 +278,7 @@ export function Dashboard() {
             title={t('dashboard.urgent')}
             tone="orange"
             action={
-              <button onClick={() => setPage('products')} className="flex shrink-0 items-center gap-0.5 text-xs text-green-400 hover:text-green-300">
+              <button onClick={() => setPage('products')} className="-me-2 flex min-h-[44px] shrink-0 items-center gap-0.5 rounded-lg px-2 text-xs text-green-400 hover:text-green-300">
                 {t('dashboard.all')} <ChevronRight size={14} />
               </button>
             }
@@ -302,8 +302,8 @@ export function Dashboard() {
 
       <div className="grid grid-cols-2 gap-3">
         {categoryBreakdown.length > 0 && (
-          <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-            <h2 className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.categories')}</h2>
+          <div className="self-start rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
+            <h2 className="mb-2 text-[0.7rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.categories')}</h2>
             <div className="space-y-1.5">
               {categoryBreakdown.map(({ key, label, count }) => (
                 <div key={key} className="flex items-center justify-between">
@@ -318,12 +318,12 @@ export function Dashboard() {
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
             <div className="flex items-center gap-2">
               <TrendingDown size={14} className="text-yellow-400" />
-              <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.lowStock')}</span>
+              <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.lowStock')}</span>
             </div>
             <p className={`stat-number mt-1 text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-yellow-400' : 'text-gray-300'}`}><CountUp value={stats.lowStockCount} /></p>
           </div>
           <div className="rounded-2xl border border-primary-700 bg-primary-800/60 p-3">
-            <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.storageLocations')}</span>
+            <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-gray-400">{t('dashboard.storageLocations')}</span>
             <p className="stat-number mt-1 text-2xl font-bold text-gray-300"><CountUp value={stats.totalLocations} /></p>
           </div>
         </div>

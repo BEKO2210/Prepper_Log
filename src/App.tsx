@@ -103,7 +103,7 @@ export default function App() {
             </div>
           </header>
 
-          <main className="mx-auto max-w-2xl px-4 pb-24 pt-4">
+          <main className="mx-auto max-w-2xl px-4 pt-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
             {/* No AnimatePresence / mode="wait": exit-gated transitions can
                 deadlock on rapid tab switches and leave the page blank. A plain
                 keyed fade-in remounts the page on navigation — the old page

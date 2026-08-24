@@ -245,7 +245,7 @@ function InlineScanner({ onScanned, autoStart = false }: { onScanned: (data: { b
         <button
           type="button"
           onClick={() => { stopCamera(); reset(); setExpanded(false); }}
-          className="rounded-lg p-1 text-gray-400 hover:bg-primary-700 hover:text-gray-200"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 hover:bg-primary-700 hover:text-gray-200"
         >
           <ChevronDown size={18} />
         </button>
@@ -471,7 +471,7 @@ function DateScanner({ onResult }: { onResult: (parsed: ParsedExpiry) => void })
       <button
         type="button"
         onClick={() => { setExpanded(true); startCamera(); }}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-green-500/40 bg-green-500/5 px-4 py-2.5 text-sm font-medium text-green-400 transition-colors hover:border-green-500/60 hover:bg-green-500/10"
+        className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg border border-dashed border-green-500/40 bg-green-500/5 px-4 py-2.5 text-sm font-medium text-green-400 transition-colors hover:border-green-500/60 hover:bg-green-500/10"
       >
         <ScanText size={16} />
         {t('form.ocrScanDate')}
@@ -483,7 +483,7 @@ function DateScanner({ onResult }: { onResult: (parsed: ParsedExpiry) => void })
     <div className="space-y-2 rounded-xl border border-primary-600 bg-primary-800/50 p-3">
       <div className="flex items-center justify-between text-sm font-medium text-gray-300">
         <div className="flex items-center gap-2"><ScanText size={16} /> {t('form.ocrScanDate')}</div>
-        <button type="button" onClick={close} aria-label={t('pwa.close')} className="rounded-lg p-1 text-gray-400 hover:bg-primary-700 hover:text-gray-200">
+        <button type="button" onClick={close} aria-label={t('pwa.close')} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 hover:bg-primary-700 hover:text-gray-200">
           <X size={18} />
         </button>
       </div>
@@ -750,10 +750,10 @@ export function ProductForm() {
               </div>
             ) : (
               <div className="flex gap-2">
-                <button type="button" onClick={handleCameraClick} className="hidden items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500">
+                <button type="button" onClick={handleCameraClick} className="hidden min-h-[44px] items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500">
                   <Camera size={18} /> {t('form.camera')}
                 </button>
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500">
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="flex min-h-[44px] items-center gap-2 rounded-lg border border-primary-600 bg-primary-800 px-4 py-2 text-sm text-gray-300 hover:border-green-500">
                   <Upload size={18} /> {t('form.gallery')}
                 </button>
               </div>

@@ -288,7 +288,7 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowInfo(!showInfo)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Info size={18} className="text-green-400" />
@@ -502,13 +502,13 @@ export function Settings() {
               onChange={(e) => setNewLocation(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddLocation()}
               placeholder={t('settings.newLocationPlaceholder')}
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 py-2 ps-9 pe-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
+              className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 py-2 ps-9 pe-4 text-sm text-gray-200 placeholder-gray-500 focus:border-green-500 focus:outline-none"
             />
           </div>
           <button
             onClick={handleAddLocation}
             disabled={!newLocation.trim()}
-            className="rounded-lg bg-green-700 px-3 py-2 text-white hover:bg-green-600 disabled:opacity-50"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-green-700 px-3 py-2 text-white hover:bg-green-600 disabled:opacity-50"
           >
             <Plus size={18} />
           </button>
@@ -531,9 +531,9 @@ export function Settings() {
                   deleteStorageLocation(loc.id!);
                 }}
                 aria-label={t('settings.deleteLocation', { name: loc.name })}
-                className="rounded p-1.5 text-gray-400 transition-colors hover:bg-primary-600 hover:text-red-400"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-primary-600 hover:text-red-400"
               >
-                <Trash2 size={14} />
+                <Trash2 size={18} />
               </button>
             </div>
           ))}
@@ -658,7 +658,7 @@ export function Settings() {
               value={syncServerUrl}
               onChange={(e) => setSyncServerUrl(e.target.value)}
               placeholder="http://192.168.0.20:8787"
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+              className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
             />
           </div>
 
@@ -669,7 +669,7 @@ export function Settings() {
               value={syncDeviceName}
               onChange={(e) => setSyncDeviceName(e.target.value)}
               placeholder={t('sync.deviceNamePlaceholder')}
-              className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+              className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
             />
           </div>
 
@@ -681,7 +681,7 @@ export function Settings() {
                 value={syncCode}
                 onChange={(e) => setSyncCode(e.target.value)}
                 placeholder={t('sync.syncCodePlaceholder')}
-                className="w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
+                className="min-h-[44px] w-full rounded-lg border border-primary-600 bg-primary-900 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-sky-500 focus:outline-none"
               />
             </div>
           )}
@@ -689,7 +689,7 @@ export function Settings() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <button
               onClick={handleSaveSyncSettings}
-              className="rounded-lg bg-primary-700 px-3 py-2 text-sm text-gray-200 hover:bg-primary-600"
+              className="min-h-[44px] rounded-lg bg-primary-700 px-3 py-2 text-sm text-gray-200 hover:bg-primary-600"
             >
               {t('sync.saveSettings')}
             </button>
@@ -698,7 +698,7 @@ export function Settings() {
               <button
                 onClick={handlePairSyncDevice}
                 disabled={syncBusy}
-                className="rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-[44px] rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {showRepair ? t('sync.repairDevice') : t('sync.pairDevice')}
               </button>
@@ -706,7 +706,7 @@ export function Settings() {
               <button
                 onClick={handleSyncNowClick}
                 disabled={syncBusy || !syncConfigState.enabled}
-                className="flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RefreshCw size={15} className={syncBusy ? 'animate-spin' : ''} />
                 {t('sync.syncNow')}
@@ -716,7 +716,7 @@ export function Settings() {
 
           <button
             onClick={handleOpenSyncGuide}
-            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
+            className="min-h-[44px] w-full rounded-lg bg-sky-600 px-3 py-2 text-sm font-medium text-white hover:bg-sky-500"
           >
             {t('sync.openGuide')}
           </button>
@@ -822,7 +822,7 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowImpressum(!showImpressum)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Info size={18} className="text-blue-400" />
@@ -859,7 +859,7 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowDatenschutz(!showDatenschutz)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <Shield size={18} className="text-green-400" />
@@ -899,7 +899,7 @@ export function Settings() {
       <section className="rounded-xl border border-primary-700 bg-primary-800/60 p-4">
         <button
           onClick={() => setShowAGB(!showAGB)}
-          className="flex w-full items-center justify-between"
+          className="flex min-h-[44px] w-full items-center justify-between"
         >
           <h3 className="flex items-center gap-2 font-semibold text-gray-200">
             <FileText size={18} className="text-blue-400" />
