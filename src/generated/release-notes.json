@@ -1,15 +1,11 @@
 {
-  "version": "2.0.17",
-  "generatedAt": "2026-08-24T12:17:10.656Z",
-  "sinceTag": "v2.0.17",
+  "version": "2.0.18",
+  "generatedAt": "2026-08-24T12:46:39.098Z",
+  "sinceTag": null,
   "items": [
     {
-      "message": "wip(ui): Gestaltungsgrundlage Lagerlogbuch (Web, geparkt)",
-      "sha": "31030d3"
-    },
-    {
-      "message": "fix(ui): Touch-Ziele auf 44px und Ausrichtung bei 412px",
-      "sha": "ed1358d"
+      "message": "Merge pull request #101 from BEKO2210/polish/touch-targets-412",
+      "sha": "cc1cf76"
     }
   ]
 }
